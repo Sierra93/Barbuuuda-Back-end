@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Barbuuuda.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201224185647_TestStashChangedMigration")]
-    partial class TestStashChangedMigration
+    [Migration("20201225161101_AddTableHeadersTest.")]
+    partial class AddTableHeadersTest
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -262,6 +262,35 @@ namespace Barbuuuda.Migrations
                     b.HasKey("TypeId");
 
                     b.ToTable("TaskTypes", "dbo");
+                });
+
+            modelBuilder.Entity("Barbuuuda.Models.User.HeaderTypeDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("HeaderField")
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("header_field");
+
+                    b.Property<string>("HeaderIcon")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("header_icon");
+
+                    b.Property<string>("HeaderType")
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("header_type");
+
+                    b.Property<string>("ProfileField")
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("profile_field");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Headers", "dbo");
                 });
 
             modelBuilder.Entity("Barbuuuda.Models.User.UserDto", b =>

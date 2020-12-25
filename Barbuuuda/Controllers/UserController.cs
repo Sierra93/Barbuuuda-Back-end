@@ -1,5 +1,6 @@
 ﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Core.ViewModels.User;
 using Barbuuuda.Models.User;
 using Barbuuuda.Services;
 using Microsoft.AspNetCore.Http;
@@ -47,13 +48,25 @@ namespace Barbuuuda.Controllers {
         /// <summary>
         /// Метод проверяет, авторизован ли юзер, если нет, то вернет false, иначе true.
         /// </summary>
-        /// <param name="userId">Id юзера.</param>
+        /// <param name="role">Роль юзера.</param>
         /// <returns>true/false</returns>
-        [HttpGet, Route("authorize/{userId}")]
-        public async Task<IActionResult> Authorize([FromRoute] int userId) {
+        [HttpPost, Route("authorize/{login}")]
+        public async Task<IActionResult> Authorize([FromBody] UserAuthorizeVm user) {
             IUser _user = new UserService(_db);
 
-            return Ok(await _user.Authorize(userId));
+            // Проверяет, авторизован ли юзер.
+            bool bAuthorize = await _user.Authorize(user.UserLogin);
+
+            // В зависимости от роли юзера формирует хидер.
+            IList<HeaderTypeDto> aHeaderFields = await _user.GetHeader(user.UserRole);
+
+            // Результирующий объект.
+            object oObj = new {
+                bAuthorize,
+                aHeaderFields
+            };
+
+            return Ok(oObj);
         }
     }
 }

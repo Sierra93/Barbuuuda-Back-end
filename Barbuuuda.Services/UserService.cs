@@ -223,13 +223,13 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="userId">Id юзера.</param>
         /// <returns>true/false</returns>
-        public async Task<bool> Authorize(int userId) {
+        public async Task<bool> Authorize(string login) {
             try {
-                if (userId == 0) {
+                if (string.IsNullOrEmpty(login)) {
                     throw new ArgumentNullException();
                 }
 
-                return await _db.Users.Where(u => u.UserId.Equals(userId)).Select(t => t.Token != null).FirstOrDefaultAsync();
+                return await _db.Users.Where(u => u.UserId.Equals(login)).Select(t => t.Token != null).FirstOrDefaultAsync();
             }
 
             catch (ArgumentNullException ex) {
@@ -238,6 +238,33 @@ namespace Barbuuuda.Services {
 
             catch (ArgumentException ex) {
                 throw new ArgumentException("Пользователя с таким Id не существует", ex.Message.ToString());
+            }
+
+            catch (Exception ex) {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод получает хидер в зависимости от роли.
+        /// </summary>
+        /// <param name="role">Роль юзера.</param>
+        /// <returns></returns>
+        public async Task<IList<HeaderTypeDto>> GetHeader(string role) {
+            try {
+                if (string.IsNullOrEmpty(role)) {
+                    throw new ArgumentNullException();
+                }
+
+                return await _db.Headers.Where(h => h.HeaderType.Equals(role)).ToListAsync();
+            }
+
+            catch (IndexOutOfRangeException ex) {
+                throw new IndexOutOfRangeException($"Поля этой роли не сформированы {ex.Message}");
+            }
+
+            catch (ArgumentNullException ex) {
+                throw new ArgumentNullException($"Роль пользователя не передана {ex.Message}");
             }
 
             catch (Exception ex) {

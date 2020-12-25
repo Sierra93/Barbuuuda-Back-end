@@ -29,13 +29,13 @@ namespace Barbuuuda {
                 builder.WithOrigins("http://localhost:8080/", "http://localhost:8080").AllowAnyMethod().AllowAnyHeader();
             }));
 
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //  options.UseSqlServer(
-            //      Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
-
             services.AddDbContext<ApplicationDbContext>(options =>
               options.UseSqlServer(
-                  Configuration.GetConnectionString("TestConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+                  Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //  options.UseSqlServer(
+            //      Configuration.GetConnectionString("TestConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

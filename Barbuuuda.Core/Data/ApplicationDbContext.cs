@@ -30,6 +30,8 @@ namespace Barbuuuda.Core.Data {
 
         public DbSet<TaskDto> Tasks { get; set; }   // Таблица заданий.
 
+        public DbSet<HeaderTypeDto> Headers { get; set; }   // Таблица полей хидера.
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }

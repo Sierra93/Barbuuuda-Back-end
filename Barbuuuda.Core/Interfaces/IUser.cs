@@ -27,6 +27,13 @@ namespace Barbuuuda.Core.Interfaces {
         /// </summary>
         /// <param name="userId">Id юзера.</param>
         /// <returns>true/false</returns>
-        Task<bool> Authorize(int userId);
+        Task<bool> Authorize(string login);
+
+        /// <summary>
+        /// Метод получает хидер в зависимости от роли.
+        /// </summary>
+        /// <param name="role">Роль юзера.</param>
+        /// <returns></returns>
+        Task<IList<HeaderTypeDto>> GetHeader(string role);
     }
 }
