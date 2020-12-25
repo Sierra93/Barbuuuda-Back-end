@@ -48,9 +48,9 @@ namespace Barbuuuda.Controllers {
         /// <summary>
         /// Метод проверяет, авторизован ли юзер, если нет, то вернет false, иначе true.
         /// </summary>
-        /// <param name="role">Роль юзера.</param>
+        /// <param name="user">Объект для авторизации юзера.</param>
         /// <returns>true/false</returns>
-        [HttpPost, Route("authorize/{login}")]
+        [HttpPost, Route("authorize")]
         public async Task<IActionResult> Authorize([FromBody] UserAuthorizeVm user) {
             IUser _user = new UserService(_db);
 
