@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Barbuuuda.Core.Data {
     public class ApplicationDbContext : DbContext {
-        public DbSet<UserDto> Users { get; set; }    // Таблица пользователей.
+        //public DbSet<UserDto> Users { get; set; }    // Таблица пользователей.
 
         //public DbSet<LoggerDto> Logs { get; set; }   // Таблица логов.
 

@@ -26,12 +26,20 @@ namespace Barbuuuda {
             services.AddControllers();
 
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder => {
-                builder.WithOrigins("http://localhost:8080/", "http://localhost:8080").AllowAnyMethod().AllowAnyHeader();
+                builder.WithOrigins(
+                    "http://localhost:8080/",
+                    "http://localhost:8080",
+                    "https://publico-dev.xyz",
+                    "https://publico-dev.xyz/")
+                .AllowAnyMethod().AllowAnyHeader();
             }));
 
             services.AddDbContext<ApplicationDbContext>(options =>
               options.UseSqlServer(
                   Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+
+            services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
+        opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
             //services.AddDbContext<ApplicationDbContext>(options =>
             //  options.UseSqlServer(

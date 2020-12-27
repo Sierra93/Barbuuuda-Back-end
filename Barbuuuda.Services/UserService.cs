@@ -18,9 +18,11 @@ namespace Barbuuuda.Services {
     /// </summary>
     public class UserService : IUser {
         ApplicationDbContext _db;
+        PostgreDbContext _postgre;
 
-        public UserService(ApplicationDbContext db) {
+        public UserService(ApplicationDbContext db, PostgreDbContext postgre) {
             _db = db;
+            _postgre = postgre;
         }
 
         /// <summary>
@@ -43,8 +45,8 @@ namespace Barbuuuda.Services {
                     string hashPass = HashMD5.HashPassword(user.UserPassword);
                     user.UserPassword = hashPass;
 
-                    await _db.Users.AddAsync(user);
-                    await _db.SaveChangesAsync();
+                    await _postgre.Users.AddAsync(user);
+                    await _postgre.SaveChangesAsync();
 
                     return user;
                 }
@@ -71,13 +73,13 @@ namespace Barbuuuda.Services {
         /// <returns>Статус true/false</returns>
         async Task<bool> IdentityUser(string login, string email, string phone) {
             // Ищет по логину.
-            UserDto isUserLogin = await _db.Users.Where(u => u.UserLogin.Equals(login)).FirstOrDefaultAsync();
+            UserDto isUserLogin = await _postgre.Users.Where(u => u.UserLogin.Equals(login)).FirstOrDefaultAsync();
 
             // Ищет по email.
-            UserDto isUserEmail = await _db.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
+            UserDto isUserEmail = await _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
 
             // Ищет по телефону.
-            UserDto isUserPhone = await _db.Users.Where(u => u.UserPhone.Equals(phone)).FirstOrDefaultAsync();
+            UserDto isUserPhone = await _postgre.Users.Where(u => u.UserPhone.Equals(phone)).FirstOrDefaultAsync();
 
             if (isUserLogin != null || isUserEmail != null || isUserPhone != null) {
                 return true;
@@ -88,7 +90,7 @@ namespace Barbuuuda.Services {
 
         async Task<bool> IdentityUser(string email) {
             // Ищет по email.
-            UserDto isUserEmail = await _db.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
+            UserDto isUserEmail = await _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
 
             if (isUserEmail != null) {
                 return true;
@@ -138,7 +140,7 @@ namespace Barbuuuda.Services {
                         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
                         // Записывает токен юзеру.
-                        UserDto updateUser = await _db.Users.Where(u => u.UserEmail.Equals(user.UserEmail)).FirstOrDefaultAsync();
+                        UserDto updateUser = await _postgre.Users.Where(u => u.UserEmail.Equals(user.UserEmail)).FirstOrDefaultAsync();
                         updateUser.Token = encodedJwt;
 
                         var response = new {
@@ -147,7 +149,7 @@ namespace Barbuuuda.Services {
                             role = updateUser.UserType
                         };
 
-                        _db.Users.Update(updateUser);
+                        _postgre.Users.Update(updateUser);
                         await _db.SaveChangesAsync();
 
                         return response;
@@ -193,7 +195,7 @@ namespace Barbuuuda.Services {
         /// <param name="login"></param>
         /// <returns></returns>
         public async Task<bool> GetUserPassword(string password) {
-            UserDto oUser = await _db.Users.Where(p => p.UserPassword.Equals(password)).FirstOrDefaultAsync();
+            UserDto oUser = await _postgre.Users.Where(p => p.UserPassword.Equals(password)).FirstOrDefaultAsync();
 
             if (oUser == null) {
                 return false;
@@ -203,7 +205,7 @@ namespace Barbuuuda.Services {
         }
 
         async Task<ClaimsIdentity> GetUserDB(string email) {
-            UserDto oUser = await _db.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
+            UserDto oUser = await _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
 
             if (oUser != null) {
                 var claims = new List<Claim> {
@@ -229,7 +231,7 @@ namespace Barbuuuda.Services {
                     throw new ArgumentNullException();
                 }
 
-                return await _db.Users.Where(u => u.UserId.Equals(login)).Select(t => t.Token != null).FirstOrDefaultAsync();
+                return await _postgre.Users.Where(u => u.UserId.Equals(login)).Select(t => t.Token != null).FirstOrDefaultAsync();
             }
 
             catch (ArgumentNullException ex) {

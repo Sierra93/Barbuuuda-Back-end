@@ -17,9 +17,11 @@ namespace Barbuuuda.Controllers {
     [ApiController, Route("user")]
     public class UserController : ControllerBase {
         ApplicationDbContext _db;
+        PostgreDbContext _postgre;
 
-        public UserController(ApplicationDbContext db) {
+        public UserController(ApplicationDbContext db, PostgreDbContext postgre) {
             _db = db;
+            _postgre = postgre;
         }
 
 
@@ -28,7 +30,7 @@ namespace Barbuuuda.Controllers {
         /// </summary>
         [HttpPost, Route("create")]
         public async Task<IActionResult> Create([FromBody] UserDto user) {
-            IUser _user = new UserService(_db);
+            IUser _user = new UserService(_db, _postgre);
             UserDto oUser = await _user.Create(user);
 
             return Ok(oUser);
@@ -39,7 +41,7 @@ namespace Barbuuuda.Controllers {
         /// </summary>
         [HttpPost, Route("login")]
         public async Task<IActionResult> Login([FromBody] UserDto user) {
-            IUser _user = new UserService(_db);
+            IUser _user = new UserService(_db, _postgre);
             var oUser = await _user.Login(user);
 
             return Ok(oUser);
@@ -52,7 +54,7 @@ namespace Barbuuuda.Controllers {
         /// <returns>true/false</returns>
         [HttpPost, Route("authorize")]
         public async Task<IActionResult> Authorize([FromBody] UserAuthorizeVm user) {
-            IUser _user = new UserService(_db);
+            IUser _user = new UserService(_db, _postgre);
 
             // Проверяет, авторизован ли юзер.
             bool bAuthorize = await _user.Authorize(user.UserLogin);

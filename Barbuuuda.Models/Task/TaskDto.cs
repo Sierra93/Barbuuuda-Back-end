@@ -53,10 +53,10 @@ namespace Barbuuuda.Models.Task {
         [Column("task_price", TypeName = "money")]
         public double? TaskPrice { get; set; }   // Бюджет задания в цифрах либо по дефолту "По договоренности".
 
-        [Column("task_title", TypeName = "nvarchar(200)")]
+        [Column("task_title", TypeName = "text")]
         public string TaskTitle { get; set; }   // Заголовок задания.
 
-        [Column("task_detail", TypeName = "nvarchar(max)")]
+        [Column("task_detail", TypeName = "text")]
         public string TaskDetail { get; set; }  // Описание задания.
 
     }
