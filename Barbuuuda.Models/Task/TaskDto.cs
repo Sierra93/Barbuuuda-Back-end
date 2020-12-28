@@ -35,23 +35,14 @@ namespace Barbuuuda.Models.Task {
         [Column("count_views", TypeName = "integer")]
         public int CountViews { get; set; }     // Кол-во просмотров задания.
 
-        [Column("task_type_id", TypeName = "integer")]
-        public int TaskTypeId { get; set; } // Id типа заданий (для всех, для про).
+        [Column("type_code", TypeName = "varchar(100)")]
+        public string TypeCode { get; set; } // Id типа заданий (для всех, для про).
 
-        [ForeignKey("TaskTypeId")]
-        public TaskTypeDto Type { get; set; }
+        [Column("status_code", TypeName = "varchar(100)")]
+        public string StatusCode { get; set; }   // Id статуса задания.
 
-        [Column("task_status_id", TypeName = "integer")]
-        public int TaskStatusId { get; set; }   // Id статуса задания.
-
-        [ForeignKey("TaskStatusId")]
-        public TaskStatusDto Status { get; set; }
-
-        [Column("task_category_id", TypeName = "integer")]
-        public int TaskCategoryId { get; set; }     // Id категории задания (программирование и тд).
-
-        [ForeignKey("TaskCategoryId")]
-        public TaskCategoryDto Category { get; set; }
+        [Column("category_code", TypeName = "varchar(100)")]
+        public string CategoryCode { get; set; }     // Id категории задания (программирование и тд).
 
         [Column("task_price", TypeName = "money")]
         public double? TaskPrice { get; set; }   // Бюджет задания в цифрах либо по дефолту "По договоренности".
@@ -62,10 +53,7 @@ namespace Barbuuuda.Models.Task {
         [Column("task_detail", TypeName = "text")]
         public string TaskDetail { get; set; }  // Описание задания.
 
-        [Column("spec_id", TypeName = "integer")]
-        public int SpecId { get; set; }
-
-        [ForeignKey("TaskSpecId")]
-        public int Spec { get; set; }
+        [Column("spec_code", TypeName = "varchar(100)")]
+        public string SpecCode { get; set; }
     }
 }

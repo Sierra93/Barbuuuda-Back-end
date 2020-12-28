@@ -13,6 +13,9 @@ namespace Barbuuuda.Models.Task {
         [Key, Column("status_id")]
         public int StatusId { get; set; }
 
+        [Column("status_code", TypeName = "varchar(100)")]
+        public string StatusCode { get; set; }  // Код статуса.
+
         [Column("status_name", TypeName = "varchar(100)")]
         public string StatusName { get; set; }
     }

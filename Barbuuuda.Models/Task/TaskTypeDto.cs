@@ -13,6 +13,9 @@ namespace Barbuuuda.Models.Task {
         [Key, Column("type_id")]
         public int TypeId { get; set; }
 
+        [Column("type_code", TypeName = "varchar(100)")]
+        public string TypeCode { get; set; }  // Код типа.
+
         [Column("type_name", TypeName = "varchar(100)")]
         public string TypeName { get; set; }    // Название типа задания.
     }

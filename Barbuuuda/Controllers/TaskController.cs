@@ -1,4 +1,7 @@
 ﻿using Barbuuuda.Core.Data;
+using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Models.Task;
+using Barbuuuda.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -18,6 +21,20 @@ namespace Barbuuuda.Controllers {
         public TaskController(ApplicationDbContext db, PostgreDbContext postgre) {
             _db = db;
             _postgre = postgre;
+        }
+
+        
+        /// <summary>
+        /// Метод создает новое задание.
+        /// </summary>
+        /// <param name="task">Объект с данными задания.</param>
+        /// <returns>Вернет данные созданного задания.</returns>
+        [HttpPost, Route("create")]
+        public async Task<IActionResult> CreateTask([FromBody] TaskDto task) {
+            ITask _task = new TaskService(_db, _postgre);
+            TaskDto oTask = await _task.CreateTask(task);
+
+            return Ok(oTask);
         }
     }
 }

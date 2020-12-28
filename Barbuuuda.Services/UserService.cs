@@ -223,7 +223,7 @@ namespace Barbuuuda.Services {
         /// <summary>
         /// Метод проверяет, авторизован ли юзер, если нет, то вернет false, иначе true.
         /// </summary>
-        /// <param name="userId">Id юзера.</param>
+        /// <param name="login">Логин юзера.</param>
         /// <returns>true/false</returns>
         public async Task<bool> Authorize(string login) {
             try {
@@ -235,11 +235,7 @@ namespace Barbuuuda.Services {
             }
 
             catch (ArgumentNullException ex) {
-                throw new ArgumentNullException("UserId не передан", ex.Message.ToString());
-            }
-
-            catch (ArgumentException ex) {
-                throw new ArgumentException("Пользователя с таким Id не существует", ex.Message.ToString());
+                throw new ArgumentNullException("Логин пользователя не передан", ex.Message.ToString());
             }
 
             catch (Exception ex) {

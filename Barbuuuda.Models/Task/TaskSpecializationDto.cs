@@ -13,6 +13,9 @@ namespace Barbuuuda.Models.Task {
         [Key, Column("spec_id")]
         public int SpecId { get; set; }
 
+        [Column("spec_code", TypeName = "varchar(100)")]
+        public string SpecCode { get; set; }  // Код специализации.
+
         [Column("spec_name", TypeName = "varchar(200)")]
         public string SpecName { get; set; }    // Название специализации.
     }

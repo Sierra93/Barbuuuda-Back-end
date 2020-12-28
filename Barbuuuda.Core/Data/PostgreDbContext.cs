@@ -13,6 +13,12 @@ namespace Barbuuuda.Core.Data {
 
         public DbSet<TaskSpecializationDto> TaskSpecializations { get; set; }   // Таблица специализаций.
 
+        public DbSet<TaskStatusDto> TaskStatuses { get; set; }   // Таблица статусов заданий.
+
+        public DbSet<TaskCategoryDto> TaskCategories { get; set; }   // Таблица категорий заданий.
+
+        public DbSet<TaskTypeDto> TaskTypes { get; set; }   // Таблица типов заданий.
+
         public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }
