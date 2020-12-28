@@ -11,6 +11,8 @@ namespace Barbuuuda.Core.Data {
 
         public DbSet<TaskDto> Tasks { get; set; }    // Таблица предложений поставщикам.
 
+        public DbSet<TaskSpecializationDto> TaskSpecializations { get; set; }   // Таблица специализаций.
+
         public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }

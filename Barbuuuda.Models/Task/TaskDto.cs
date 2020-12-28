@@ -14,39 +14,42 @@ namespace Barbuuuda.Models.Task {
         [Key, Column("task_id")]
         public int TaskId { get; set; }
 
-        [Required, Column("owner_id", TypeName = "int")]
+        [Required, Column("owner_id", TypeName = "integer")]
         public int OwnerId { get; set; }    // Id заказчика, который создал задание.
 
         [ForeignKey("OwnerId")]
         public UserDto Owner { get; set; }
 
-        [Column("executor_id", TypeName = "int")]
+        [Column("executor_id", TypeName = "integer")]
         public int? ExecutorId { get; set; }
 
         [ForeignKey("ExecutorId")]
         public UserDto Executor { get; set; }   // Id исполнителя, который выполняет задание.
 
-        [Column("date_create_task", TypeName = "datetime")]
+        [Column("date_create_task", TypeName = "timestamp")]
         public DateTime DateCreateTask { get; set; }    // Дата создания задачи.
 
-        [Column("count_offers", TypeName = "int")]
+        [Column("count_offers", TypeName = "integer")]
         public int CountOffers { get; set; }    // Кол-во ставок к заданию.
 
-        [Column("count_views", TypeName = "int")]
+        [Column("count_views", TypeName = "integer")]
         public int CountViews { get; set; }     // Кол-во просмотров задания.
 
-        [Column("task_type_id", TypeName = "int")]
+        [Column("task_type_id", TypeName = "integer")]
         public int TaskTypeId { get; set; } // Id типа заданий (для всех, для про).
+
         [ForeignKey("TaskTypeId")]
         public TaskTypeDto Type { get; set; }
 
-        [Column("task_status_id", TypeName = "int")]
+        [Column("task_status_id", TypeName = "integer")]
         public int TaskStatusId { get; set; }   // Id статуса задания.
+
         [ForeignKey("TaskStatusId")]
         public TaskStatusDto Status { get; set; }
 
-        [Column("task_category_id", TypeName = "int")]
+        [Column("task_category_id", TypeName = "integer")]
         public int TaskCategoryId { get; set; }     // Id категории задания (программирование и тд).
+
         [ForeignKey("TaskCategoryId")]
         public TaskCategoryDto Category { get; set; }
 
@@ -59,5 +62,10 @@ namespace Barbuuuda.Models.Task {
         [Column("task_detail", TypeName = "text")]
         public string TaskDetail { get; set; }  // Описание задания.
 
+        [Column("spec_id", TypeName = "integer")]
+        public int SpecId { get; set; }
+
+        [ForeignKey("TaskSpecId")]
+        public int Spec { get; set; }
     }
 }

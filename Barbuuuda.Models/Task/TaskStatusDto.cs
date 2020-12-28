@@ -13,7 +13,7 @@ namespace Barbuuuda.Models.Task {
         [Key, Column("status_id")]
         public int StatusId { get; set; }
 
-        [Column("status_name", TypeName = "nvarchar(100)")]
+        [Column("status_name", TypeName = "varchar(100)")]
         public string StatusName { get; set; }
     }
 }
