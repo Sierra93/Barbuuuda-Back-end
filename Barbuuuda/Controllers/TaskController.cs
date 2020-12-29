@@ -5,6 +5,7 @@ using Barbuuuda.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,6 +36,30 @@ namespace Barbuuuda.Controllers {
             TaskDto oResultTask = await _task.CreateTask(oTask);
 
             return Ok(oResultTask);
+        }
+
+        /// <summary>
+        /// Метод выгружает список категорий заданий.
+        /// </summary>
+        /// <returns>Коллекцию категорий.</returns>
+        [HttpPost, Route("get-categories")]
+        public async Task<IActionResult> GetCategories() {
+            ITask _task = new TaskService(_db, _postgre);
+            IList aCategories = await _task.GetTaskCategories();
+
+            return Ok(aCategories);
+        }
+
+        /// <summary>
+        /// Метод выгружает список специализаций заданий.
+        /// </summary>
+        /// <returns>Коллекцию специализаций.</returns>
+        [HttpPost, Route("get-specializations")]
+        public async Task<IActionResult> GetSpecializations() {
+            ITask _task = new TaskService(_db, _postgre);
+            IList aSpecializations = await _task.GetTaskSpecializations();
+
+            return Ok(aSpecializations);
         }
     }
 }

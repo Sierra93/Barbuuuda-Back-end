@@ -31,7 +31,7 @@ namespace Barbuuuda.Services {
         /// <returns>Вернет данные созданного задания.</returns>
         public async Task<TaskDto> CreateTask(TaskDto oTask) {
             try {
-                CommonMethodsService<string> common = new CommonMethodsService<string>(_db);
+                CommonMethodsService<string> common = new CommonMethodsService<string>(_db, _postgre);
 
                 if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail)) {
                     throw new ArgumentException();
@@ -126,6 +126,34 @@ namespace Barbuuuda.Services {
             
             catch (ArgumentNullException ex) {
                 throw new ArgumentNullException($"Специализации с таким кодом не найдено {ex.Message}");
+            }
+
+            catch (Exception ex) {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод выгружает список категорий заданий.
+        /// </summary>
+        /// <returns>Коллекцию категорий.</returns>
+        public async Task<IList> GetTaskCategories() {
+            try {
+                return await _postgre.TaskCategories.ToListAsync();
+            }
+
+            catch (Exception ex) {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод выгружает список специализаций заданий.
+        /// </summary>
+        /// <returns>Коллекцию специализаций.</returns>
+        public async Task<IList> GetTaskSpecializations() {
+            try {
+                return await _postgre.TaskSpecializations.ToListAsync();
             }
 
             catch (Exception ex) {

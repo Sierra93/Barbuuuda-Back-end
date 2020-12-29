@@ -12,9 +12,11 @@ namespace Barbuuuda.Services {
     /// </summary>
     public class CommonMethodsService<TEnum> {
         ApplicationDbContext _db;
+        PostgreDbContext _postgre;
 
-        public CommonMethodsService(ApplicationDbContext db) {
+        public CommonMethodsService(ApplicationDbContext db, PostgreDbContext postgre) {
             _db = db;
+            _postgre = postgre;
         }
     }
 }
