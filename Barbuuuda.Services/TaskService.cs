@@ -1,5 +1,5 @@
-﻿using Barbuuuda.Core.Data;
-using Barbuuuda.Core.Enums;
+﻿using Barbuuuda.Core.Consts;
+using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
@@ -29,38 +29,34 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="task">Объект с данными задания.</param>
         /// <returns>Вернет данные созданного задания.</returns>
-        public async Task<TaskDto> CreateTask(TaskDto task) {
+        public async Task<TaskDto> CreateTask(TaskDto oTask) {
             try {
                 CommonMethodsService<string> common = new CommonMethodsService<string>(_db);
 
-                if (string.IsNullOrEmpty(task.TaskTitle) || string.IsNullOrEmpty(task.TaskDetail)) {
+                if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail)) {
                     throw new ArgumentException();
                 }
 
-                // Проверяет существование заказчика.
-                await IdentityCustomer(task.OwnerId);
+                // Проверяет существование заказчика, который создает задание.
+                await IdentityCustomer(oTask.OwnerId);
 
-                task.DateCreateTask = DateTime.Now;
-
-                // Выбирает description статуса.
-                string sDescription = common.GetEnumDescription(TaskStatusEnum.Auction);
+                oTask.DateCreateTask = DateTime.Now;
 
                 // Запишет статус "В аукционе".
-                task.StatusCode = await _postgre.TaskStatuses
+                oTask.StatusCode = await _postgre.TaskStatuses
                     .Where(s => s.StatusName
-                    .Equals(sDescription))
+                    .Equals(StatusTask.AUCTION))
                     .Select(s => s.StatusCode).FirstOrDefaultAsync();
 
                 // Проверяет, есть ли такая категория в БД.
-                await IdentityCategory(task.CategoryCode);
+                await IdentityCategory(oTask.CategoryCode);
 
                 // Проверяет существование специализации.
-                await IdentitySpecialization(task.SpecCode);
-
-                await _postgre.Tasks.AddAsync(task);
+                await IdentitySpecialization(oTask.SpecCode);
+                await _postgre.Tasks.AddAsync(oTask);
                 await _postgre.SaveChangesAsync();
 
-                return task;
+                return oTask;
             }
 
             catch (ArgumentException ex) {

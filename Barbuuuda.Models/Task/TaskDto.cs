@@ -39,10 +39,10 @@ namespace Barbuuuda.Models.Task {
         public string TypeCode { get; set; } // Id типа заданий (для всех, для про).
 
         [Column("status_code", TypeName = "varchar(100)")]
-        public string StatusCode { get; set; }   // Id статуса задания.
+        public string StatusCode { get; set; }   // Код статуса задания.
 
         [Column("category_code", TypeName = "varchar(100)")]
-        public string CategoryCode { get; set; }     // Id категории задания (программирование и тд).
+        public string CategoryCode { get; set; }     // Код категории задания (программирование и тд).
 
         [Column("task_price", TypeName = "money")]
         public double? TaskPrice { get; set; }   // Бюджет задания в цифрах либо по дефолту "По договоренности".
@@ -54,6 +54,6 @@ namespace Barbuuuda.Models.Task {
         public string TaskDetail { get; set; }  // Описание задания.
 
         [Column("spec_code", TypeName = "varchar(100)")]
-        public string SpecCode { get; set; }
+        public string SpecCode { get; set; }    // Код специализации.
     }
 }

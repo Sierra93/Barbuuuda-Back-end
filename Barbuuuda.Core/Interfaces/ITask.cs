@@ -14,6 +14,6 @@ namespace Barbuuuda.Core.Interfaces {
         /// </summary>
         /// <param name="task">Объект с данными задания.</param>
         /// <returns>Вернет данные созданного задания.</returns>
-        Task<TaskDto> CreateTask(TaskDto task);
+        Task<TaskDto> CreateTask(TaskDto oTask);
     }
 }

@@ -30,11 +30,11 @@ namespace Barbuuuda.Controllers {
         /// <param name="task">Объект с данными задания.</param>
         /// <returns>Вернет данные созданного задания.</returns>
         [HttpPost, Route("create")]
-        public async Task<IActionResult> CreateTask([FromBody] TaskDto task) {
+        public async Task<IActionResult> CreateTask([FromBody] TaskDto oTask) {
             ITask _task = new TaskService(_db, _postgre);
-            TaskDto oTask = await _task.CreateTask(task);
+            TaskDto oResultTask = await _task.CreateTask(oTask);
 
-            return Ok(oTask);
+            return Ok(oResultTask);
         }
     }
 }
