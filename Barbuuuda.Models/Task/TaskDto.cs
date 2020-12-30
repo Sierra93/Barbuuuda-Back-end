@@ -36,7 +36,7 @@ namespace Barbuuuda.Models.Task {
         public int CountViews { get; set; }     // Кол-во просмотров задания.
 
         [Column("type_code", TypeName = "varchar(100)")]
-        public string TypeCode { get; set; } // Id типа заданий (для всех, для про).
+        public string TypeCode { get; set; } // Код типа заданий (для всех, для про).
 
         [Column("status_code", TypeName = "varchar(100)")]
         public string StatusCode { get; set; }   // Код статуса задания.

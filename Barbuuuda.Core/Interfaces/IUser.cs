@@ -13,27 +13,27 @@ namespace Barbuuuda.Core.Interfaces {
         /// Метод создает нового пользователя.
         /// </summary>
         /// <param name="user">Объект с данными регистрации пользователя.</param>
-        Task<UserDto> Create(UserDto user);
+        UserDto Create(UserDto user);
 
         /// <summary>
         /// Метод авторизует пользователя.
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>
         /// <returns>Статус true/false</returns>
-        Task<object> Login(UserDto user);
+        object Login(UserDto user);
 
         /// <summary>
         /// Метод проверяет, авторизован ли юзер, если нет, то вернет false, иначе true.
         /// </summary>
         /// <param name="userId">Id юзера.</param>
         /// <returns>true/false</returns>
-        Task<bool> Authorize(string login);
+        bool Authorize(string login, ref int userId);
 
         /// <summary>
         /// Метод получает хидер в зависимости от роли.
         /// </summary>
         /// <param name="role">Роль юзера.</param>
         /// <returns></returns>
-        Task<IList<HeaderTypeDto>> GetHeader(string role);
+        IList<HeaderTypeDto> GetHeader(string role);
     }
 }

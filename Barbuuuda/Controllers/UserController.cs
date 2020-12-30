@@ -29,9 +29,9 @@ namespace Barbuuuda.Controllers {
         /// Метод создает нового пользователя.
         /// </summary>
         [HttpPost, Route("create")]
-        public async Task<IActionResult> Create([FromBody] UserDto user) {
+        public IActionResult Create([FromBody] UserDto user) {
             IUser _user = new UserService(_db, _postgre);
-            UserDto oUser = await _user.Create(user);
+            UserDto oUser = _user.Create(user);
 
             return Ok(oUser);
         }
@@ -40,9 +40,9 @@ namespace Barbuuuda.Controllers {
         /// Метод авторизует пользователя.
         /// </summary>
         [HttpPost, Route("login")]
-        public async Task<IActionResult> Login([FromBody] UserDto user) {
+        public IActionResult Login([FromBody] UserDto user) {
             IUser _user = new UserService(_db, _postgre);
-            var oUser = await _user.Login(user);
+            var oUser = _user.Login(user);
 
             return Ok(oUser);
         }
@@ -53,19 +53,21 @@ namespace Barbuuuda.Controllers {
         /// <param name="user">Объект для авторизации юзера.</param>
         /// <returns>true/false</returns>
         [HttpPost, Route("authorize")]
-        public async Task<IActionResult> Authorize([FromBody] UserAuthorizeVm user) {
+        public IActionResult Authorize([FromBody] UserAuthorizeVm user) {
             IUser _user = new UserService(_db, _postgre);
+            int userId = 0;
 
             // Проверяет, авторизован ли юзер.
-            bool bAuthorize = await _user.Authorize(user.UserLogin);
+            bool bAuthorize = _user.Authorize(user.UserLogin, ref userId);
 
             // В зависимости от роли юзера формирует хидер.
-            IList<HeaderTypeDto> aHeaderFields = await _user.GetHeader(user.UserRole);
+            IList<HeaderTypeDto> aHeaderFields = _user.GetHeader(user.UserRole);
 
             // Результирующий объект.
             object oObj = new {
                 bAuthorize,
-                aHeaderFields
+                aHeaderFields,
+                userId
             };
 
             return Ok(oObj);

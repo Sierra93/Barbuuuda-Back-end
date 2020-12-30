@@ -48,6 +48,9 @@ namespace Barbuuuda.Services {
                     .Equals(StatusTask.AUCTION))
                     .Select(s => s.StatusCode).FirstOrDefaultAsync();
 
+                // TODO: Доработать передачу с фронта для про или для всех.
+                oTask.TypeCode = "Для всех";  
+
                 // Проверяет, есть ли такая категория в БД.
                 await IdentityCategory(oTask.CategoryCode);
 
