@@ -26,8 +26,11 @@ namespace Barbuuuda.Models.Task {
         [ForeignKey("ExecutorId")]
         public UserDto Executor { get; set; }   // Id исполнителя, который выполняет задание.
 
-        [Column("date_create_task", TypeName = "timestamp")]
-        public DateTime DateCreateTask { get; set; }    // Дата создания задачи.
+        [Column("task_begda", TypeName = "timestamp")]
+        public DateTime TaskBegda { get; set; }    // Дата создания задачи.
+
+        [Column("task_endda", TypeName = "timestamp")]
+        public DateTime TaskEndda { get; set; }    // Дата завершения задачи.
 
         [Column("count_offers", TypeName = "integer")]
         public int CountOffers { get; set; }    // Кол-во ставок к заданию.

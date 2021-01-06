@@ -31,35 +31,40 @@ namespace Barbuuuda.Services {
         /// <returns>Вернет данные созданного задания.</returns>
         public async Task<TaskDto> CreateTask(TaskDto oTask) {
             try {
-                CommonMethodsService<string> common = new CommonMethodsService<string>(_db, _postgre);
-
                 if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail)) {
                     throw new ArgumentException();
                 }
 
                 // Проверяет существование заказчика, который создает задание.
-                await IdentityCustomer(oTask.OwnerId);
-
-                oTask.DateCreateTask = DateTime.Now;
-
-                // Запишет статус "В аукционе".
-                oTask.StatusCode = await _postgre.TaskStatuses
-                    .Where(s => s.StatusName
-                    .Equals(StatusTask.AUCTION))
-                    .Select(s => s.StatusCode).FirstOrDefaultAsync();
-
-                // TODO: Доработать передачу с фронта для про или для всех.
-                oTask.TypeCode = "Для всех";  
+                bool bCustomer = await IdentityCustomer(oTask.OwnerId);
 
                 // Проверяет, есть ли такая категория в БД.
-                await IdentityCategory(oTask.CategoryCode);
+                bool bCategory = await IdentityCategory(oTask.CategoryCode);
 
                 // Проверяет существование специализации.
-                await IdentitySpecialization(oTask.SpecCode);
-                await _postgre.Tasks.AddAsync(oTask);
-                await _postgre.SaveChangesAsync();
+                bool bSpec = await IdentitySpecialization(oTask.SpecCode);
 
-                return oTask;
+                // Если все проверки прошли.
+                if (bCustomer && bCategory && bSpec) {
+                    oTask.TaskBegda = DateTime.Now;
+
+                    // Запишет статус "В аукционе".
+                    oTask.StatusCode = StatusTask.AUCTION;
+
+                    // TODO: Доработать передачу с фронта для про или для всех.
+                    oTask.TypeCode = "Для всех";                    
+                    
+                    await _postgre.Tasks.AddAsync(oTask);
+                    await _postgre.SaveChangesAsync();
+
+                    return oTask;
+                }
+
+                throw new ArgumentNullException();
+            }
+
+            catch (ArgumentNullException ex) {
+                throw new ArgumentNullException($"Не все проверки пройдены {ex.Message}");
             }
 
             catch (ArgumentException ex) {
@@ -157,6 +162,56 @@ namespace Barbuuuda.Services {
         public async Task<IList> GetTaskSpecializations() {
             try {
                 return await _postgre.TaskSpecializations.ToListAsync();
+            }
+
+            catch (Exception ex) {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+
+        /// <summary>
+        /// Метод получает список заданий заказчика.
+        /// </summary>
+        /// <param name="userId">Id заказчика.</param>
+        /// <returns>Коллекция заданий.</returns>
+        public async Task<IList> GetTasksList(int userId) {
+            try {
+                if (userId == 0) {
+                    throw new ArgumentNullException();
+                }
+
+                //IList iPrice = _postgre.Tasks.ForEachAsync(el => {
+                    
+                //});
+
+                return await (from tasks in _postgre.Tasks
+                              join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                              join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                              join users in _postgre.Users on tasks.OwnerId equals users.UserId
+                              where tasks.OwnerId.Equals(userId)
+                              select new {
+                                  tasks.CategoryCode,
+                                  tasks.CountOffers,
+                                  tasks.CountViews,
+                                  tasks.OwnerId,
+                                  tasks.SpecCode,
+                                  categories.CategoryName,
+                                  tasks.StatusCode,
+                                  statuses.StatusName,
+                                  tasks.TaskBegda,
+                                  tasks.TaskEndda,
+                                  tasks.TaskTitle,
+                                  tasks.TaskDetail,
+                                  tasks.TaskId,
+                                  taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                  tasks.TypeCode,
+                                  users.UserLogin
+                              }).ToListAsync();
+            }
+
+            catch (ArgumentNullException ex) {
+                throw new ArgumentNullException($"Не передан UserId {ex.Message}");
             }
 
             catch (Exception ex) {

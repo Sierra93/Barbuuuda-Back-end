@@ -61,5 +61,18 @@ namespace Barbuuuda.Controllers {
 
             return Ok(aSpecializations);
         }
+
+        /// <summary>
+        /// Метод получает список заданий заказчика.
+        /// </summary>
+        /// <param name="userId">Id заказчика.</param>
+        /// <returns>Коллекция заданий.</returns>
+        [HttpPost, Route("tasks-list/{userId}")]
+        public async Task<IActionResult> GetTasksList([FromRoute] int userId) {
+            ITask _task = new TaskService(_db, _postgre);
+            IList aCustomerTasks = await _task.GetTasksList(userId);
+
+            return Ok(aCustomerTasks);
+        }
     }
 }

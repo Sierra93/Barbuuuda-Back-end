@@ -28,7 +28,7 @@ namespace Barbuuuda.Core.Data {
 
         public DbSet<TaskCategoryDto> TaskCategories { get; set; }     // Таблица категорий заданий.
 
-        public DbSet<TaskDto> Tasks { get; set; }   // Таблица заданий.
+        //public DbSet<TaskDto> Tasks { get; set; }   // Таблица заданий.
 
         public DbSet<HeaderTypeDto> Headers { get; set; }   // Таблица полей хидера.
 

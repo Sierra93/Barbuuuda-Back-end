@@ -29,7 +29,7 @@ namespace Barbuuuda.Services {
         /// Метод создает нового пользователя.
         /// </summary>
         /// <param name="user">Объект с данными регистрации пользователя.</param>
-        public UserDto Create(UserDto user) {
+        public async Task<UserDto> Create(UserDto user) {
             try {
                 bool bFields = CheckUserFields(user);
 
@@ -38,15 +38,15 @@ namespace Barbuuuda.Services {
                 }
 
                 // Проверяет существование пользователя.
-                bool isUser = IdentityUser(user.UserLogin, user.UserEmail, user.UserPhone);
+                bool isUser = await IdentityUser(user.UserLogin, user.UserEmail, user.UserPhone);
 
                 if (!isUser) {
                     // Хэширует пароль в MD5.
                     string hashPass = HashMD5.HashPassword(user.UserPassword);
                     user.UserPassword = hashPass;
 
-                     _postgre.Users.AddAsync(user);
-                    _postgre.SaveChangesAsync();
+                    await _postgre.Users.AddAsync(user);
+                    await _postgre.SaveChangesAsync();
 
                     return user;
                 }
@@ -71,15 +71,15 @@ namespace Barbuuuda.Services {
         /// Метод ищет пользователя в БД. Если существует, то не дает создать.
         /// </summary>
         /// <returns>Статус true/false</returns>
-        bool IdentityUser(string login, string email, string phone) {
+        async Task<bool> IdentityUser(string login, string email, string phone) {
             // Ищет по логину.
-            UserDto isUserLogin =  _postgre.Users.Where(u => u.UserLogin.Equals(login)).FirstOrDefault();
+            UserDto isUserLogin =  await _postgre.Users.Where(u => u.UserLogin.Equals(login)).FirstOrDefaultAsync();
 
             // Ищет по email.
-            UserDto isUserEmail =  _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefault();
+            UserDto isUserEmail = await _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
 
             // Ищет по телефону.
-            UserDto isUserPhone =  _postgre.Users.Where(u => u.UserPhone.Equals(phone)).FirstOrDefault();
+            UserDto isUserPhone = await _postgre.Users.Where(u => u.UserPhone.Equals(phone)).FirstOrDefaultAsync();
 
             if (isUserLogin != null || isUserEmail != null || isUserPhone != null) {
                 return true;
@@ -88,9 +88,9 @@ namespace Barbuuuda.Services {
             return false;
         }
 
-        bool IdentityUser(string email) {
+        async Task<bool> IdentityUser(string email) {
             // Ищет по email.
-            UserDto isUserEmail = _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefault();
+            UserDto isUserEmail = await _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
 
             if (isUserEmail != null) {
                 return true;
@@ -104,7 +104,7 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>
         /// <returns>Статус true/false</returns>
-        public object Login(UserDto user) {
+        public async Task<object> Login(UserDto user) {
             try {
                 ErrorExtension errorExtension = new ErrorExtension();
 
@@ -112,7 +112,7 @@ namespace Barbuuuda.Services {
                     throw new ArgumentException();
                 }
 
-                bool bUser = IdentityUser(user.UserEmail);
+                bool bUser = await IdentityUser(user.UserEmail);
 
                 if (bUser) {
                     // Выбирает юзера из БД.
@@ -122,7 +122,7 @@ namespace Barbuuuda.Services {
                     string hashPassword = HashMD5.HashPassword(user.UserPassword);
 
                     // Выбирает пароль пользователя из БД.
-                    bool getIdentityPassword = GetUserPassword(hashPassword);
+                    bool getIdentityPassword = await GetUserPassword(hashPassword);
 
                     if (!getIdentityPassword) {
                         return errorExtension.ThrowErrorLogin();
@@ -150,7 +150,7 @@ namespace Barbuuuda.Services {
                         };
 
                         _postgre.Users.Update(updateUser);
-                        _db.SaveChangesAsync();
+                        await _db.SaveChangesAsync();
 
                         return response;
                     }
@@ -194,8 +194,8 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="login"></param>
         /// <returns></returns>
-        public bool GetUserPassword(string password) {
-            UserDto oUser = _postgre.Users.Where(p => p.UserPassword.Equals(password)).FirstOrDefault();
+        public async Task<bool> GetUserPassword(string password) {
+            UserDto oUser = await _postgre.Users.Where(p => p.UserPassword.Equals(password)).FirstOrDefaultAsync();
 
             if (oUser == null) {
                 return false;

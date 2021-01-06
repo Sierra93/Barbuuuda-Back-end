@@ -28,5 +28,12 @@ namespace Barbuuuda.Core.Interfaces {
         /// </summary>
         /// <returns>Коллекцию специализаций.</returns>
         Task<IList> GetTaskSpecializations();
+
+        /// <summary>
+        /// Метод получает список заданий заказчика.
+        /// </summary>
+        /// <param name="userId">Id заказчика.</param>
+        /// <returns>Коллекция заданий.</returns>
+        Task<IList> GetTasksList(int userId);
     }
 }

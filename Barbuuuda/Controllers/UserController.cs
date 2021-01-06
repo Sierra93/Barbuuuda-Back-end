@@ -29,9 +29,9 @@ namespace Barbuuuda.Controllers {
         /// Метод создает нового пользователя.
         /// </summary>
         [HttpPost, Route("create")]
-        public IActionResult Create([FromBody] UserDto user) {
+        public async Task<IActionResult> Create([FromBody] UserDto user) {
             IUser _user = new UserService(_db, _postgre);
-            UserDto oUser = _user.Create(user);
+            UserDto oUser = await _user.Create(user);
 
             return Ok(oUser);
         }
@@ -40,9 +40,9 @@ namespace Barbuuuda.Controllers {
         /// Метод авторизует пользователя.
         /// </summary>
         [HttpPost, Route("login")]
-        public IActionResult Login([FromBody] UserDto user) {
+        public async Task<IActionResult> Login([FromBody] UserDto user) {
             IUser _user = new UserService(_db, _postgre);
-            var oUser = _user.Login(user);
+            var oUser = await _user.Login(user);
 
             return Ok(oUser);
         }
