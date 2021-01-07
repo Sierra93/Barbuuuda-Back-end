@@ -63,14 +63,16 @@ namespace Barbuuuda.Controllers {
         }
 
         /// <summary>
-        /// Метод получает список заданий заказчика.
+        /// Метод получает список заданий заказчика или конкретное задание.
         /// </summary>
         /// <param name="userId">Id заказчика.</param>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="type">Параметр получения заданий либо все либо одно.</param>
         /// <returns>Коллекция заданий.</returns>
-        [HttpPost, Route("tasks-list/{userId}")]
-        public async Task<IActionResult> GetTasksList([FromRoute] int userId) {
+        [HttpPost, Route("tasks-list")]
+        public async Task<IActionResult> GetTasksList([FromQuery] int userId, [FromQuery] int? taskId, [FromQuery] string type) {
             ITask _task = new TaskService(_db, _postgre);
-            IList aCustomerTasks = await _task.GetTasksList(userId);
+            IList aCustomerTasks = await _task.GetTasksList(userId, taskId, type);
 
             return Ok(aCustomerTasks);
         }

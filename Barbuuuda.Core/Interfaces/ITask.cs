@@ -33,7 +33,9 @@ namespace Barbuuuda.Core.Interfaces {
         /// Метод получает список заданий заказчика.
         /// </summary>
         /// <param name="userId">Id заказчика.</param>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="type">Параметр получения заданий либо все либо одно.</param>
         /// <returns>Коллекция заданий.</returns>
-        Task<IList> GetTasksList(int userId);
+        Task<IList> GetTasksList(int userId, int? taskId, string type);
     }
 }
