@@ -192,7 +192,7 @@ namespace Barbuuuda.Services {
             }
            
             catch (ArgumentNullException ex) {
-                throw new ArgumentNullException($"Не передан Id {ex.Message}");
+                throw new ArgumentNullException($"Не передан UserId {ex.Message}");
             }
 
             catch (Exception ex) {
@@ -210,7 +210,7 @@ namespace Barbuuuda.Services {
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                           join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
                           join users in _postgre.Users on tasks.OwnerId equals users.UserId
-                          where tasks.OwnerId.Equals(userId)
+                          where tasks.OwnerId == userId
                           select new {
                               tasks.CategoryCode,
                               tasks.CountOffers,
@@ -237,9 +237,32 @@ namespace Barbuuuda.Services {
         /// <param name="id">Id задачи.</param>
         /// <returns>Коллекцию заданий.</returns>
         async Task<IList> GetSingleTask(int userId, int? taskId) {
-            return await _postgre.Tasks
-                .Where(u => u.OwnerId == userId)
-                .Where(t => t.TaskId == taskId).ToListAsync();
+            return await (from tasks in _postgre.Tasks
+                          join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                          join specializations in _postgre.TaskSpecializations on tasks.SpecCode equals specializations.SpecCode
+                          join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                          join users in _postgre.Users on tasks.OwnerId equals users.UserId
+                          where tasks.OwnerId == userId
+                          where tasks.TaskId == taskId
+                          select new {
+                              tasks.CategoryCode,
+                              tasks.CountOffers,
+                              tasks.CountViews,
+                              tasks.OwnerId,
+                              tasks.SpecCode,
+                              categories.CategoryName,
+                              specializations.SpecName,
+                              tasks.StatusCode,
+                              statuses.StatusName,
+                              tasks.TaskBegda,
+                              tasks.TaskEndda,
+                              tasks.TaskTitle,
+                              tasks.TaskDetail,
+                              tasks.TaskId,
+                              taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                              tasks.TypeCode,
+                              users.UserLogin
+                          }).ToListAsync();
         }
     }
 }
