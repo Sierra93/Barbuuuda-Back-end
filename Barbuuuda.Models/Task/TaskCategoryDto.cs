@@ -18,5 +18,18 @@ namespace Barbuuuda.Models.Task {
 
         [Column("category_name", TypeName = "varchar(100)")]
         public string CategoryName { get; set; }    // Название категории.
+
+        [Column("specializations", TypeName = "jsonb")]
+        public Specialization[] Specializations { get; set; }
+    }
+
+    /// <summary>
+    /// Класс сопоставляется с json столбцом специализаций.
+    /// </summary>
+    [NotMapped]
+    public class Specialization {
+        public string SpecName { get; set; }
+
+        public string SpecCode { get; set; }
     }
 }

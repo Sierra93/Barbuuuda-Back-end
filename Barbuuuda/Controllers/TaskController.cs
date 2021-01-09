@@ -56,10 +56,11 @@ namespace Barbuuuda.Controllers {
         /// <returns>Коллекцию специализаций.</returns>
         [HttpPost, Route("get-specializations")]
         public async Task<IActionResult> GetSpecializations() {
-            ITask _task = new TaskService(_db, _postgre);
-            IList aSpecializations = await _task.GetTaskSpecializations();
+            //ITask _task = new TaskService(_db, _postgre);
+            //IList aSpecializations = await _task.GetTaskSpecializations();
 
-            return Ok(aSpecializations);
+            //return Ok(aSpecializations);
+            throw new NotImplementedException();
         }
 
         /// <summary>

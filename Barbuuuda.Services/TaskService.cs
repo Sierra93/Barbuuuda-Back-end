@@ -126,20 +126,21 @@ namespace Barbuuuda.Services {
         /// <param name="specId"></param>
         /// <returns></returns>
         async Task<bool> IdentitySpecialization(string code) {
-            try {
-                return await _postgre.TaskSpecializations
-                    .Where(s => s.SpecCode
-                    .Equals(code))
-                    .FirstOrDefaultAsync() != null ? true : throw new ArgumentNullException();
-            }
-            
-            catch (ArgumentNullException ex) {
-                throw new ArgumentNullException($"Специализации с таким кодом не найдено {ex.Message}");
-            }
+            //try {
+            //    return await _postgre.TaskSpecializations
+            //        .Where(s => s.SpecCode
+            //        .Equals(code))
+            //        .FirstOrDefaultAsync() != null ? true : throw new ArgumentNullException();
+            //}
 
-            catch (Exception ex) {
-                throw new Exception(ex.Message.ToString());
-            }
+            //catch (ArgumentNullException ex) {
+            //    throw new ArgumentNullException($"Специализации с таким кодом не найдено {ex.Message}");
+            //}
+
+            //catch (Exception ex) {
+            //    throw new Exception(ex.Message.ToString());
+            //}
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -160,15 +161,15 @@ namespace Barbuuuda.Services {
         /// Метод выгружает список специализаций заданий.
         /// </summary>
         /// <returns>Коллекцию специализаций.</returns>
-        public async Task<IList> GetTaskSpecializations() {
-            try {
-                return await _postgre.TaskSpecializations.ToListAsync();
-            }
+        //public async Task<IList> GetTaskSpecializations() {
+        //    try {
+        //        return await _postgre.TaskSpecializations.ToListAsync();
+        //    }
 
-            catch (Exception ex) {
-                throw new Exception(ex.Message.ToString());
-            }
-        }
+        //    catch (Exception ex) {
+        //        throw new Exception(ex.Message.ToString());
+        //    }
+        //}
 
 
         /// <summary>
@@ -239,7 +240,7 @@ namespace Barbuuuda.Services {
         async Task<IList> GetSingleTask(int userId, int? taskId) {
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                          join specializations in _postgre.TaskSpecializations on tasks.SpecCode equals specializations.SpecCode
+                          //join specializations in _postgre.TaskSpecializations on tasks.SpecCode equals specializations.SpecCode
                           join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
                           join users in _postgre.Users on tasks.OwnerId equals users.UserId
                           where tasks.OwnerId == userId
@@ -251,7 +252,7 @@ namespace Barbuuuda.Services {
                               tasks.OwnerId,
                               tasks.SpecCode,
                               categories.CategoryName,
-                              specializations.SpecName,
+                              //specializations.SpecName,
                               tasks.StatusCode,
                               statuses.StatusName,
                               tasks.TaskBegda,

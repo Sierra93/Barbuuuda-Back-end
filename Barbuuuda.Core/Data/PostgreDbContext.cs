@@ -11,8 +11,6 @@ namespace Barbuuuda.Core.Data {
 
         public DbSet<TaskDto> Tasks { get; set; }    // Таблица предложений поставщикам.
 
-        public DbSet<TaskSpecializationDto> TaskSpecializations { get; set; }   // Таблица специализаций.
-
         public DbSet<TaskStatusDto> TaskStatuses { get; set; }   // Таблица статусов заданий.
 
         public DbSet<TaskCategoryDto> TaskCategories { get; set; }   // Таблица категорий заданий.
