@@ -5,11 +5,14 @@ using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Services {
@@ -232,41 +235,62 @@ namespace Barbuuuda.Services {
                               taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                               tasks.TypeCode,
                               users.UserLogin
-                          }).ToListAsync(); 
+                          })
+                          .OrderBy(o => o.TaskId)
+                          .ToListAsync(); 
         }
 
         /// <summary>
         /// Метод получает одно задание заказчика.
         /// </summary>
         /// <param name="id">Id задачи.</param>
+        /// <param name="taskId">Id задачи. Может быть null.</param>
         /// <returns>Коллекцию заданий.</returns>
         async Task<IList> GetSingleTask(int userId, int? taskId) {
-            return await (from tasks in _postgre.Tasks
-                          join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                          //join specializations in _postgre.TaskSpecializations on tasks.SpecCode equals specializations.SpecCode
-                          join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                          join users in _postgre.Users on tasks.OwnerId equals users.UserId
-                          where tasks.OwnerId == userId
-                          where tasks.TaskId == taskId
-                          select new {
-                              tasks.CategoryCode,
-                              tasks.CountOffers,
-                              tasks.CountViews,
-                              tasks.OwnerId,
-                              tasks.SpecCode,
-                              categories.CategoryName,
-                              //specializations.SpecName,
-                              tasks.StatusCode,
-                              statuses.StatusName,
-                              tasks.TaskBegda,
-                              tasks.TaskEndda,
-                              tasks.TaskTitle,
-                              tasks.TaskDetail,
-                              tasks.TaskId,
-                              taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                              tasks.TypeCode,
-                              users.UserLogin
-                          }).ToListAsync();
+            // Выбирает объект задачи, который нужно редактировать.
+            TaskDto oEditTask = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
+
+            // Выбирает список специализаций конкретной категории по коду категории.
+            IList aTaskSpecializations = await _postgre.TaskCategories
+                .Where(c => c.CategoryCode.Equals(oEditTask.CategoryCode))
+                .Select(s => s.Specializations)
+                .FirstOrDefaultAsync();
+            string specName = string.Empty;
+
+            // Выбирает название специализации.
+            foreach (Specialization spec in aTaskSpecializations) {
+                if (spec.SpecCode.Equals(oEditTask.SpecCode)) {
+                    specName = spec.SpecName;
+                }
+            }
+
+            var oTask = await (from tasks in _postgre.Tasks
+                               join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                               join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                               join users in _postgre.Users on tasks.OwnerId equals users.UserId
+                               where tasks.OwnerId == userId
+                               where tasks.TaskId == taskId
+                               select new {
+                                   tasks.CategoryCode,
+                                   tasks.CountOffers,
+                                   tasks.CountViews,
+                                   tasks.OwnerId,
+                                   tasks.SpecCode,
+                                   categories.CategoryName,
+                                   specName,
+                                   tasks.StatusCode,
+                                   statuses.StatusName,
+                                   tasks.TaskBegda,
+                                   tasks.TaskEndda,
+                                   tasks.TaskTitle,
+                                   tasks.TaskDetail,
+                                   tasks.TaskId,
+                                   taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                   tasks.TypeCode,
+                                   users.UserLogin
+                               }).ToListAsync();
+
+            return oTask;
         }
     }
 }
