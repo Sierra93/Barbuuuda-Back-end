@@ -43,14 +43,17 @@ namespace Barbuuuda.Services {
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
 
                 // Проверяет существование специализации.
-                bool bSpec = await IdentitySpecialization(oTask.SpecCode);
+                //bool bSpec = await IdentitySpecialization(oTask.SpecCode);
 
                 // Если все проверки прошли.
-                if (bCustomer && bCategory && bSpec) {
+                if (bCustomer && bCategory) {
                     oTask.TaskBegda = DateTime.Now;
 
-                    // Запишет статус "В аукционе".
-                    oTask.StatusCode = StatusTask.AUCTION;
+                    // Запишет код статуса "В аукционе".
+                    oTask.StatusCode = await _postgre.TaskStatuses
+                    .Where(s => s.StatusName
+                    .Equals(StatusTask.AUCTION))
+                    .Select(s => s.StatusCode).FirstOrDefaultAsync();
 
                     // TODO: Доработать передачу с фронта для про или для всех.
                     oTask.TypeCode = "Для всех";                    
