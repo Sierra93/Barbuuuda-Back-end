@@ -44,5 +44,11 @@ namespace Barbuuuda.Core.Interfaces {
         /// <param name="type">Параметр получения заданий либо все либо одно.</param>
         /// <returns>Коллекция заданий.</returns>
         Task<IList> GetTasksList(int userId, int? taskId, string type);
+
+        /// <summary>
+        /// Метод удаляет задание.
+        /// </summary>
+        /// <param name="taskId">Id задачи.</param>
+        Task DeleteTask(int taskId);
     }
 }

@@ -90,5 +90,17 @@ namespace Barbuuuda.Controllers {
 
             return Ok(aCustomerTasks);
         }
+
+        /// <summary>
+        /// Метод удаляет задание.
+        /// </summary>
+        /// <param name="taskId">Id задачи.</param>
+        [HttpGet, Route("delete/{taskId}")]
+        public async Task<IActionResult> DeleteTask([FromRoute] int taskId) {
+            ITask _task = new TaskService(_db, _postgre);
+            await _task.DeleteTask(taskId);
+
+            return Ok();
+        }
     }
 }
