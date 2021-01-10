@@ -84,6 +84,59 @@ namespace Barbuuuda.Services {
         }
 
         /// <summary>
+        /// Метод редактирует задание.
+        /// </summary>
+        /// <param name="task">Объект с данными задания.</param>
+        /// <returns>Вернет данные измененного задания.</returns>
+        public async Task<TaskDto> EditTask(TaskDto oTask) {
+            try {
+                if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail)) {
+                    throw new ArgumentException();
+                }
+
+                // Проверяет существование заказчика, который создает задание.
+                bool bCustomer = await IdentityCustomer(oTask.OwnerId);
+
+                // Проверяет, есть ли такая категория в БД.
+                bool bCategory = await IdentityCategory(oTask.CategoryCode);
+
+                // Проверяет существование специализации.
+                //bool bSpec = await IdentitySpecialization(oTask.SpecCode);
+
+                // Если все проверки прошли.
+                if (bCustomer && bCategory) {
+                    // Запишет код статуса "В аукционе".
+                    oTask.StatusCode = await _postgre.TaskStatuses
+                    .Where(s => s.StatusName
+                    .Equals(StatusTask.AUCTION))
+                    .Select(s => s.StatusCode).FirstOrDefaultAsync();
+
+                    // TODO: Доработать передачу с фронта для про или для всех.
+                    oTask.TypeCode = "Для всех";
+
+                    _postgre.Tasks.Update(oTask);
+                    await _postgre.SaveChangesAsync();
+
+                    return oTask;
+                }
+
+                throw new ArgumentNullException();
+            }
+
+            catch (ArgumentNullException ex) {
+                throw new ArgumentNullException($"Не все проверки пройдены {ex.Message}");
+            }
+
+            catch (ArgumentException ex) {
+                throw new ArgumentException($"Не все обязательные поля заполнены {ex.Message}");
+            }
+
+            catch (Exception ex) {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
         /// Метод ищет заказчика в БД.
         /// </summary>
         /// <param name="userId"></param>
@@ -291,6 +344,6 @@ namespace Barbuuuda.Services {
                                }).ToListAsync();
 
             return oTask;
-        }
+        }        
     }
 }

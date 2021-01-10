@@ -48,7 +48,7 @@ namespace Barbuuuda.Models.Task {
         public string CategoryCode { get; set; }     // Код категории задания (программирование и тд).
 
         [Column("task_price", TypeName = "money")]
-        public double? TaskPrice { get; set; }   // Бюджет задания в цифрах либо по дефолту "По договоренности".
+        public decimal? TaskPrice { get; set; }   // Бюджет задания в цифрах либо по дефолту "По договоренности".
 
         [Column("task_title", TypeName = "text")]
         public string TaskTitle { get; set; }   // Заголовок задания.

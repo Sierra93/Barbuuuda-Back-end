@@ -39,6 +39,19 @@ namespace Barbuuuda.Controllers {
         }
 
         /// <summary>
+        /// Метод создает новое задание.
+        /// </summary>
+        /// <param name="task">Объект с данными задания.</param>
+        /// <returns>Вернет данные измененного задания.</returns>
+        [HttpPost, Route("edit")]
+        public async Task<IActionResult> EditTask([FromBody] TaskDto oTask) {
+            ITask _task = new TaskService(_db, _postgre);
+            TaskDto oResultTask = await _task.EditTask(oTask);
+
+            return Ok(oResultTask);
+        }
+
+        /// <summary>
         /// Метод выгружает список категорий заданий.
         /// </summary>
         /// <returns>Коллекцию категорий.</returns>

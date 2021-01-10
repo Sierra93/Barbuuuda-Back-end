@@ -18,6 +18,13 @@ namespace Barbuuuda.Core.Interfaces {
         Task<TaskDto> CreateTask(TaskDto oTask);
 
         /// <summary>
+        /// Метод редактирует задание.
+        /// </summary>
+        /// <param name="task">Объект с данными задания.</param>
+        /// <returns>Вернет данные созданного задания.</returns>
+        Task<TaskDto> EditTask(TaskDto oTask);
+
+        /// <summary>
         /// Метод выгружает список категорий заданий.
         /// </summary>
         /// <returns>Коллекцию категорий.</returns>
