@@ -50,5 +50,19 @@ namespace Barbuuuda.Core.Interfaces {
         /// </summary>
         /// <param name="taskId">Id задачи.</param>
         Task DeleteTask(int taskId);
+
+        /// <summary>
+        /// Метод фильтрует задания заказчика по параметру.
+        /// </summary>
+        /// <param name="query">Параметр фильтрации.</param>
+        /// <returns>Отфильтрованные данные.</returns>
+        Task<IList> FilterTask(string query);
+
+        /// <summary>
+        /// Метод ищет задание по Id или названию.
+        /// </summary>
+        /// <param name="param">Поисковый параметр.</param>
+        /// <returns>Результат поиска.</returns>
+        Task<IList> SearchTask(string param);
     }
 }

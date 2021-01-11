@@ -280,8 +280,8 @@ namespace Barbuuuda.Services {
                               categories.CategoryName,
                               tasks.StatusCode,
                               statuses.StatusName,
-                              tasks.TaskBegda,
-                              tasks.TaskEndda,
+                              taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                              taskEndda = string.Format("{0:f}", tasks.TaskEndda),
                               tasks.TaskTitle,
                               tasks.TaskDetail,
                               tasks.TaskId,
@@ -369,6 +369,54 @@ namespace Barbuuuda.Services {
             catch (Exception ex) {
                 throw new Exception(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Метод фильтрует задания заказчика по параметру.
+        /// </summary>
+        /// <param name="query">Параметр фильтрации.</param>
+        /// <returns>Отфильтрованные данные.</returns>
+        public async Task<IList> FilterTask(string query) {
+            try {
+                IList aFilterCollection = null;
+
+                if (string.IsNullOrEmpty(query)) {
+                    throw new ArgumentNullException();
+                }
+
+                // Фильтрует список заданий в зависимости от параметра фильтрации.
+                switch (query) {
+                    // Фильтрует по дате создания задания.
+                    case TaskFilterType.DATE_BEGDA:
+                        aFilterCollection = await _postgre.Tasks.OrderBy(s => s.TaskBegda).ToListAsync();
+                        break;
+
+                    // Фильтрует по дате сдачи задания.
+                    case TaskFilterType.DATE_ENDDA:
+                        aFilterCollection = await _postgre.Tasks.OrderBy(s => s.TaskEndda).ToListAsync();
+                        break;
+                }
+
+                return aFilterCollection;
+            }
+
+            catch (ArgumentNullException ex) {
+                throw new ArgumentNullException($"Не передан параметр запроса {ex.Message}");
+            }
+
+            catch (Exception ex) {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        /// <summary>
+        /// Метод ищет задание по Id или названию.
+        /// </summary>
+        /// <param name="param">Поисковый параметр.</param>
+        /// <returns>Результат поиска.</returns>
+        public Task<IList> SearchTask(string param) {
+            throw new NotImplementedException();
         }
     }
 }

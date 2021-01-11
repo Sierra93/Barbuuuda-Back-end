@@ -102,5 +102,28 @@ namespace Barbuuuda.Controllers {
 
             return Ok();
         }
+
+        /// <summary>
+        /// Метод фильтрует задания заказчика по параметру.
+        /// </summary>
+        /// <param name="query">Параметр фильтрации.</param>
+        /// <returns>Отфильтрованные данные.</returns>
+        [HttpGet, Route("filter")]
+        public async Task<IActionResult> FilterTask([FromQuery] string query) {
+            ITask _task = new TaskService(_db, _postgre);
+            IList aTasks = await _task.FilterTask(query);
+
+            return Ok(aTasks);
+        }
+
+        /// <summary>
+        /// Метод ищет задание по Id или названию.
+        /// </summary>
+        /// <param name="param">Поисковый параметр.</param>
+        /// <returns>Результат поиска.</returns>
+        [HttpGet, Route("search/{param}")]
+        public async Task<IActionResult> SearchTask([FromRoute] string param) {
+            return Ok();
+        }
     }
 }
