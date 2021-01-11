@@ -121,9 +121,12 @@ namespace Barbuuuda.Controllers {
         /// </summary>
         /// <param name="param">Поисковый параметр.</param>
         /// <returns>Результат поиска.</returns>
-        [HttpGet, Route("search/{param}")]
-        public async Task<IActionResult> SearchTask([FromRoute] string param) {
-            return Ok();
+        [HttpGet, Route("search")]
+        public async Task<IActionResult> SearchTask([FromQuery] string param) {
+            ITask _task = new TaskService(_db, _postgre);
+            IList aTasks = await _task.SearchTask(param);
+
+            return Ok(aTasks);
         }
     }
 }

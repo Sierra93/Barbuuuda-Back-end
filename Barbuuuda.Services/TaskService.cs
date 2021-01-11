@@ -415,8 +415,33 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="param">Поисковый параметр.</param>
         /// <returns>Результат поиска.</returns>
-        public Task<IList> SearchTask(string param) {
-            throw new NotImplementedException();
+        public async Task<IList> SearchTask(string param) {
+            try {
+                if (string.IsNullOrEmpty(param)) {
+                    return await _postgre.Tasks.ToListAsync();
+                }
+
+                // Если передали Id.
+                if (int.TryParse(param, out int bIntParse)) {
+                    int taskId = Convert.ToInt32(param);
+                    return await _postgre.Tasks
+                    .Where(t => t.TaskId == taskId)
+                    .ToListAsync();
+                }
+
+                // Если передали строку.
+                if (param is string) {
+                    return await _postgre.Tasks
+                        .Where(t => t.TaskTitle.Contains(param))
+                        .ToListAsync();
+                }
+
+                return null;
+            }
+
+            catch (Exception ex) {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }
