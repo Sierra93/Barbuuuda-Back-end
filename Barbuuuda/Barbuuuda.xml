@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Barbuuuda</name>
+    </assembly>
+    <members>
+        <member name="T:Barbuuuda.Controllers.MainPageController">
+            <summary>
+            Контроллер главной страницы.
+            </summary>
+        </member>
+        <member name="M:Barbuuuda.Controllers.MainPageController.GetFonContent">
+            <summary>
+            Метод получает информацию для главного фона.
+            </summary>
+            <returns>Объект фона.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.MainPageController.GetWhyContent">
+            <summary>
+            Метод выгружает данные для блока "ПОЧЕМУ BARBUUUDA".
+            </summary>
+            <returns>Все объекты WhyDto</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.MainPageController.GetWorkContent">
+            <summary>
+            Метод выгружает данные для блока "КАК ЭТО РАБОТАЕТ".
+            </summary>
+            <returns>Все объекты WorkDto</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.MainPageController.GetPrivilegeContent">
+            <summary>
+            Метод выгружает данные для блока "ЧТО ВЫ ПОЛУЧАЕТЕ"
+            </summary>
+            <returns>Все объекты PrivilegeDto</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.MainPageController.GetAdvantageContent">
+            <summary>
+            Метод возвращает данные для блока "Преимущества"
+            </summary>
+            <returns>Все объекты Advantage</returns>
+        </member>
+        <member name="T:Barbuuuda.Controllers.TaskController">
+            <summary>
+            Контроллер содержит логику работы с заданиями.
+            </summary>
+        </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.CreateTask(Barbuuuda.Models.Task.TaskDto)">
+            <summary>
+            Метод создает новое задание.
+            </summary>
+            <param name="task">Объект с данными задания.</param>
+            <returns>Вернет данные созданного задания.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.EditTask(Barbuuuda.Models.Task.TaskDto)">
+            <summary>
+            Метод создает новое задание.
+            </summary>
+            <param name="task">Объект с данными задания.</param>
+            <returns>Вернет данные измененного задания.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.GetCategories">
+            <summary>
+            Метод выгружает список категорий заданий.
+            </summary>
+            <returns>Коллекцию категорий.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.GetSpecializations">
+            <summary>
+            Метод выгружает список специализаций заданий.
+            </summary>
+            <returns>Коллекцию специализаций.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.GetTasksList(System.Int32,System.Nullable{System.Int32},System.String)">
+            <summary>
+            Метод получает список заданий заказчика или конкретное задание.
+            </summary>
+            <param name="userId">Id заказчика.</param>
+            <param name="taskId">Id задания.</param>
+            <param name="type">Параметр получения заданий либо все либо одно.</param>
+            <returns>Коллекция заданий.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.DeleteTask(System.Int32)">
+            <summary>
+            Метод удаляет задание.
+            </summary>
+            <param name="taskId">Id задачи.</param>
+        </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.FilterTask(System.String)">
+            <summary>
+            Метод фильтрует задания заказчика по параметру.
+            </summary>
+            <param name="query">Параметр фильтрации.</param>
+            <returns>Отфильтрованные данные.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.SearchTask(System.String)">
+            <summary>
+            Метод ищет задание по Id или названию.
+            </summary>
+            <param name="param">Поисковый параметр.</param>
+            <returns>Результат поиска.</returns>
+        </member>
+        <member name="T:Barbuuuda.Controllers.UserController">
+            <summary>
+            Контроллер содержит логику работы с пользователями.
+            </summary>
+        </member>
+        <member name="M:Barbuuuda.Controllers.UserController.Create(Barbuuuda.Models.User.UserDto)">
+            <summary>
+            Метод создает нового пользователя.
+            </summary>
+        </member>
+        <member name="M:Barbuuuda.Controllers.UserController.Login(Barbuuuda.Models.User.UserDto)">
+            <summary>
+            Метод авторизует пользователя.
+            </summary>
+        </member>
+        <member name="M:Barbuuuda.Controllers.UserController.Authorize(Barbuuuda.Core.ViewModels.User.UserAuthorizeVm)">
+            <summary>
+            Метод проверяет, авторизован ли юзер, если нет, то вернет false, иначе true.
+            </summary>
+            <param name="user">Объект для авторизации юзера.</param>
+            <returns>true/false</returns>
+        </member>
+    </members>
+</doc>

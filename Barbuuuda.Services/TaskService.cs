@@ -417,6 +417,7 @@ namespace Barbuuuda.Services {
         /// <returns>Результат поиска.</returns>
         public async Task<IList> SearchTask(string param) {
             try {
+                // Если ничего, значит выгрузить все.
                 if (string.IsNullOrEmpty(param)) {
                     return await _postgre.Tasks.ToListAsync();
                 }
