@@ -71,5 +71,11 @@ namespace Barbuuuda.Core.Interfaces {
         /// <param name="date">Параметр даты.</param>
         /// <returns>Найденные задания.</returns>
         Task<IList> GetSearchTaskDate(string date);
+
+        /// <summary>
+        /// Метод выгружает активные задания заказчика.
+        /// </summary>
+        /// <returns>Список активных заданий.</returns>
+        Task<IList> LoadActiveTasks(int userId);
     }
 }

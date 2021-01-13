@@ -68,7 +68,7 @@ namespace Barbuuuda.Controllers {
         /// </summary>
         /// <returns>Коллекцию специализаций.</returns>
         [HttpPost, Route("get-specializations")]
-        public async Task<IActionResult> GetSpecializations() {
+        public Task<IActionResult> GetSpecializations() {
             //ITask _task = new TaskService(_db, _postgre);
             //IList aSpecializations = await _task.GetTaskSpecializations();
 
@@ -138,6 +138,18 @@ namespace Barbuuuda.Controllers {
         public async Task<IActionResult> GetSearchTaskDate([FromQuery] string date) {
             ITask _task = new TaskService(_db, _postgre);
             IList aTasks = await _task.GetSearchTaskDate(date);
+
+            return Ok(aTasks);
+        }
+
+        /// <summary>
+        /// Метод выгружает активные задания заказчика.
+        /// </summary>
+        /// <returns>Список активных заданий.</returns>
+        [HttpGet, Route("active")]
+        public async Task<IActionResult> LoadActiveTasks([FromQuery] int userId) {
+            ITask _task = new TaskService(_db, _postgre);
+            IList aTasks = await _task.LoadActiveTasks(userId);
 
             return Ok(aTasks);
         }

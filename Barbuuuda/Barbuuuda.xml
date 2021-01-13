@@ -106,6 +106,12 @@
             <param name="date">Параметр даты.</param>
             <returns>Найденные задания.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.LoadActiveTasks(System.Int32)">
+            <summary>
+            Метод выгружает активные задания заказчика.
+            </summary>
+            <returns>Список активных заданий.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.UserController">
             <summary>
             Контроллер содержит логику работы с пользователями.

@@ -2,6 +2,8 @@
 using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Enums;
 using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Core.Logger;
+using Barbuuuda.Models.Logger;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
@@ -521,6 +523,62 @@ namespace Barbuuuda.Services {
                                   tasks.TypeCode,
                                   users.UserLogin
                               })
+                          .OrderBy(o => o.TaskId)
+                          .ToListAsync();
+        }
+
+        /// <summary>
+        /// Метод выгружает активные задания заказчика.
+        /// Активными считаются задания в статусе в аукционе и в работе.
+        /// </summary>
+        /// <returns>Список активных заданий.</returns>
+        public async Task<IList> LoadActiveTasks(int userId) {
+            try {
+                return userId != 0 ? await GetActiveTasks(userId) : throw new ArgumentNullException();
+            }
+
+            catch (ArgumentNullException ex) {
+                throw new ArgumentNullException($"Не передан UserId {ex.Message}");
+            }
+
+            catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogError();
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод получает активные задания в статусах "В аукционе" и "В работе".
+        /// </summary>
+        /// <param name="taskId"></param>
+        /// <returns></returns>
+        async Task<IList> GetActiveTasks(int userId) {
+            return await (from tasks in _postgre.Tasks
+                          join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                          join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                          join users in _postgre.Users on tasks.OwnerId equals users.UserId
+                          where statuses.StatusName.Equals(StatusTask.AUCTION) ||
+                          statuses.StatusName.Equals(StatusTask.IN_WORK)
+                          where users.UserId == userId
+                          select new {
+                              tasks.CategoryCode,
+                              tasks.CountOffers,
+                              tasks.CountViews,
+                              tasks.OwnerId,
+                              tasks.SpecCode,
+                              categories.CategoryName,
+                              tasks.StatusCode,
+                              statuses.StatusName,
+                              taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                              taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                              tasks.TaskTitle,
+                              tasks.TaskDetail,
+                              tasks.TaskId,
+                              taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                              tasks.TypeCode,
+                              users.UserLogin
+                          })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
         }
