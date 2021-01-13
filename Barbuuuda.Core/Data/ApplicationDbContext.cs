@@ -1,4 +1,5 @@
-﻿using Barbuuuda.Models.MainPage;
+﻿using Barbuuuda.Models.Logger;
+using Barbuuuda.Models.MainPage;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
@@ -8,9 +9,7 @@ using System.Text;
 
 namespace Barbuuuda.Core.Data {
     public class ApplicationDbContext : DbContext {
-        //public DbSet<UserDto> Users { get; set; }    // Таблица пользователей.
-
-        //public DbSet<LoggerDto> Logs { get; set; }   // Таблица логов.
+        public DbSet<LoggerDto> Logs { get; set; }   // Таблица логов.
 
         public DbSet<FonDto> Fons { get; set; }     // Таблица фона.
 
@@ -27,8 +26,6 @@ namespace Barbuuuda.Core.Data {
         public DbSet<TaskStatusDto> TaskStatuses { get; set; }    // Таблица статусов заданий.
 
         public DbSet<TaskCategoryDto> TaskCategories { get; set; }     // Таблица категорий заданий.
-
-        //public DbSet<TaskDto> Tasks { get; set; }   // Таблица заданий.
 
         public DbSet<HeaderTypeDto> Headers { get; set; }   // Таблица полей хидера.
 
