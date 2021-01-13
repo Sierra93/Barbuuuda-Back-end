@@ -128,5 +128,18 @@ namespace Barbuuuda.Controllers {
 
             return Ok(aTasks);
         }
+
+        /// <summary>
+        /// Метод ищет задания указанной даты.
+        /// </summary>
+        /// <param name="date">Параметр даты.</param>
+        /// <returns>Найденные задания.</returns>
+        [HttpGet, Route("concretely-date")]
+        public async Task<IActionResult> GetSearchTaskDate([FromQuery] string date) {
+            ITask _task = new TaskService(_db, _postgre);
+            IList aTasks = await _task.GetSearchTaskDate(date);
+
+            return Ok(aTasks);
+        }
     }
 }

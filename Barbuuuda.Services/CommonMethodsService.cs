@@ -10,7 +10,7 @@ namespace Barbuuuda.Services {
     /// <summary>
     /// Сервис общих методов.
     /// </summary>
-    public class CommonMethodsService<TEnum> {
+    public class CommonMethodsService {
         ApplicationDbContext _db;
         PostgreDbContext _postgre;
 

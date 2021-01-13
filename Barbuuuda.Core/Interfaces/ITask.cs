@@ -64,5 +64,12 @@ namespace Barbuuuda.Core.Interfaces {
         /// <param name="param">Поисковый параметр.</param>
         /// <returns>Результат поиска.</returns>
         Task<IList> SearchTask(string param);
+
+        /// <summary>
+        /// Метод ищет задания указанной даты.
+        /// </summary>
+        /// <param name="date">Параметр даты.</param>
+        /// <returns>Найденные задания.</returns>
+        Task<IList> GetSearchTaskDate(string date);
     }
 }

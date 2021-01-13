@@ -99,6 +99,13 @@
             <param name="param">Поисковый параметр.</param>
             <returns>Результат поиска.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.GetSearchTaskDate(System.String)">
+            <summary>
+            Метод ищет задания указанной даты.
+            </summary>
+            <param name="date">Параметр даты.</param>
+            <returns>Найденные задания.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.UserController">
             <summary>
             Контроллер содержит логику работы с пользователями.

@@ -444,5 +444,85 @@ namespace Barbuuuda.Services {
                 throw new Exception(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Метод ищет задания указанной даты.
+        /// </summary>
+        /// <param name="date">Параметр даты.</param>
+        /// <returns>Найденные задания.</returns>
+        public async Task<IList> GetSearchTaskDate(string date) {
+            try {
+                if (string.IsNullOrEmpty(date)) {
+                    throw new ArgumentNullException();
+                }
+
+                List<TaskDto> aTasks = new List<TaskDto>();
+
+                // Выбирает задания форматируя даты для сравнений.
+                foreach (TaskDto task in _postgre.Tasks) {
+                    DateTime dt = Convert.ToDateTime(date);
+
+                    // Форматирует дату с фронта оставляет только день, месяц и год.
+                    string formatDate = Convert.ToDateTime(string.Format("{0:u}", dt).Replace("Z", "")).ToString("d");
+
+                    // Форматирует дату с БД оставляет только день, месяц и год.
+                    string dbFormatDate = task.TaskEndda.ToString("d");
+
+                    if (dbFormatDate.Equals(formatDate)) {
+                        aTasks.Add(task);
+                    }
+                }
+
+                // Выбирает нужные задания форматируя даты к нужному виду.
+                foreach (TaskDto oTask in aTasks) {
+                    IList aResultTasks = await GetTasksByIds(oTask.TaskId);
+
+                    return aResultTasks;
+                }
+
+                return null;
+            }
+
+            catch (ArgumentNullException ex) {
+                throw new ArgumentNullException($"Дата не передана {ex.Message}");
+            }
+
+            catch (Exception ex) {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод вернет задания по Id, которые передаются в метод.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Список заданий.</returns>
+        async Task<IList> GetTasksByIds(int taskId) {
+            return await (from tasks in _postgre.Tasks
+                          join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                          join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                          join users in _postgre.Users on tasks.OwnerId equals users.UserId
+                          where tasks.TaskId == taskId
+                          select new {
+                                  tasks.CategoryCode,
+                                  tasks.CountOffers,
+                                  tasks.CountViews,
+                                  tasks.OwnerId,
+                                  tasks.SpecCode,
+                                  categories.CategoryName,
+                                  tasks.StatusCode,
+                                  statuses.StatusName,
+                                  taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                  taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                  tasks.TaskTitle,
+                                  tasks.TaskDetail,
+                                  tasks.TaskId,
+                                  taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                  tasks.TypeCode,
+                                  users.UserLogin
+                              })
+                          .OrderBy(o => o.TaskId)
+                          .ToListAsync();
+        }
     }
 }
