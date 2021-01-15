@@ -582,5 +582,52 @@ namespace Barbuuuda.Services {
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
         }
+
+        /// <summary>
+        /// Метод получает кол-во задач определенного статуса.
+        /// </summary>
+        /// <param name="status">Имя статуса, кол-во задач которых нужно получить.</param>
+        /// <returns>Число кол-ва задач.</returns>
+        public async Task<object> GetCountTaskStatuses() {
+            try {
+                int countTotal = await GetStatusName(StatusTask.TOTAL);
+                int countAuction = await GetStatusName(StatusTask.AUCTION);
+                int countWork = await GetStatusName(StatusTask.IN_WORK);
+                int countGarant = await GetStatusName(StatusTask.GARANT);
+                int countComplete = await GetStatusName(StatusTask.COMPLETE);
+                int countPerechet = await GetStatusName(StatusTask.PERECHET);
+                int countDraft = await GetStatusName(StatusTask.DRAFT);
+
+                return new {
+                    total = countTotal,
+                    auction = countAuction,
+                    work = countWork,
+                    garant = countGarant,
+                    complete = countComplete,
+                    perechet = countPerechet,
+                    draft = countDraft
+                };
+            }
+
+            catch (Exception ex) {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод получает кол-во заданий определенного статуса.
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        async Task<int> GetStatusName(string status) {
+            return await _postgre.Tasks
+                .Join(_postgre.TaskStatuses,
+                t => t.StatusCode,
+                s => s.StatusCode,                
+                (t, s) => new { s.StatusName })
+                .Where(s => s.StatusName
+                .Equals(status))                
+                .CountAsync();
+        }
     }
 }

@@ -112,6 +112,12 @@
             </summary>
             <returns>Список активных заданий.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.GetCountTaskStatuses">
+            <summary>
+            Метод получает кол-во задач определенного статуса.
+            </summary>
+            <returns>Число кол-ва задач.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.UserController">
             <summary>
             Контроллер содержит логику работы с пользователями.

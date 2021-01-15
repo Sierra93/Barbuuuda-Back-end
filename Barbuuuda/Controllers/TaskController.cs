@@ -153,5 +153,17 @@ namespace Barbuuuda.Controllers {
 
             return Ok(aTasks);
         }
+
+        /// <summary>
+        /// Метод получает кол-во задач определенного статуса.
+        /// </summary>
+        /// <returns>Число кол-ва задач.</returns>
+        [HttpPost, Route("count-status")]
+        public async Task<IActionResult> GetCountTaskStatuses() {
+            ITask _task = new TaskService(_db, _postgre);
+            object countTask = await _task.GetCountTaskStatuses();
+
+            return Ok(countTask);
+        }
     }
 }

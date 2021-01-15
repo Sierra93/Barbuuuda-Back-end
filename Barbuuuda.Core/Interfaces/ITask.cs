@@ -77,5 +77,12 @@ namespace Barbuuuda.Core.Interfaces {
         /// </summary>
         /// <returns>Список активных заданий.</returns>
         Task<IList> LoadActiveTasks(int userId);
+
+        /// <summary>
+        /// Метод получает кол-во задач определенного статуса.
+        /// </summary>
+        /// <param name="status">Имя статуса, кол-во задач которых нужно получить.</param>
+        /// <returns>Число кол-ва задач.</returns>
+        Task<object> GetCountTaskStatuses();
     }
 }
