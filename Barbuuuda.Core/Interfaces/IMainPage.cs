@@ -1,5 +1,6 @@
 ﻿using Barbuuuda.Models.MainPage;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,5 +39,11 @@ namespace Barbuuuda.Core.Interfaces {
         /// </summary>
         /// <returns>Объект Advantage</returns>
         Task<IList<AdvantageDto>> GetAdvantageContent();
+
+        /// <summary>
+        /// Метод выгружает список категорий заданий.
+        /// </summary>
+        /// <returns></returns>
+        Task<IList> GetCategoryList();
     }
 }

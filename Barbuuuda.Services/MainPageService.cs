@@ -4,6 +4,7 @@ using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.MainPage;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,9 +15,11 @@ namespace Barbuuuda.Services {
     /// </summary>
     public class MainPageService : IMainPage {
         ApplicationDbContext _db;
+        PostgreDbContext _postgre;
 
-        public MainPageService(ApplicationDbContext db) {
+        public MainPageService(ApplicationDbContext db, PostgreDbContext postgre) {
             _db = db;
+            _postgre = postgre;
         }
 
         /// <summary>
@@ -107,6 +110,23 @@ namespace Barbuuuda.Services {
                 throw new Exception(ex.Message.ToString());
             }
 
+        }
+
+
+        /// <summary>
+        /// Метод выгружает список категорий заданий.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IList> GetCategoryList() {
+            try {
+                return await _postgre.TaskCategories.ToListAsync();
+            }
+
+            catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
+                throw new Exception(ex.Message.ToString());
+            }
         }
     }
 }

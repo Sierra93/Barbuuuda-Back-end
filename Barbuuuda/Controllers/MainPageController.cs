@@ -4,6 +4,7 @@ using Barbuuuda.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,9 +16,11 @@ namespace Barbuuuda.Controllers {
     [ApiController, Route("main")]
     public class MainPageController : Controller {
         ApplicationDbContext _db;
+        PostgreDbContext _postgre;
 
-        public MainPageController(ApplicationDbContext db) {
+        public MainPageController(ApplicationDbContext db, PostgreDbContext postgre) {
             _db = db;
+            _postgre = postgre;
         }
 
         /// <summary>
@@ -26,7 +29,7 @@ namespace Barbuuuda.Controllers {
         /// <returns>Объект фона.</returns>
         [HttpPost, Route("get-fon")]
         public async Task<IActionResult> GetFonContent() {
-            IMainPage _mainPage = new MainPageService(_db);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetFonContent());
         }
 
@@ -36,7 +39,7 @@ namespace Barbuuuda.Controllers {
         /// <returns>Все объекты WhyDto</returns>
         [HttpPost, Route("get-why")]
         public async Task<IActionResult> GetWhyContent() {
-            IMainPage _mainPage = new MainPageService(_db);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetWhyContent());
         }
 
@@ -46,7 +49,7 @@ namespace Barbuuuda.Controllers {
         /// <returns>Все объекты WorkDto</returns>
         [HttpPost, Route("get-work")]
         public async Task<IActionResult> GetWorkContent() {
-            IMainPage _mainPage = new MainPageService(_db);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetWorkContent());
         }
 
@@ -56,7 +59,7 @@ namespace Barbuuuda.Controllers {
         /// <returns>Все объекты PrivilegeDto</returns>
         [HttpPost, Route("get-privilege")]
         public async Task<IActionResult> GetPrivilegeContent() {
-            IMainPage _mainPage = new MainPageService(_db);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetPrivilegeContent());
         }
 
@@ -66,8 +69,21 @@ namespace Barbuuuda.Controllers {
         /// <returns>Все объекты Advantage</returns>
         [HttpPost, Route("get-advantage")]
         public async Task<IActionResult> GetAdvantageContent() {
-            IMainPage _mainPage = new MainPageService(_db);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetAdvantageContent());
+        }
+
+
+        /// <summary>
+        /// Метод выгружает список категорий заданий.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Route("category-list")]
+        public async Task<IActionResult> GetCategoryList() {
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
+            IList aCategories = await _mainPage.GetCategoryList();
+
+            return Ok(aCategories);
         }
     }
 }

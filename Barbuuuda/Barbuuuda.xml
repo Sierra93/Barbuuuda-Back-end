@@ -39,6 +39,12 @@
             </summary>
             <returns>Все объекты Advantage</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.MainPageController.GetCategoryList">
+            <summary>
+            Метод выгружает список категорий.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.TaskController">
             <summary>
             Контроллер содержит логику работы с заданиями.
