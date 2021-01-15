@@ -1,6 +1,7 @@
 ﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Extensions;
 using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -55,14 +56,20 @@ namespace Barbuuuda.Services {
             }
 
             catch (ArgumentNullException ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogError();
                 throw new ArgumentNullException("Не все поля заполнены", ex.Message.ToString());
             }
 
             catch (ArgumentException ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogError();
                 throw new ArgumentException("Такой пользователь уже существует", ex.Message.ToString());
             }
 
             catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -160,14 +167,20 @@ namespace Barbuuuda.Services {
             }
 
             catch (ArgumentNullException ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogError();
                 throw new ArgumentNullException("Такого пользователя не существует", ex.Message.ToString());
             }
 
             catch (ArgumentException ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogError();
                 throw new ArgumentException("Параметры не могут быть пустыми", ex.Message.ToString());
             }
 
             catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -241,10 +254,14 @@ namespace Barbuuuda.Services {
             }
 
             catch (ArgumentNullException ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogError();
                 throw new ArgumentNullException("Логин пользователя не передан", ex.Message.ToString());
             }
 
             catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -264,14 +281,20 @@ namespace Barbuuuda.Services {
             }
 
             catch (IndexOutOfRangeException ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogError();
                 throw new IndexOutOfRangeException($"Поля этой роли не сформированы {ex.Message}");
             }
 
             catch (ArgumentNullException ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogError();
                 throw new ArgumentNullException($"Роль пользователя не передана {ex.Message}");
             }
 
             catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }

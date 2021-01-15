@@ -610,6 +610,8 @@ namespace Barbuuuda.Services {
             }
 
             catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -628,6 +630,85 @@ namespace Barbuuuda.Services {
                 .Where(s => s.StatusName
                 .Equals(status))                
                 .CountAsync();
+        }
+
+        /// <summary>
+        /// Метод получает задания определенного статуса.
+        /// </summary>
+        /// <param name="status">Название статуса.</param>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns>Список заданий с определенным статусом.</returns>
+        public async Task<IList> GetStatusTasks(string status, int userId) {
+            try {
+                return string.IsNullOrEmpty(status) ? throw new ArgumentNullException() :
+                     await (from tasks in _postgre.Tasks
+                                   join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                                   join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                                   join users in _postgre.Users on tasks.OwnerId equals users.UserId
+                                   where statuses.StatusName.Equals(status)
+                                   where users.UserId == userId
+                                   select new {
+                                       tasks.CategoryCode,
+                                       tasks.CountOffers,
+                                       tasks.CountViews,
+                                       tasks.OwnerId,
+                                       tasks.SpecCode,
+                                       categories.CategoryName,
+                                       tasks.StatusCode,
+                                       statuses.StatusName,
+                                       taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                       taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                       tasks.TaskTitle,
+                                       tasks.TaskDetail,
+                                       tasks.TaskId,
+                                       taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                       tasks.TypeCode,
+                                       users.UserLogin
+                                   })
+                          .OrderBy(o => o.TaskId)
+                          .ToListAsync();
+            }
+
+            catch (ArgumentNullException ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogError();
+                throw new ArgumentNullException($"Не передан статус {ex.Message}");
+            }
+
+            catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод получает кол-во заданий всего.
+        /// </summary>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns></returns>
+        public async Task<int> GetTotalCountTasks(int userId) {
+            try {
+                return userId != 0 ? await _postgre.Tasks
+                    .Join(_postgre.Users,
+                    t => t.OwnerId,
+                    u => u.UserId,
+                    (t, u) => new { u.UserId })
+                    .Where(u => u.UserId == userId)
+                    .CountAsync() : throw new ArgumentNullException();
+            }
+
+            catch (ArgumentNullException ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogError();
+                throw new ArgumentNullException($"UserId не передан {ex.Message}");
+            }
+
+            catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
+                throw new Exception(ex.Message.ToString());
+            }
         }
     }
 }

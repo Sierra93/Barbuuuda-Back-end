@@ -165,5 +165,32 @@ namespace Barbuuuda.Controllers {
 
             return Ok(countTask);
         }
+
+        /// <summary>
+        /// Метод получает задания определенного статуса.
+        /// </summary>
+        /// <param name="status">Название статуса.</param>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns>Список заданий с определенным статусом.</returns>
+        [HttpGet, Route("task-status")]
+        public async Task<IActionResult> GetStatusTasks([FromQuery] string status, int userId) {
+            ITask _task = new TaskService(_db, _postgre);
+            IList aTasks = await _task.GetStatusTasks(status, userId);
+
+            return Ok(aTasks);
+        }
+
+        /// <summary>
+        /// Метод получает кол-во заданий всего.
+        /// </summary>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns></returns>
+        [HttpGet, Route("total")]
+        public async Task<IActionResult> GetTotalCountTasks([FromQuery] int userId) {
+            ITask _task = new TaskService(_db, _postgre);
+            int countTasks = await _task.GetTotalCountTasks(userId);
+
+            return Ok(countTasks);
+        }
     }
 }

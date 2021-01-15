@@ -118,6 +118,21 @@
             </summary>
             <returns>Число кол-ва задач.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.GetStatusTasks(System.String,System.Int32)">
+            <summary>
+            Метод получает задания определенного статуса.
+            </summary>
+            <param name="status">Название статуса.</param>
+            <param name="userId">Id пользователя.</param>
+            <returns>Список заданий с определенным статусом.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.GetTotalCountTasks(System.Int32)">
+            <summary>
+            Метод получает кол-во заданий всего.
+            </summary>
+            <param name="userId">Id пользователя.</param>
+            <returns></returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.UserController">
             <summary>
             Контроллер содержит логику работы с пользователями.

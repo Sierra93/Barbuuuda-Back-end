@@ -1,5 +1,6 @@
 ﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.MainPage;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -30,10 +31,14 @@ namespace Barbuuuda.Services {
             }
 
             catch (ArgumentNullException ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogError();
                 throw new ArgumentNullException("Данные фона не найдены", ex.Message.ToString());
             }
 
             catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -48,6 +53,8 @@ namespace Barbuuuda.Services {
             }
 
             catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -62,6 +69,8 @@ namespace Barbuuuda.Services {
             }
 
             catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -76,6 +85,8 @@ namespace Barbuuuda.Services {
             }
 
             catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -91,6 +102,8 @@ namespace Barbuuuda.Services {
             }
 
             catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
 
