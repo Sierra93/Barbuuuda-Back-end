@@ -584,6 +584,39 @@ namespace Barbuuuda.Services {
         }
 
         /// <summary>
+        /// Метод получает задания в статусе "В аукционе".
+        /// </summary>
+        /// <param name="taskId"></param>
+        /// <returns></returns>
+        async Task<IList> GetAuctionTasks() {
+            return await (from tasks in _postgre.Tasks
+                          join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                          join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                          join users in _postgre.Users on tasks.OwnerId equals users.UserId
+                          where statuses.StatusName.Equals(StatusTask.AUCTION)
+                          select new {
+                              tasks.CategoryCode,
+                              tasks.CountOffers,
+                              tasks.CountViews,
+                              tasks.OwnerId,
+                              tasks.SpecCode,
+                              categories.CategoryName,
+                              tasks.StatusCode,
+                              statuses.StatusName,
+                              taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                              taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                              tasks.TaskTitle,
+                              tasks.TaskDetail,
+                              tasks.TaskId,
+                              taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                              tasks.TypeCode,
+                              users.UserLogin
+                          })
+                          .OrderBy(o => o.TaskId)
+                          .ToListAsync();
+        }
+
+        /// <summary>
         /// Метод получает кол-во задач определенного статуса.
         /// </summary>
         /// <param name="status">Имя статуса, кол-во задач которых нужно получить.</param>
@@ -702,6 +735,22 @@ namespace Barbuuuda.Services {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogError();
                 throw new ArgumentNullException($"UserId не передан {ex.Message}");
+            }
+
+            catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        public async Task<IList> LoadAuctionTasks() {
+            try {
+                return await GetAuctionTasks();
             }
 
             catch (Exception ex) {

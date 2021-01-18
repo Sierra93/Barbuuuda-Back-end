@@ -41,7 +41,7 @@
         </member>
         <member name="M:Barbuuuda.Controllers.MainPageController.GetCategoryList">
             <summary>
-            Метод выгружает список категорий.
+            Метод выгружает список категорий заданий.
             </summary>
             <returns></returns>
         </member>
@@ -138,6 +138,12 @@
             </summary>
             <param name="userId">Id пользователя.</param>
             <returns></returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.LoadAuctionTasks">
+            <summary>
+            Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".
+            </summary>
+            <returns>Список заданий.</returns>
         </member>
         <member name="T:Barbuuuda.Controllers.UserController">
             <summary>

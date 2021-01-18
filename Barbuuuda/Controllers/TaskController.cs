@@ -192,5 +192,17 @@ namespace Barbuuuda.Controllers {
 
             return Ok(countTasks);
         }
+
+        /// <summary>
+        /// Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        [HttpPost, Route("auction")]
+        public async Task<IActionResult> LoadAuctionTasks() {
+            ITask _task = new TaskService(_db, _postgre);
+            IList aAuctionTasks = await _task.LoadAuctionTasks();
+
+            return Ok(aAuctionTasks);
+        }
     }
 }

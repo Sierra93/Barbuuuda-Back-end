@@ -93,13 +93,17 @@ namespace Barbuuuda.Core.Interfaces {
         /// <returns>Список заданий с определенным статусом.</returns>
         Task<IList> GetStatusTasks(string status, int userId);
 
-
-
         /// <summary>
         /// Метод получает кол-во заданий всего.
         /// </summary>
         /// <param name="userId">Id пользователя.</param>
         /// <returns></returns>
         Task<int> GetTotalCountTasks(int userId);
+
+        /// <summary>
+        /// Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        Task<IList> LoadAuctionTasks();
     }
 }
