@@ -128,5 +128,21 @@ namespace Barbuuuda.Services {
                 throw new Exception(ex.Message.ToString());
             }
         }
+
+        /// <summary>
+        /// Метод полчает данные долгосрочного сотрудничества.
+        /// </summary>
+        /// <returns>ОБъект с данными.</returns>
+        public async Task<HopeDto> GetHopeContent() {
+            try {
+                return await _db.Hopes.FirstOrDefaultAsync();
+            }
+
+            catch (Exception ex) {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogError();
+                throw new Exception(ex.Message.ToString());
+            }
+        }
     }
 }

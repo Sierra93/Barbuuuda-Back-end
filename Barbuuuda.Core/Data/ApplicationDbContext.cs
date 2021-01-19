@@ -29,6 +29,8 @@ namespace Barbuuuda.Core.Data {
 
         public DbSet<HeaderTypeDto> Headers { get; set; }   // Таблица полей хидера.
 
+        public DbSet<HopeDto> Hopes { get; set; }  // Таблица НАДЕЕМСЯ НА ДОЛГОЕ СОТРУДНИЧЕСТВО.
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }

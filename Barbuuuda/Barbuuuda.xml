@@ -45,6 +45,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.MainPageController.GetHopeContent">
+            <summary>
+            Метод полчает данные долгосрочного сотрудничества.
+            </summary>
+            <returns>ОБъект с данными.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.TaskController">
             <summary>
             Контроллер содержит логику работы с заданиями.

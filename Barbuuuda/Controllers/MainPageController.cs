@@ -1,5 +1,6 @@
 ﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Models.MainPage;
 using Barbuuuda.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -84,6 +85,18 @@ namespace Barbuuuda.Controllers {
             IList aCategories = await _mainPage.GetCategoryList();
 
             return Ok(aCategories);
+        }
+
+        /// <summary>
+        /// Метод полчает данные долгосрочного сотрудничества.
+        /// </summary>
+        /// <returns>ОБъект с данными.</returns>
+        [HttpGet, Route("get-hope")]
+        public async Task<IActionResult> GetHopeContent() {
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
+            HopeDto oHope = await _mainPage.GetHopeContent();
+
+            return Ok(oHope);
         }
     }
 }

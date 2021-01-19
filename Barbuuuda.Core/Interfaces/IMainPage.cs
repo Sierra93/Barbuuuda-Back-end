@@ -45,5 +45,12 @@ namespace Barbuuuda.Core.Interfaces {
         /// </summary>
         /// <returns></returns>
         Task<IList> GetCategoryList();
+
+
+        /// <summary>
+        /// Метод полчает данные долгосрочного сотрудничества.
+        /// </summary>
+        /// <returns>ОБъект с данными.</returns>
+        Task<HopeDto> GetHopeContent();
     }
 }
