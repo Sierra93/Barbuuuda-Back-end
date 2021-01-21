@@ -96,7 +96,7 @@ namespace Barbuuuda.Services {
                     throw new ArgumentException();
                 }
 
-                // Проверяет существование заказчика, который создает задание.
+                // Проверяет существование заказчика, который создал задание.
                 bool bCustomer = await IdentityCustomer(oTask.OwnerId);
 
                 // Проверяет, есть ли такая категория в БД.
@@ -338,8 +338,8 @@ namespace Barbuuuda.Services {
                                    specName,
                                    tasks.StatusCode,
                                    statuses.StatusName,
-                                   tasks.TaskBegda,
-                                   tasks.TaskEndda,
+                                   taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                   taskEndda = string.Format("{0:f}", tasks.TaskEndda),
                                    tasks.TaskTitle,
                                    tasks.TaskDetail,
                                    tasks.TaskId,
@@ -438,7 +438,8 @@ namespace Barbuuuda.Services {
                 // Если передали строку.
                 if (param is string) {
                     return await _postgre.Tasks
-                        .Where(t => t.TaskTitle.Contains(param))
+                        .Where(t => t.TaskTitle.ToLower()
+                        .Contains(param.ToLower()))
                         .ToListAsync();
                 }
 
