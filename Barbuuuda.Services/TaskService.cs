@@ -210,7 +210,10 @@ namespace Barbuuuda.Services {
         /// <returns>Коллекцию категорий.</returns>
         public async Task<IList> GetTaskCategories() {
             try {
-                return await _postgre.TaskCategories.ToListAsync();
+                return await _postgre
+                    .TaskCategories
+                    .OrderBy(t => t.CategoryId)
+                    .ToListAsync();
             }
 
             catch (Exception ex) {

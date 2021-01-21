@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -119,7 +120,10 @@ namespace Barbuuuda.Services {
         /// <returns></returns>
         public async Task<IList> GetCategoryList() {
             try {
-                return await _postgre.TaskCategories.ToListAsync();
+                return await _postgre
+                     .TaskCategories
+                     .OrderBy(t => t.CategoryId)
+                     .ToListAsync();
             }
 
             catch (Exception ex) {

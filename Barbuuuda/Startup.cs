@@ -28,11 +28,11 @@ namespace Barbuuuda {
             services.AddControllers();
 
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder => {
-                builder.WithOrigins(
-                    "http://localhost:8080/",
-                    "http://localhost:8080",
+                builder.WithOrigins(                    
                     "https://publico-dev.xyz",
-                    "https://publico-dev.xyz/")
+                    "https://publico-dev.xyz/",
+                    "http://localhost:8080/",
+                    "http://localhost:8080")
                 .AllowAnyMethod().AllowAnyHeader();
             }));
 

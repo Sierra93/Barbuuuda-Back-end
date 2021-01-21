@@ -21,6 +21,9 @@ namespace Barbuuuda.Models.Task {
 
         [Column("specializations", TypeName = "jsonb")]
         public Specialization[] Specializations { get; set; }
+
+        [Column("url", TypeName = "text")]
+        public string Url { get; set; }     // Url иконки категории.
     }
 
     /// <summary>
