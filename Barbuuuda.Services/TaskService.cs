@@ -429,13 +429,14 @@ namespace Barbuuuda.Services {
 
                 // Если передали Id.
                 if (int.TryParse(param, out int bIntParse)) {
-                    int taskId = Convert.ToInt32(param);
+                    int taskId = Convert.ToInt32(param);                    
                     return await _postgre.Tasks
                     .Where(t => t.TaskId == taskId)
                     .ToListAsync();
                 }
 
                 // Если передали строку.
+                // Находит задание переводя все в нижний регистр для поиска.
                 if (param is string) {
                     return await _postgre.Tasks
                         .Where(t => t.TaskTitle.ToLower()

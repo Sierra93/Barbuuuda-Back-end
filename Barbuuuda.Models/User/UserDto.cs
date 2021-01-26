@@ -59,5 +59,17 @@ namespace Barbuuuda.Models.User {
 
         [Column("date_register", TypeName = "timestamp")]
         public DateTime DateRegister { get; set; }  // Дата регистрации пользователя.
+
+        [Column("about_info", TypeName = "text")]
+        public string AboutInfo { get; set; }   // Информация "Обо мне".
+
+        [Column("score", TypeName = "numeric(12,2)")]
+        public decimal? Score { get; set; }     // Счет пользователя.
+
+        [Column("plan", TypeName = "varchar(10)")]
+        public string Plan { get; set; }    // План: PRO или базовый.
+
+        [Column("city", TypeName = "varchar(200)")]
+        public string City { get; set; }
     }
 }
