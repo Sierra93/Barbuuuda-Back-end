@@ -79,7 +79,7 @@ namespace Barbuuuda.Controllers {
         /// <param name="userId">Id юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
         [HttpPost, Route("profile")]
-        public async Task<IActionResult> GetProfileInfo(int userId) {
+        public async Task<IActionResult> GetProfileInfo([FromQuery] int userId) {
             IUser _user = new UserService(_db, _postgre);
             object oUser = await _user.GetProfileInfo(userId);
 

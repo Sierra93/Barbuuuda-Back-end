@@ -24,11 +24,11 @@ namespace Barbuuuda.Controllers {
             _postgre = postgre;
         }
 
-        
+
         /// <summary>
         /// Метод создает новое задание.
         /// </summary>
-        /// <param name="task">Объект с данными задания.</param>
+        /// <param name="oTask">Объект с данными задания.</param>
         /// <returns>Вернет данные созданного задания.</returns>
         [HttpPost, Route("create")]
         public async Task<IActionResult> CreateTask([FromBody] TaskDto oTask) {
@@ -41,7 +41,7 @@ namespace Barbuuuda.Controllers {
         /// <summary>
         /// Метод создает новое задание.
         /// </summary>
-        /// <param name="task">Объект с данными задания.</param>
+        /// <param name="oTask">Объект с данными задания.</param>
         /// <returns>Вернет данные измененного задания.</returns>
         [HttpPost, Route("edit")]
         public async Task<IActionResult> EditTask([FromBody] TaskDto oTask) {

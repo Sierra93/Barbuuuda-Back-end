@@ -60,14 +60,14 @@
             <summary>
             Метод создает новое задание.
             </summary>
-            <param name="task">Объект с данными задания.</param>
+            <param name="oTask">Объект с данными задания.</param>
             <returns>Вернет данные созданного задания.</returns>
         </member>
         <member name="M:Barbuuuda.Controllers.TaskController.EditTask(Barbuuuda.Models.Task.TaskDto)">
             <summary>
             Метод создает новое задание.
             </summary>
-            <param name="task">Объект с данными задания.</param>
+            <param name="oTask">Объект с данными задания.</param>
             <returns>Вернет данные измененного задания.</returns>
         </member>
         <member name="M:Barbuuuda.Controllers.TaskController.GetCategories">
@@ -172,6 +172,13 @@
             </summary>
             <param name="user">Объект для авторизации юзера.</param>
             <returns>true/false</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.UserController.GetProfileInfo(System.Int32)">
+            <summary>
+            Метод получает информацию о пользователе для профиля.
+            </summary>
+            <param name="userId">Id юзера.</param>
+            <returns>Объект с данными о профиле пользователя.</returns>
         </member>
     </members>
 </doc>

@@ -26,5 +26,33 @@ namespace Barbuuuda.Tests {
         public IList GetTasksList() {
             return _postgre.Tasks.ToList();
         }
+
+        /// <summary>
+        /// Метод получает всю информацию профиля.
+        /// </summary>
+        /// <returns></returns>
+        public object GetProfileInfo() {
+            int userId = 1;
+
+            return _postgre.Users
+                    .Where(u => u.UserId == userId)
+                    .Select(up => new {
+                        up.UserLogin,
+                        up.UserEmail,
+                        up.UserPhone,
+                        up.LastName,
+                        up.FirstName,
+                        up.Patronymic,
+                        up.UserIcon,
+                        up.Rating,
+                        dateRegister = string.Format("{0:f}", up.DateRegister),
+                        scoreMoney = string.Format("{0:0,0}", up.Score),
+                        up.AboutInfo,
+                        up.Plan,
+                        up.City,
+                        up.Age
+                    })
+                    .FirstOrDefault();
+        }
     }
 }
