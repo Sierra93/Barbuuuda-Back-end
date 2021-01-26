@@ -41,5 +41,12 @@ namespace Barbuuuda.Core.Interfaces {
         /// <param name="userId">Id юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
         Task<object> GetProfileInfo(int userId);
+
+        /// <summary>
+        /// Метод сохраняет личные данные юзера.
+        /// </summary>
+        /// <param name="user">Объект с данными юзера.</param>
+        /// <returns>Измененные данные.</returns>
+        Task<UserDto> SaveProfileData(UserDto user);
     }
 }

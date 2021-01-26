@@ -339,5 +339,32 @@ namespace Barbuuuda.Services {
                 throw new Exception(ex.Message.ToString());
             }
         }
+
+        /// <summary>
+        /// Метод сохраняет личные данные юзера.
+        /// </summary>
+        /// <param name="user">Объект с данными юзера.</param>
+        /// <returns>Измененные данные.</returns>
+        public async Task<UserDto> SaveProfileData(UserDto user) {
+            try {
+                if (user.UserId == 0)
+                    throw new ArgumentNullException();
+
+                _postgre.Users.Update(user);
+                _postgre.SaveChanges();
+
+                UserDto oUser = await _postgre.Users.Where(u => u.UserId == user.UserId).FirstOrDefaultAsync();
+
+                return oUser;
+            }
+
+            catch (ArgumentNullException ex) {
+                throw new ArgumentNullException($"Не передан UserId {ex.Message}");
+            }
+
+            catch (Exception ex) {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
     }
 }

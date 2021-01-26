@@ -74,5 +74,8 @@ namespace Barbuuuda.Models.User {
 
         [Column("age", TypeName = "integer")]
         public int Age { get; set; }
+
+        [Column("gender", TypeName = "character(1)")]
+        public char Gender { get; set; }    // M - мужчина, F - женщина.
     }
 }

@@ -44,8 +44,8 @@ namespace Barbuuuda.Tests {
                 Age = 23
             };
 
-            context.Add(oUser);
+            context.Users.Add(oUser);
             context.SaveChanges();
-        }
+        }      
     }
 }
