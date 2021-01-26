@@ -72,5 +72,18 @@ namespace Barbuuuda.Controllers {
 
             return Ok(oObj);
         }
+
+        /// <summary>
+        /// Метод получает информацию о пользователе для профиля.
+        /// </summary>
+        /// <param name="userId">Id юзера.</param>
+        /// <returns>Объект с данными о профиле пользователя.</returns>
+        [HttpPost, Route("profile")]
+        public async Task<IActionResult> GetProfileInfo(int userId) {
+            IUser _user = new UserService(_db, _postgre);
+            object oUser = await _user.GetProfileInfo(userId);
+
+            return Ok(oUser);
+        }
     }
 }

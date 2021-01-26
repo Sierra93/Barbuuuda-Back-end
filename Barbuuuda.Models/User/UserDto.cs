@@ -71,5 +71,8 @@ namespace Barbuuuda.Models.User {
 
         [Column("city", TypeName = "varchar(200)")]
         public string City { get; set; }
+
+        [Column("age", TypeName = "integer")]
+        public int Age { get; set; }
     }
 }

@@ -35,5 +35,11 @@ namespace Barbuuuda.Core.Interfaces {
         /// <param name="role">Роль юзера.</param>
         /// <returns></returns>
         IList<HeaderTypeDto> GetHeader(string role);
+        /// <summary>
+        /// Метод получает информацию о пользователе для профиля.
+        /// </summary>
+        /// <param name="userId">Id юзера.</param>
+        /// <returns>Объект с данными о профиле пользователя.</returns>
+        Task<object> GetProfileInfo(int userId);
     }
 }

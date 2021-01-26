@@ -298,5 +298,46 @@ namespace Barbuuuda.Services {
                 throw new Exception(ex.Message.ToString());
             }
         }
+
+        /// <summary>
+        /// Метод получает информацию о пользователе для профиля.
+        /// </summary>
+        /// <param name="userId">Id юзера.</param>
+        /// <returns>Объект с данными о профиле пользователя.</returns>
+        public async Task<object> GetProfileInfo(int userId) {
+            try {
+                if (userId == 0) {
+                    throw new ArgumentNullException();
+                }
+
+                return await _postgre.Users
+                    .Where(u => u.UserId == userId)
+                    .Select(up => new {
+                        up.UserLogin,
+                        up.UserEmail,
+                        up.UserPhone,
+                        up.LastName,
+                        up.FirstName,
+                        up.Patronymic,
+                        up.UserIcon,
+                        up.Rating,
+                        dateRegister = string.Format("{0:f}", up.DateRegister),
+                        scoreMoney = string.Format("{0:0,0}", up.Score),
+                        up.AboutInfo,
+                        up.Plan,
+                        up.City,
+                        up.Age
+                    })
+                    .FirstOrDefaultAsync();
+            }
+
+            catch (ArgumentNullException ex) {
+                throw new ArgumentNullException($"Не передан UserId {ex.Message}");
+            }
+
+            catch (Exception ex) {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
     }
 }
