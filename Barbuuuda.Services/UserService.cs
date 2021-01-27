@@ -343,19 +343,15 @@ namespace Barbuuuda.Services {
         /// <summary>
         /// Метод сохраняет личные данные юзера.
         /// </summary>
-        /// <param name="user">Объект с данными юзера.</param>
-        /// <returns>Измененные данные.</returns>
-        public async Task<UserDto> SaveProfileData(UserDto user) {
+        /// <param name="needUserUpdate">Объект с данными юзера.</param>
+        public async Task SaveProfileData(UserDto needUserUpdate) {
             try {
-                if (user.UserId == 0)
+                if (needUserUpdate.UserId == 0)
                     throw new ArgumentNullException();
 
-                _postgre.Users.Update(user);
-                _postgre.SaveChanges();
-
-                UserDto oUser = await _postgre.Users.Where(u => u.UserId == user.UserId).FirstOrDefaultAsync();
-
-                return oUser;
+                // Изменяет объект юзера.
+                await ChangeProfileData(needUserUpdate);
+                await _postgre.SaveChangesAsync();
             }
 
             catch (ArgumentNullException ex) {
@@ -365,6 +361,24 @@ namespace Barbuuuda.Services {
             catch (Exception ex) {
                 throw new Exception(ex.Message.ToString());
             }
+        }
+
+        /// <summary>
+        /// Метод изменяет объект юзера.
+        /// </summary>
+        /// <param name="needUserUpdate">Исходный объект юзера для изменения.</param>
+        private async Task ChangeProfileData(UserDto needUserUpdate) {
+            UserDto oldUser = await _postgre.Users
+                    .Where(u => u.UserId == needUserUpdate.UserId)
+                    .FirstOrDefaultAsync();
+
+            // Изменяет некоторые поля.
+            oldUser.LastName = needUserUpdate.LastName;
+            oldUser.FirstName = needUserUpdate.FirstName;
+            oldUser.Patronymic = needUserUpdate.Patronymic;
+            oldUser.UserEmail = needUserUpdate.UserEmail;
+            oldUser.City = needUserUpdate.City;
+            oldUser.Gender = needUserUpdate.Gender;            
         }
     }
 }

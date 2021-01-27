@@ -90,13 +90,12 @@ namespace Barbuuuda.Controllers {
         /// Метод сохраняет личные данные юзера.
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
-        /// <returns>Измененные данные.</returns>
         [HttpPost, Route("save-data")]
         public async Task<IActionResult> SaveProfileData([FromBody] UserDto user) {
             IUser _user = new UserService(_db, _postgre);
-            UserDto oUser = await _user.SaveProfileData(user);
+            await _user.SaveProfileData(user);
 
-            return Ok(oUser);
+            return Ok();
         }
     }
 }

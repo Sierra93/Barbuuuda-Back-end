@@ -46,7 +46,6 @@ namespace Barbuuuda.Core.Interfaces {
         /// Метод сохраняет личные данные юзера.
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
-        /// <returns>Измененные данные.</returns>
-        Task<UserDto> SaveProfileData(UserDto user);
+        Task SaveProfileData(UserDto user);
     }
 }
