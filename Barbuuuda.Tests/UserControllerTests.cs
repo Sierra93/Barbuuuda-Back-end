@@ -36,12 +36,12 @@ namespace Barbuuuda.Tests {
         /// <param name="context"></param>
         void AddProfileInfo(PostgreDbContext context) {
             UserDto oUser = new UserDto {
-                UserLogin = "Olyaleya",
-                UserPassword = "12345!",
-                UserEmail = "olyaleya@mail.ru",
-                UserType = "Заказчик",
-                UserPhone = "8(985)-435-65-78",
-                Age = 23
+                //UserLogin = "Olyaleya",
+                //UserPassword = "12345!",
+                //UserEmail = "olyaleya@mail.ru",
+                //UserType = "Заказчик",
+                //UserPhone = "8(985)-435-65-78",
+                //Age = 23
             };
 
             context.Users.Add(oUser);

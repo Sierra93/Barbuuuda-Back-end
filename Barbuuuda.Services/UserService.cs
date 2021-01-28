@@ -3,9 +3,11 @@ using Barbuuuda.Core.Extensions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.User;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -18,53 +20,43 @@ namespace Barbuuuda.Services {
     /// Сервис реализует методы пользователя.
     /// </summary>
     public class UserService : IUser {
-        ApplicationDbContext _db;
-        PostgreDbContext _postgre;
+        private readonly ApplicationDbContext _db;
+        private readonly PostgreDbContext _postgre;
+        private readonly IdentityDbContext _iden;
+        private readonly UserManager<UserDto> _userManager;
+        private readonly SignInManager<UserDto> _signInManager;
 
-        public UserService(ApplicationDbContext db, PostgreDbContext postgre) {
+        public UserService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserDto> userManager, SignInManager<UserDto> signInManager) {
             _db = db;
             _postgre = postgre;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _iden = iden;
         }
 
         /// <summary>
         /// Метод создает нового пользователя.
         /// </summary>
         /// <param name="user">Объект с данными регистрации пользователя.</param>
-        public async Task<UserDto> Create(UserDto user) {
+        public async Task<object> Create(UserDto model) {
             try {
-                bool bFields = CheckUserFields(user);
+                List<string> aErrors = new List<string>();
 
-                if (!bFields) {
-                    throw new ArgumentNullException();
+                // Добавляет юзера.
+                var addedUser = await _userManager.CreateAsync(model, model.UserPassword);
+
+                if (addedUser.Succeeded) {
+                    return addedUser;
                 }
 
-                // Проверяет существование пользователя.
-                bool isUser = await IdentityUser(user.UserLogin, user.UserEmail, user.UserPhone);
-
-                if (!isUser) {
-                    // Хэширует пароль в MD5.
-                    string hashPass = HashMD5.HashPassword(user.UserPassword);
-                    user.UserPassword = hashPass;
-
-                    await _postgre.Users.AddAsync(user);
-                    await _postgre.SaveChangesAsync();
-
-                    return user;
+                else {
+                    foreach (var error in addedUser.Errors) {
+                        aErrors.Add(error.Description);
+                        return aErrors;
+                    }
                 }
 
-                throw new ArgumentException();
-            }
-
-            catch (ArgumentNullException ex) {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                await _logger.LogError();
-                throw new ArgumentNullException("Не все поля заполнены", ex.Message.ToString());
-            }
-
-            catch (ArgumentException ex) {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                await _logger.LogError();
-                throw new ArgumentException("Такой пользователь уже существует", ex.Message.ToString());
+                throw new Exception();
             }
 
             catch (Exception ex) {
@@ -80,31 +72,31 @@ namespace Barbuuuda.Services {
         /// <returns>Статус true/false</returns>
         async Task<bool> IdentityUser(string login, string email, string phone) {
             // Ищет по логину.
-            UserDto isUserLogin =  await _postgre.Users.Where(u => u.UserLogin.Equals(login)).FirstOrDefaultAsync();
+            //UserDto isUserLogin =  await _postgre.Users.Where(u => u.UserLogin.Equals(login)).FirstOrDefaultAsync();
 
-            // Ищет по email.
-            UserDto isUserEmail = await _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
+            //// Ищет по email.
+            //UserDto isUserEmail = await _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
 
-            // Ищет по телефону.
-            UserDto isUserPhone = await _postgre.Users.Where(u => u.UserPhone.Equals(phone)).FirstOrDefaultAsync();
+            //// Ищет по телефону.
+            //UserDto isUserPhone = await _postgre.Users.Where(u => u.UserPhone.Equals(phone)).FirstOrDefaultAsync();
 
-            if (isUserLogin != null || isUserEmail != null || isUserPhone != null) {
-                return true;
-            }
-
-            return false;
-        }
-
-        async Task<bool> IdentityUser(string email) {
-            // Ищет по email.
-            UserDto isUserEmail = await _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
-
-            if (isUserEmail != null) {
-                return true;
-            }
+            //if (isUserLogin != null || isUserEmail != null || isUserPhone != null) {
+            //    return true;
+            //}
 
             return false;
         }
+
+        //async Task<bool> IdentityUser(string email) {
+        //    // Ищет по email.
+        //    UserDto isUserEmail = await _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
+
+        //    if (isUserEmail != null) {
+        //        return true;
+        //    }
+
+        //    return false;
+        //}
 
         /// <summary>
         /// Метод авторизует пользователя.
@@ -113,57 +105,58 @@ namespace Barbuuuda.Services {
         /// <returns>Статус true/false</returns>
         public async Task<object> Login(UserDto user) {
             try {
-                ErrorExtension errorExtension = new ErrorExtension();
+                //ErrorExtension errorExtension = new ErrorExtension();
 
-                if (string.IsNullOrEmpty(user.UserEmail) || string.IsNullOrEmpty(user.UserPassword)) {
-                    throw new ArgumentException();
-                }
+                //if (string.IsNullOrEmpty(user.UserEmail) || string.IsNullOrEmpty(user.UserPassword)) {
+                //    throw new ArgumentException();
+                //}
 
-                bool bUser = await IdentityUser(user.UserEmail);
+                //bool bUser = await IdentityUser(user.UserEmail);
 
-                if (bUser) {
-                    // Выбирает юзера из БД.
-                    var oUser = GetUserDB(user.UserEmail);
+                //if (bUser) {
+                //    // Выбирает юзера из БД.
+                //    var oUser = GetUserDB(user.UserEmail);
 
-                    // Хэширует пароль для сравнения.
-                    string hashPassword = HashMD5.HashPassword(user.UserPassword);
+                //    // Хэширует пароль для сравнения.
+                //    string hashPassword = HashMD5.HashPassword(user.UserPassword);
 
-                    // Выбирает пароль пользователя из БД.
-                    bool getIdentityPassword = await GetUserPassword(hashPassword);
+                //    // Выбирает пароль пользователя из БД.
+                //    bool getIdentityPassword = await GetUserPassword(hashPassword);
 
-                    if (!getIdentityPassword) {
-                        return errorExtension.ThrowErrorLogin();
-                    }
+                //    if (!getIdentityPassword) {
+                //        return errorExtension.ThrowErrorLogin();
+                //    }
 
-                    if (oUser != null) {
-                        var now = DateTime.UtcNow;
-                        var jwt = new JwtSecurityToken(
-                            issuer: AuthOptions.ISSUER,
-                            audience: AuthOptions.AUDIENCE,
-                            notBefore: now,
-                            claims: oUser.Claims,
-                            expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
-                            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-                        var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+                //    if (oUser != null) {
+                //        var now = DateTime.UtcNow;
+                //        var jwt = new JwtSecurityToken(
+                //            issuer: AuthOptions.ISSUER,
+                //            audience: AuthOptions.AUDIENCE,
+                //            notBefore: now,
+                //            claims: oUser.Claims,
+                //            expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                //            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                //        var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                        // Записывает токен юзеру.
-                        UserDto updateUser = _postgre.Users.Where(u => u.UserEmail.Equals(user.UserEmail)).FirstOrDefault();
-                        updateUser.Token = encodedJwt;
+                //        // Записывает токен юзеру.
+                //        //UserDto updateUser = _postgre.Users.Where(u => u.UserEmail.Equals(user.UserEmail)).FirstOrDefault();
+                //        //updateUser.Token = encodedJwt;
 
-                        var response = new {
-                            access_token = encodedJwt,
-                            username = oUser.Name,
-                            role = updateUser.UserType
-                        };
+                //        var response = new {
+                //            access_token = encodedJwt,
+                //            username = oUser.Name
+                //            //role = updateUser.UserType
+                //        };
 
-                        _postgre.Users.Update(updateUser);
-                        await _db.SaveChangesAsync();
+                //        //_postgre.Users.Update(updateUser);
+                //        await _db.SaveChangesAsync();
 
-                        return response;
-                    }
-                }
+                //        return response;
+                //    }
+                //}
 
-                return errorExtension.ThrowErrorLogin();
+                //return errorExtension.ThrowErrorLogin();
+                return null;
             }
 
             catch (ArgumentNullException ex) {
@@ -191,13 +184,13 @@ namespace Barbuuuda.Services {
         /// <param name="user"></param>
         /// <returns></returns>
         bool CheckUserFields(UserDto user) {
-            if (string.IsNullOrEmpty(user.UserLogin) ||
-                   string.IsNullOrEmpty(user.UserPassword) ||
-                   string.IsNullOrEmpty(user.UserEmail) ||
-                   string.IsNullOrEmpty(user.UserType) ||
-                   string.IsNullOrEmpty(user.UserPhone)) {
-                return false;
-            }
+            //if (string.IsNullOrEmpty(user.UserLogin) ||
+            //       string.IsNullOrEmpty(user.UserPassword) ||
+            //       string.IsNullOrEmpty(user.UserEmail) ||
+            //       string.IsNullOrEmpty(user.UserType) ||
+            //       string.IsNullOrEmpty(user.UserPhone)) {
+            //    return false;
+            //}
 
             return true;
         }
@@ -208,27 +201,27 @@ namespace Barbuuuda.Services {
         /// <param name="login"></param>
         /// <returns></returns>
         public async Task<bool> GetUserPassword(string password) {
-            UserDto oUser = await _postgre.Users.Where(p => p.UserPassword.Equals(password)).FirstOrDefaultAsync();
+            //UserDto oUser = await _postgre.Users.Where(p => p.UserPassword.Equals(password)).FirstOrDefaultAsync();
 
-            if (oUser == null) {
-                return false;
-            }
+            //if (oUser == null) {
+            //    return false;
+            //}
 
             return true;
         }
 
         ClaimsIdentity GetUserDB(string email) {
-            UserDto oUser =  _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefault();
+            //UserDto oUser =  _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefault();
 
-            if (oUser != null) {
-                var claims = new List<Claim> {
-                        new Claim(ClaimsIdentity.DefaultNameClaimType, email)
-                    };
+            //if (oUser != null) {
+            //    var claims = new List<Claim> {
+            //            new Claim(ClaimsIdentity.DefaultNameClaimType, email)
+            //        };
 
-                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+            //    ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
 
-                return claimsIdentity;
-            }
+            //    return claimsIdentity;
+            //}
 
             return null;
         }
@@ -238,19 +231,20 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="login">Логин юзера.</param>
         /// <returns>true/false</returns>
-        public bool Authorize(string email, ref int userId) {
+        public bool Authorize(string email, ref string userId) {
             try {
-                if (string.IsNullOrEmpty(email)) {
-                    throw new ArgumentNullException();
-                }
+                //if (string.IsNullOrEmpty(email)) {
+                //    throw new ArgumentNullException();
+                //}
 
-                UserDto oUser = _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefault();
-                
-                if (oUser != null) {
-                    userId = oUser.UserId;
-                }
+                //UserDto oUser = _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefault();
 
-                return oUser.Token != null ? true : false;
+                //if (oUser != null) {
+                //    userId = oUser.Id;
+                //}
+
+                //return oUser.Token != null ? true : false;
+                return false;
             }
 
             catch (ArgumentNullException ex) {
@@ -304,18 +298,18 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="userId">Id юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        public async Task<object> GetProfileInfo(int userId) {
+        public async Task<object> GetProfileInfo(string userId) {
             try {
-                if (userId == 0) {
+                if (string.IsNullOrEmpty(userId)) {
                     throw new ArgumentNullException();
                 }
 
                 return await _postgre.Users
-                    .Where(u => u.UserId == userId)
+                    .Where(u => u.Id.Equals(userId))
                     .Select(up => new {
-                        up.UserLogin,
-                        up.UserEmail,
-                        up.UserPhone,
+                        //up.UserLogin,
+                        //up.UserEmail,
+                        //up.UserPhone,
                         up.LastName,
                         up.FirstName,
                         up.Patronymic,
@@ -346,7 +340,7 @@ namespace Barbuuuda.Services {
         /// <param name="needUserUpdate">Объект с данными юзера.</param>
         public async Task SaveProfileData(UserDto needUserUpdate) {
             try {
-                if (needUserUpdate.UserId == 0)
+                if (string.IsNullOrEmpty(needUserUpdate.Id))
                     throw new ArgumentNullException();
 
                 // Изменяет объект юзера.
@@ -369,16 +363,16 @@ namespace Barbuuuda.Services {
         /// <param name="needUserUpdate">Исходный объект юзера для изменения.</param>
         private async Task ChangeProfileData(UserDto needUserUpdate) {
             UserDto oldUser = await _postgre.Users
-                    .Where(u => u.UserId == needUserUpdate.UserId)
+                    .Where(u => u.Id.Equals(needUserUpdate.Id))
                     .FirstOrDefaultAsync();
 
             // Изменяет некоторые поля.
             oldUser.LastName = needUserUpdate.LastName;
             oldUser.FirstName = needUserUpdate.FirstName;
             oldUser.Patronymic = needUserUpdate.Patronymic;
-            oldUser.UserEmail = needUserUpdate.UserEmail;
+            //oldUser.UserEmail = needUserUpdate.UserEmail;
             oldUser.City = needUserUpdate.City;
-            oldUser.Gender = needUserUpdate.Gender;            
+            //oldUser.Gender = needUserUpdate.Gender;            
         }
     }
 }

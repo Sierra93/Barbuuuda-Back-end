@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Barbuuuda.Core.Data {
     public class PostgreDbContext : DbContext {
-        public DbSet<UserDto> Users { get; set; }    // Таблица пользователей.
+        public DbSet<UserDto> Users { get; set; }    // Таблица информации аккаунтов пользователей.
 
         public DbSet<TaskDto> Tasks { get; set; }    // Таблица предложений поставщикам.
 

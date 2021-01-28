@@ -13,7 +13,7 @@ namespace Barbuuuda.Core.Interfaces {
         /// Метод создает нового пользователя.
         /// </summary>
         /// <param name="user">Объект с данными регистрации пользователя.</param>
-        Task<UserDto> Create(UserDto user);
+        Task<object> Create(UserDto user);
 
         /// <summary>
         /// Метод авторизует пользователя.
@@ -27,7 +27,7 @@ namespace Barbuuuda.Core.Interfaces {
         /// </summary>
         /// <param name="userId">Id юзера.</param>
         /// <returns>true/false</returns>
-        bool Authorize(string login, ref int userId);
+        bool Authorize(string login, ref string userId);
 
         /// <summary>
         /// Метод получает хидер в зависимости от роли.
@@ -40,7 +40,7 @@ namespace Barbuuuda.Core.Interfaces {
         /// </summary>
         /// <param name="userId">Id юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        Task<object> GetProfileInfo(int userId);
+        Task<object> GetProfileInfo(string userId);
 
         /// <summary>
         /// Метод сохраняет личные данные юзера.

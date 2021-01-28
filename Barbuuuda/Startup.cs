@@ -1,7 +1,9 @@
 using Barbuuuda.Core.Data;
+using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -42,6 +44,12 @@ namespace Barbuuuda {
 
             services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
         opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+
+            services.AddDbContext<IdentityDbContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+
+            services.AddIdentity<UserDto, IdentityRole>()
+                .AddEntityFrameworkStores<IdentityDbContext>();
 
             //services.AddDbContext<ApplicationDbContext>(options =>
             //  options.UseSqlServer(
@@ -85,6 +93,7 @@ namespace Barbuuuda {
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => {
