@@ -2,6 +2,7 @@
 using Barbuuuda.Core.Extensions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
+using Barbuuuda.Core.ViewModels.User;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,22 +39,19 @@ namespace Barbuuuda.Services {
         /// Метод создает нового пользователя.
         /// </summary>
         /// <param name="user">Объект с данными регистрации пользователя.</param>
-        public async Task<object> Create(UserDto model) {
-            try {
-                List<string> aErrors = new List<string>();
-
+        public async Task<object> Create(UserDto user) {
+            try {                
                 // Добавляет юзера.
-                var addedUser = await _userManager.CreateAsync(model, model.UserPassword);
+                var addedUser = await _userManager.CreateAsync(user, user.UserPassword);
 
+                //Если регистрация успешна.
                 if (addedUser.Succeeded) {
                     return addedUser;
                 }
 
                 else {
-                    foreach (var error in addedUser.Errors) {
-                        aErrors.Add(error.Description);
-                        return aErrors;
-                    }
+                    CustomValidatorVm custom = new CustomValidatorVm(_iden);
+                    return await custom.ValidateAsync(_userManager, user);
                 }
 
                 throw new Exception();
@@ -61,7 +59,7 @@ namespace Barbuuuda.Services {
 
             catch (Exception ex) {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                await _logger.LogCritical();
+                await _logger.LogError();
                 throw new Exception(ex.Message.ToString());
             }
         }
