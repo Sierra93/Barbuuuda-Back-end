@@ -231,13 +231,14 @@ namespace Barbuuuda.Services {
         /// <summary>
         /// Метод получает все задания заказчика.
         /// </summary>
-        /// <param name="id">Id заказчика.</param>
+        /// <param name="userId">Id заказчика.</param>
         /// <returns>Коллекцию заданий.</returns>
         async Task<IList> GetAllTasks(string userId) {
+            string userName = await GetUserLoginById(userId);
+
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                           join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                          join users in _iden.AspNetUsers on tasks.OwnerId equals users.Id
                           where tasks.OwnerId.Equals(userId)
                           select new {
                               tasks.CategoryCode,
@@ -255,7 +256,7 @@ namespace Barbuuuda.Services {
                               tasks.TaskId,
                               taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                               tasks.TypeCode,
-                              users.UserName
+                              userName
                           })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync(); 
@@ -285,10 +286,10 @@ namespace Barbuuuda.Services {
                 }
             }
 
+            string userName = await GetUserLoginById(userId);
             var oTask = await (from tasks in _postgre.Tasks
                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                               join users in _postgre.Users on tasks.OwnerId equals users.Id
                                where tasks.OwnerId.Equals(userId)
                                where tasks.TaskId.Equals(taskId)
                                select new {
@@ -308,7 +309,7 @@ namespace Barbuuuda.Services {
                                    tasks.TaskId,
                                    taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                                    tasks.TypeCode,
-                                   users.UserName
+                                   userName
                                })
                                .ToListAsync();
 
@@ -523,6 +524,8 @@ namespace Barbuuuda.Services {
         /// <param name="taskId"></param>
         /// <returns></returns>
         async Task<IList> GetActiveTasks(string userId) {
+            string userName = await GetUserLoginById(userId);
+
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                           join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
@@ -546,7 +549,7 @@ namespace Barbuuuda.Services {
                               tasks.TaskId,
                               taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                               tasks.TypeCode,
-                              users.UserName
+                              userName
                           })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
@@ -642,6 +645,8 @@ namespace Barbuuuda.Services {
         /// <returns>Список заданий с определенным статусом.</returns>
         public async Task<IList> GetStatusTasks(string status, string userId) {
             try {
+                string userName = await GetUserLoginById(userId);
+
                 return string.IsNullOrEmpty(status) ? throw new ArgumentNullException() :
                      await (from tasks in _postgre.Tasks
                                    join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
@@ -665,7 +670,7 @@ namespace Barbuuuda.Services {
                                        tasks.TaskId,
                                        taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                                        tasks.TypeCode,
-                                       users.UserName
+                                       userName
                                    })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
@@ -691,12 +696,9 @@ namespace Barbuuuda.Services {
         /// <returns></returns>
         public async Task<int> GetTotalCountTasks(string userId) {
             try {
-                return !string.IsNullOrEmpty(userId) ? await _postgre.Tasks
-                    .Join(_iden.AspNetUsers,
-                    t => t.OwnerId,
-                    u => u.Id,
-                    (t, u) => new { u.Id })
-                    .Where(u => u.Id.Equals(userId))
+                return !string.IsNullOrEmpty(userId) ?
+                    await _postgre.Tasks
+                    .Where(t => t.OwnerId.Equals(userId))
                     .CountAsync() : throw new ArgumentNullException();
             }
 
@@ -727,6 +729,19 @@ namespace Barbuuuda.Services {
                 await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
+        }
+
+        /// <summary>
+        /// Метод выбирает Login юзера по его Id.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>Login юзера.</returns>
+        private async Task<string> GetUserLoginById(string userId) {
+            return await _iden.AspNetUsers
+                .Where(u => u.Id
+                .Equals(userId))
+                .Select(u => u.UserName)
+                .FirstOrDefaultAsync();
         }
     }
 }
