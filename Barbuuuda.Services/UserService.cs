@@ -39,7 +39,7 @@ namespace Barbuuuda.Services {
         /// Метод создает нового пользователя.
         /// </summary>
         /// <param name="user">Объект с данными регистрации пользователя.</param>
-        public async Task<object> Create(UserDto user) {
+        public async Task<object> CreateAsync(UserDto user) {
             try {                
                 // Добавляет юзера.
                 var addedUser = await _userManager.CreateAsync(user, user.UserPassword);
@@ -50,6 +50,7 @@ namespace Barbuuuda.Services {
                 }
 
                 else {
+                    // Запускает цепочку проверок валидаций полей.
                     CustomValidatorVm custom = new CustomValidatorVm(_iden);
                     return await custom.ValidateAsync(_userManager, user);
                 }
@@ -101,60 +102,25 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>
         /// <returns>Статус true/false</returns>
-        public async Task<object> Login(UserDto user) {
+        public async Task<object> LoginAsync(UserDto user) {
             try {
-                //ErrorExtension errorExtension = new ErrorExtension();
+                var oAuth = await _signInManager.PasswordSignInAsync(user.UserName, user.UserPassword, user.RememberMe, false);
 
-                //if (string.IsNullOrEmpty(user.UserEmail) || string.IsNullOrEmpty(user.UserPassword)) {
-                //    throw new ArgumentException();
-                //}
+                if (oAuth.Succeeded) {
+                    // Генерит токен юзеру.
+                    string sToken = GetToken(user);
 
-                //bool bUser = await IdentityUser(user.UserEmail);
+                    return new {
+                        oAuth.Succeeded,
+                        oAuth.IsLockedOut,
+                        username = user.UserName,
+                        token = sToken
+                    };
+                }
 
-                //if (bUser) {
-                //    // Выбирает юзера из БД.
-                //    var oUser = GetUserDB(user.UserEmail);
-
-                //    // Хэширует пароль для сравнения.
-                //    string hashPassword = HashMD5.HashPassword(user.UserPassword);
-
-                //    // Выбирает пароль пользователя из БД.
-                //    bool getIdentityPassword = await GetUserPassword(hashPassword);
-
-                //    if (!getIdentityPassword) {
-                //        return errorExtension.ThrowErrorLogin();
-                //    }
-
-                //    if (oUser != null) {
-                //        var now = DateTime.UtcNow;
-                //        var jwt = new JwtSecurityToken(
-                //            issuer: AuthOptions.ISSUER,
-                //            audience: AuthOptions.AUDIENCE,
-                //            notBefore: now,
-                //            claims: oUser.Claims,
-                //            expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
-                //            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-                //        var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-                //        // Записывает токен юзеру.
-                //        //UserDto updateUser = _postgre.Users.Where(u => u.UserEmail.Equals(user.UserEmail)).FirstOrDefault();
-                //        //updateUser.Token = encodedJwt;
-
-                //        var response = new {
-                //            access_token = encodedJwt,
-                //            username = oUser.Name
-                //            //role = updateUser.UserType
-                //        };
-
-                //        //_postgre.Users.Update(updateUser);
-                //        await _db.SaveChangesAsync();
-
-                //        return response;
-                //    }
-                //}
-
-                //return errorExtension.ThrowErrorLogin();
-                return null;
+                else {
+                    throw new ArgumentException();
+                }                
             }
 
             catch (ArgumentNullException ex) {
@@ -166,7 +132,7 @@ namespace Barbuuuda.Services {
             catch (ArgumentException ex) {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogError();
-                throw new ArgumentException("Параметры не могут быть пустыми", ex.Message.ToString());
+                throw new ArgumentException("Логин или пароль введены не верно", ex.Message.ToString());
             }
 
             catch (Exception ex) {
@@ -174,6 +140,36 @@ namespace Barbuuuda.Services {
                 await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
+        }
+
+        /// <summary>
+        /// Метод выдает токен юзеру, если он прошел авторизацию.
+        /// </summary>
+        /// <param name="user">Объект с данными юзера.</param>
+        /// <returns>Токен юзера.</returns>
+        private string GetToken(UserDto user) {
+            ClaimsIdentity oClaim = GetClaim(user.UserName);
+            var now = DateTime.UtcNow;
+            var jwt = new JwtSecurityToken(
+                issuer: AuthOptions.ISSUER,
+                audience: AuthOptions.AUDIENCE,
+                notBefore: now,
+                claims: oClaim.Claims,
+                expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+            return encodedJwt;
+        }
+
+        private ClaimsIdentity GetClaim(string username) {
+            var claims = new List<Claim> {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, username)
+                };
+
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+
+            return claimsIdentity;
         }
 
         /// <summary>

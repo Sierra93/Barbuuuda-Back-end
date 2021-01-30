@@ -13,14 +13,14 @@ namespace Barbuuuda.Core.Interfaces {
         /// Метод создает нового пользователя.
         /// </summary>
         /// <param name="user">Объект с данными регистрации пользователя.</param>
-        Task<object> Create(UserDto user);
+        Task<object> CreateAsync(UserDto user);
 
         /// <summary>
         /// Метод авторизует пользователя.
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>
         /// <returns>Статус true/false</returns>
-        Task<object> Login(UserDto user);
+        Task<object> LoginAsync(UserDto user);
 
         /// <summary>
         /// Метод проверяет, авторизован ли юзер, если нет, то вернет false, иначе true.

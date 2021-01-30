@@ -11,22 +11,11 @@ namespace Barbuuuda.Models.User {
     /// </summary>
     [Table("AspNetUsers")]
     public sealed class UserDto : IdentityUser {
-        //[Column("UserLogin", TypeName = "varchar(100)")]
-        //public string UserLogin { get; set; }
-
         [Column("UserPassword", TypeName = "varchar(100)")]
         public string UserPassword { get; set; }
 
-        //[Column("UserEmail", TypeName = "varchar(100)")]
-        ////[Required(ErrorMessage = "Не указан электронный адрес")]
-        ////[RegularExpression(@"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}", ErrorMessage = "Некорректный адрес")]
-        //public string UserEmail { get; set; }
-
         [Column("UserType", TypeName = "varchar(50)")]
         public string UserType { get; set; }    // Тип пользователя: Заказчик или Исполнитель.
-
-        //[Column("UserPhone", TypeName = "varchar(100)")]
-        //public string UserPhone { get; set; }   // Номер телефона пользователя.
 
         [Column("LastName", TypeName = "varchar(100)")]
         public string LastName { get; set; }    // Фамилия.
@@ -36,9 +25,6 @@ namespace Barbuuuda.Models.User {
 
         [Column("Patronymic", TypeName = "varchar(100)")]
         public string Patronymic { get; set; }  // Отчество.
-
-        //[Column("Token", TypeName = "text")]
-        //public string Token { get; set; }   // Токен юзера.
 
         [Column("UserIcon", TypeName = "text")]
         public string UserIcon { get; set; }    // Путь к иконке пользователя.
@@ -75,5 +61,8 @@ namespace Barbuuuda.Models.User {
 
         [Column("Gender", TypeName = "varchar(1)")]
         public string Gender { get; set; }    // M - мужчина, F - женщина.
+
+        [Column("RememberMe", TypeName = "boolean ")]
+        public bool RememberMe { get; set; }
     }
 }

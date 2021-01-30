@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,39 +35,26 @@ namespace Barbuuuda.Controllers {
 
         /// <summary>
         /// Метод создает нового пользователя.
+        /// <paramref name="user">Объект с данными юзера.</paramref>
         /// </summary>
-        //[HttpPost, Route("create")]
-        //public async Task<IActionResult> Create([FromBody] UserDto user) {
-        //    IUser _user = new UserService(_db, _postgre);
-        //    UserDto oUser = await _user.Create(user);
-
-        //    return Ok(oUser);
-        //}
-
         [HttpPost, Route("create")]
-        public async Task<IActionResult> Create([FromBody] UserDto model) {
+        public async Task<IActionResult> Create([FromBody] UserDto user) {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
-            object oUser = await _user.Create(model);   
+            var oUser = await _user.CreateAsync(user);   
             
             return Ok(oUser);
         }
 
         /// <summary>
         /// Метод авторизует пользователя.
+        /// <paramref name="user">Объект с данными юзера.</paramref>
         /// </summary>
-        //[HttpPost, Route("login")]
-        //public async Task<IActionResult> Login([FromBody] UserDto user) {
-        //    IUser _user = new UserService(_db, _postgre);
-        //    var oUser = await _user.Login(user);
-
-        //    return Ok(oUser);
-        //}
-
         [HttpPost, Route("login")]
-        public async Task<IActionResult> Login([FromBody] UserDto user) {
-            
+        public async Task<IActionResult> Login([FromBody] UserDto user) {            
+            IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
+            var oAuth = await _user.LoginAsync(user);
 
-            return Ok();
+            return Ok(oAuth);
         }
 
         /// <summary>

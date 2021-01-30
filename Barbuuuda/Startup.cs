@@ -48,7 +48,13 @@ namespace Barbuuuda {
             services.AddDbContext<IdentityDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            services.AddIdentity<UserDto, IdentityRole>()
+            services.AddIdentity<UserDto, IdentityRole>(opts => {
+                opts.Password.RequiredLength = 5;   // Минимальная длина
+                opts.Password.RequireNonAlphanumeric = false;   // Требуются ли не алфавитно-цифровые символы
+                opts.Password.RequireLowercase = false; // Требуются ли символы в нижнем регистре
+                opts.Password.RequireUppercase = false; // Требуются ли символы в верхнем регистре
+                opts.Password.RequireDigit = false; // Требуются ли цифры
+            })
                 .AddEntityFrameworkStores<IdentityDbContext>();
 
             //services.AddDbContext<ApplicationDbContext>(options =>

@@ -159,11 +159,13 @@
         <member name="M:Barbuuuda.Controllers.UserController.Create(Barbuuuda.Models.User.UserDto)">
             <summary>
             Метод создает нового пользователя.
+            <paramref name="user">Объект с данными юзера.</paramref>
             </summary>
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.Login(Barbuuuda.Models.User.UserDto)">
             <summary>
             Метод авторизует пользователя.
+            <paramref name="user">Объект с данными юзера.</paramref>
             </summary>
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.Authorize(Barbuuuda.Core.ViewModels.User.UserAuthorizeVm)">
