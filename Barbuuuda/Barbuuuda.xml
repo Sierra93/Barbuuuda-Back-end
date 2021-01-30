@@ -168,12 +168,12 @@
             <paramref name="user">Объект с данными юзера.</paramref>
             </summary>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.Authorize(Barbuuuda.Core.ViewModels.User.UserAuthorizeVm)">
+        <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize(Barbuuuda.Models.User.UserDto)">
             <summary>
-            Метод проверяет, авторизован ли юзер, если нет, то вернет false, иначе true.
+            Метод проверяет, авторизован ли юзер.
             </summary>
-            <param name="user">Объект для авторизации юзера.</param>
-            <returns>true/false</returns>
+            <param name="user">Объект с данными юзера.</param>
+            <returns>Объект с данными авторизованного юзера.</returns>
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.GetProfileInfo(System.String)">
             <summary>

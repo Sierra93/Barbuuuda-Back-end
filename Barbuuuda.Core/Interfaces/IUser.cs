@@ -23,18 +23,11 @@ namespace Barbuuuda.Core.Interfaces {
         Task<object> LoginAsync(UserDto user);
 
         /// <summary>
-        /// Метод проверяет, авторизован ли юзер, если нет, то вернет false, иначе true.
+        /// Метод проверяет, авторизован ли юзер.
         /// </summary>
-        /// <param name="userId">Id юзера.</param>
-        /// <returns>true/false</returns>
-        bool Authorize(string login, ref string userId);
-
-        /// <summary>
-        /// Метод получает хидер в зависимости от роли.
-        /// </summary>
-        /// <param name="role">Роль юзера.</param>
-        /// <returns></returns>
-        IList<HeaderTypeDto> GetHeader(string role);
+        /// <param name="username">login юзера.</param>
+        /// <returns>Объект с данными авторизованного юзера.</returns>
+        Task<object> GetUserAuthorize(string username);
         /// <summary>
         /// Метод получает информацию о пользователе для профиля.
         /// </summary>

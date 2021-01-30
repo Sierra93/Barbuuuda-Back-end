@@ -54,9 +54,6 @@ namespace Barbuuuda.Services {
                 // Проверяет, есть ли такая категория в БД.
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
 
-                // Проверяет существование специализации.
-                //bool bSpec = await IdentitySpecialization(oTask.SpecCode);
-
                 // Если все проверки прошли.
                 if (bCustomer && bCategory) {
                     oTask.TaskBegda = DateTime.Now;
@@ -109,9 +106,6 @@ namespace Barbuuuda.Services {
                 // Проверяет, есть ли такая категория в БД.
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
 
-                // Проверяет существование специализации.
-                //bool bSpec = await IdentitySpecialization(oTask.SpecCode);
-
                 // Если все проверки прошли.
                 if (bCustomer && bCategory) {
                     // Запишет код статуса "В аукционе".
@@ -150,9 +144,9 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>true/false</returns>
-        async Task<bool> IdentityCustomer(int userId) {
+        async Task<bool> IdentityCustomer(string userId) {
             try {
-                if (userId == 0) {
+                if (string.IsNullOrEmpty(userId)) {
                     throw new ArgumentNullException();
                 }
 
@@ -189,29 +183,6 @@ namespace Barbuuuda.Services {
         }
 
         /// <summary>
-        /// Метод проверяет существование специализации.
-        /// </summary>
-        /// <param name="specId"></param>
-        /// <returns></returns>
-        async Task<bool> IdentitySpecialization(string code) {
-            //try {
-            //    return await _postgre.TaskSpecializations
-            //        .Where(s => s.SpecCode
-            //        .Equals(code))
-            //        .FirstOrDefaultAsync() != null ? true : throw new ArgumentNullException();
-            //}
-
-            //catch (ArgumentNullException ex) {
-            //    throw new ArgumentNullException($"Специализации с таким кодом не найдено {ex.Message}");
-            //}
-
-            //catch (Exception ex) {
-            //    throw new Exception(ex.Message.ToString());
-            //}
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Метод выгружает список категорий заданий.
         /// </summary>
         /// <returns>Коллекцию категорий.</returns>
@@ -227,21 +198,6 @@ namespace Barbuuuda.Services {
                 throw new Exception(ex.Message.ToString());
             }
         }
-
-        /// <summary>
-        /// Метод выгружает список специализаций заданий.
-        /// </summary>
-        /// <returns>Коллекцию специализаций.</returns>
-        //public async Task<IList> GetTaskSpecializations() {
-        //    try {
-        //        return await _postgre.TaskSpecializations.ToListAsync();
-        //    }
-
-        //    catch (Exception ex) {
-        //        throw new Exception(ex.Message.ToString());
-        //    }
-        //}
-
 
         /// <summary>
         /// Метод получает список заданий заказчика.
@@ -281,8 +237,8 @@ namespace Barbuuuda.Services {
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                           join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                          //join users in _iden.AspNetUsers on tasks.OwnerId equals users.Id
-                          //where tasks.OwnerId == userId
+                          join users in _iden.AspNetUsers on tasks.OwnerId equals users.Id
+                          where tasks.OwnerId.Equals(userId)
                           select new {
                               tasks.CategoryCode,
                               tasks.CountOffers,
@@ -299,7 +255,7 @@ namespace Barbuuuda.Services {
                               tasks.TaskId,
                               taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                               tasks.TypeCode,
-                              //users.UserLogin
+                              users.UserName
                           })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync(); 
@@ -332,9 +288,9 @@ namespace Barbuuuda.Services {
             var oTask = await (from tasks in _postgre.Tasks
                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                               //join users in _postgre.Users on tasks.OwnerId equals users.Id
-                               //where tasks.OwnerId == userId
-                               where tasks.TaskId == taskId
+                               join users in _postgre.Users on tasks.OwnerId equals users.Id
+                               where tasks.OwnerId.Equals(userId)
+                               where tasks.TaskId.Equals(taskId)
                                select new {
                                    tasks.CategoryCode,
                                    tasks.CountOffers,
@@ -352,8 +308,9 @@ namespace Barbuuuda.Services {
                                    tasks.TaskId,
                                    taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                                    tasks.TypeCode,
-                                   //users.UserLogin
-                               }).ToListAsync();
+                                   users.UserName
+                               })
+                               .ToListAsync();
 
             return oTask;
         }
@@ -515,7 +472,7 @@ namespace Barbuuuda.Services {
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                           join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                          //join users in _postgre.Users on tasks.OwnerId equals users.Id
+                          join users in _postgre.Users on tasks.OwnerId equals users.Id
                           where tasks.TaskId == taskId
                           select new {
                                   tasks.CategoryCode,
@@ -533,7 +490,7 @@ namespace Barbuuuda.Services {
                                   tasks.TaskId,
                                   taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                                   tasks.TypeCode,
-                                  //users.UserLogin
+                                  users.UserName
                               })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
@@ -569,10 +526,10 @@ namespace Barbuuuda.Services {
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                           join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                          //join users in _postgre.Users on tasks.OwnerId equals users.Id
+                          join users in _postgre.Users on tasks.OwnerId equals users.Id
                           where statuses.StatusName.Equals(StatusTask.AUCTION) ||
                           statuses.StatusName.Equals(StatusTask.IN_WORK)
-                          //where users.Id == userId
+                          where users.Id.Equals(userId)
                           select new {
                               tasks.CategoryCode,
                               tasks.CountOffers,
@@ -589,7 +546,7 @@ namespace Barbuuuda.Services {
                               tasks.TaskId,
                               taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                               tasks.TypeCode,
-                              //users.UserLogin
+                              users.UserName
                           })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
@@ -604,7 +561,7 @@ namespace Barbuuuda.Services {
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                           join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                          //join users in _postgre.Users on tasks.OwnerId equals users.Id
+                          join users in _postgre.Users on tasks.OwnerId equals users.Id
                           where statuses.StatusName.Equals(StatusTask.AUCTION)
                           select new {
                               tasks.CategoryCode,
@@ -622,7 +579,7 @@ namespace Barbuuuda.Services {
                               tasks.TaskId,
                               taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                               tasks.TypeCode,
-                              //users.UserLogin
+                              users.UserName
                           })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
@@ -689,9 +646,9 @@ namespace Barbuuuda.Services {
                      await (from tasks in _postgre.Tasks
                                    join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                    join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                                   //join users in _postgre.Users on tasks.OwnerId equals users.Id
+                                   join users in _postgre.Users on tasks.OwnerId equals users.Id
                                    where statuses.StatusName.Equals(status)
-                                   //where users.Id == userId
+                                   where users.Id.Equals(userId)
                                    select new {
                                        tasks.CategoryCode,
                                        tasks.CountOffers,
@@ -708,7 +665,7 @@ namespace Barbuuuda.Services {
                                        tasks.TaskId,
                                        taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                                        tasks.TypeCode,
-                                       //users.UserLogin
+                                       users.UserName
                                    })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
@@ -734,14 +691,13 @@ namespace Barbuuuda.Services {
         /// <returns></returns>
         public async Task<int> GetTotalCountTasks(string userId) {
             try {
-                //return !string.IsNullOrEmpty(userId) ? await _postgre.Tasks
-                //    .Join(_iden.AspNetUsers,
-                //    t => t.OwnerId,
-                //    u => u.Id,
-                //    (t, u) => new { u.Id })
-                //    .Where(u => u.Id == userId)
-                //    .CountAsync() : throw new ArgumentNullException();
-                return 0;
+                return !string.IsNullOrEmpty(userId) ? await _postgre.Tasks
+                    .Join(_iden.AspNetUsers,
+                    t => t.OwnerId,
+                    u => u.Id,
+                    (t, u) => new { u.Id })
+                    .Where(u => u.Id.Equals(userId))
+                    .CountAsync() : throw new ArgumentNullException();
             }
 
             catch (ArgumentNullException ex) {

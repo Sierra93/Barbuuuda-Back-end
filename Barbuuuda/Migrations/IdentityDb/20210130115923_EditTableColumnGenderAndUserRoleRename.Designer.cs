@@ -3,15 +3,17 @@ using System;
 using Barbuuuda.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Barbuuuda.Migrations.IdentityDb
 {
     [DbContext(typeof(IdentityDbContext))]
-    partial class IdentityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210130115923_EditTableColumnGenderAndUserRoleRename")]
+    partial class EditTableColumnGenderAndUserRoleRename
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,7 +69,8 @@ namespace Barbuuuda.Migrations.IdentityDb
                         .HasColumnName("FirstName");
 
                     b.Property<string>("Gender")
-                        .HasColumnType("varchar(1)")
+                        .IsRequired()
+                        .HasColumnType("character varying(1)")
                         .HasColumnName("Gender");
 
                     b.Property<bool>("IsOnline")
@@ -140,12 +143,9 @@ namespace Barbuuuda.Migrations.IdentityDb
                         .HasColumnName("UserPassword");
 
                     b.Property<string>("UserRole")
-                        .HasColumnType("varchar(1)")
+                        .IsRequired()
+                        .HasColumnType("character varying(1)")
                         .HasColumnName("UserRole");
-
-                    b.Property<string>("UserToken")
-                        .HasColumnType("text")
-                        .HasColumnName("UserToken");
 
                     b.HasKey("Id");
 

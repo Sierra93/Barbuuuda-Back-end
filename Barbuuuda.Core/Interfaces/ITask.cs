@@ -31,12 +31,6 @@ namespace Barbuuuda.Core.Interfaces {
         Task<IList> GetTaskCategories();
 
         /// <summary>
-        /// Метод выгружает список специализаций заданий.
-        /// </summary>
-        /// <returns>Коллекцию специализаций.</returns>
-        //Task<IList> GetTaskSpecializations();
-
-        /// <summary>
         /// Метод получает список заданий заказчика.
         /// </summary>
         /// <param name="userId">Id заказчика.</param>

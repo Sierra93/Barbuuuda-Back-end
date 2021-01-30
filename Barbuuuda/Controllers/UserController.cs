@@ -56,31 +56,17 @@ namespace Barbuuuda.Controllers {
 
             return Ok(oAuth);
         }
-
         /// <summary>
-        /// Метод проверяет, авторизован ли юзер, если нет, то вернет false, иначе true.
+        /// Метод проверяет, авторизован ли юзер.
         /// </summary>
-        /// <param name="user">Объект для авторизации юзера.</param>
-        /// <returns>true/false</returns>
+        /// <param name="user">Объект с данными юзера.</param>
+        /// <returns>Объект с данными авторизованного юзера.</returns>
         [HttpPost, Route("authorize")]
-        public IActionResult Authorize([FromBody] UserAuthorizeVm user) {
+        public async Task<IActionResult> GetUserAuthorize([FromBody] UserDto user) {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
-            string userId = string.Empty;
+            object oAuthorize = await _user.GetUserAuthorize(user.UserName);            
 
-            // Проверяет, авторизован ли юзер.
-            bool bAuthorize = _user.Authorize(user.UserLogin, ref userId);
-
-            // В зависимости от роли юзера формирует хидер.
-            IList<HeaderTypeDto> aHeaderFields = _user.GetHeader(user.UserRole);
-
-            // Результирующий объект.
-            object oObj = new {
-                bAuthorize,
-                aHeaderFields,
-                userId
-            };
-
-            return Ok(oObj);
+            return Ok(oAuthorize);
         }
 
         /// <summary>

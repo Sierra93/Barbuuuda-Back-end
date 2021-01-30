@@ -42,6 +42,7 @@ namespace Barbuuuda.Services {
         public async Task<object> CreateAsync(UserDto user) {
             try {                
                 // Добавляет юзера.
+                user.DateRegister = DateTime.UtcNow;
                 var addedUser = await _userManager.CreateAsync(user, user.UserPassword);
 
                 //Если регистрация успешна.
@@ -66,55 +67,29 @@ namespace Barbuuuda.Services {
         }
 
         /// <summary>
-        /// Метод ищет пользователя в БД. Если существует, то не дает создать.
-        /// </summary>
-        /// <returns>Статус true/false</returns>
-        async Task<bool> IdentityUser(string login, string email, string phone) {
-            // Ищет по логину.
-            //UserDto isUserLogin =  await _postgre.Users.Where(u => u.UserLogin.Equals(login)).FirstOrDefaultAsync();
-
-            //// Ищет по email.
-            //UserDto isUserEmail = await _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
-
-            //// Ищет по телефону.
-            //UserDto isUserPhone = await _postgre.Users.Where(u => u.UserPhone.Equals(phone)).FirstOrDefaultAsync();
-
-            //if (isUserLogin != null || isUserEmail != null || isUserPhone != null) {
-            //    return true;
-            //}
-
-            return false;
-        }
-
-        //async Task<bool> IdentityUser(string email) {
-        //    // Ищет по email.
-        //    UserDto isUserEmail = await _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefaultAsync();
-
-        //    if (isUserEmail != null) {
-        //        return true;
-        //    }
-
-        //    return false;
-        //}
-
-        /// <summary>
         /// Метод авторизует пользователя.
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>
         /// <returns>Статус true/false</returns>
         public async Task<object> LoginAsync(UserDto user) {
             try {
+                // Авторизует юзера.
                 var oAuth = await _signInManager.PasswordSignInAsync(user.UserName, user.UserPassword, user.RememberMe, false);
 
-                if (oAuth.Succeeded) {
-                    // Генерит токен юзеру.
-                    string sToken = GetToken(user);
+                // Выбирает роли юзера.
+                IList<string> aRoles = await GetUserRole(user.UserName);
+
+                // Если авторизация успешна.
+                if (oAuth.Succeeded) {                    
+                    string sToken = await GetToken(user); // Генерит токен юзеру.
 
                     return new {
                         oAuth.Succeeded,
                         oAuth.IsLockedOut,
-                        username = user.UserName,
-                        token = sToken
+                        user = user.UserName,
+                        userToken = sToken,
+                        userId = user.Id,
+                        role = aRoles
                     };
                 }
 
@@ -143,11 +118,24 @@ namespace Barbuuuda.Services {
         }
 
         /// <summary>
+        /// Метод выбирает роли юзера.
+        /// </summary>
+        /// <param name="username">Логин юзера.</param>
+        /// <returns></returns>
+        private async Task<IList<string>> GetUserRole(string username) {
+            return await _iden.AspNetUsers
+                .Where(u => u.UserName
+                .Equals(username))
+                .Select(r => r.UserRole)
+                .ToListAsync();
+        }
+
+        /// <summary>
         /// Метод выдает токен юзеру, если он прошел авторизацию.
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
         /// <returns>Токен юзера.</returns>
-        private string GetToken(UserDto user) {
+        private async Task<string> GetToken(UserDto user) {
             ClaimsIdentity oClaim = GetClaim(user.UserName);
             var now = DateTime.UtcNow;
             var jwt = new JwtSecurityToken(
@@ -159,7 +147,24 @@ namespace Barbuuuda.Services {
                 signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
+            await SetUserToken(encodedJwt, user.UserName);   // Запишет токен юзера в БД.
+
             return encodedJwt;
+        }
+
+        /// <summary>
+        /// Метод запишет токен юзера в БД.
+        /// </summary>
+        /// <param name="token">Токен юзера.</param>
+        private async Task SetUserToken(string token, string username) {
+            UserDto oUser = await _iden.AspNetUsers
+                .Where(u => u.UserName
+                .Equals(username))
+                .FirstOrDefaultAsync();
+
+            // Запишет токен.
+            oUser.UserToken = token;
+            await _iden.SaveChangesAsync();
         }
 
         private ClaimsIdentity GetClaim(string username) {
@@ -173,72 +178,38 @@ namespace Barbuuuda.Services {
         }
 
         /// <summary>
-        /// Метод проверяет заполненность полей.
+        /// Метод проверяет, авторизован ли юзер.
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        bool CheckUserFields(UserDto user) {
-            //if (string.IsNullOrEmpty(user.UserLogin) ||
-            //       string.IsNullOrEmpty(user.UserPassword) ||
-            //       string.IsNullOrEmpty(user.UserEmail) ||
-            //       string.IsNullOrEmpty(user.UserType) ||
-            //       string.IsNullOrEmpty(user.UserPhone)) {
-            //    return false;
-            //}
-
-            return true;
-        }
-
-        /// <summary>
-        /// Метод выбирает пароль пользователя из БД.
-        /// </summary>
-        /// <param name="login"></param>
-        /// <returns></returns>
-        public async Task<bool> GetUserPassword(string password) {
-            //UserDto oUser = await _postgre.Users.Where(p => p.UserPassword.Equals(password)).FirstOrDefaultAsync();
-
-            //if (oUser == null) {
-            //    return false;
-            //}
-
-            return true;
-        }
-
-        ClaimsIdentity GetUserDB(string email) {
-            //UserDto oUser =  _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefault();
-
-            //if (oUser != null) {
-            //    var claims = new List<Claim> {
-            //            new Claim(ClaimsIdentity.DefaultNameClaimType, email)
-            //        };
-
-            //    ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-
-            //    return claimsIdentity;
-            //}
-
-            return null;
-        }
-
-        /// <summary>
-        /// Метод проверяет, авторизован ли юзер, если нет, то вернет false, иначе true.
-        /// </summary>
-        /// <param name="login">Логин юзера.</param>
-        /// <returns>true/false</returns>
-        public bool Authorize(string email, ref string userId) {
+        /// <param name="username">login юзера.</param>
+        /// <returns>Объект с данными авторизованного юзера.</returns>
+        public async Task<object> GetUserAuthorize(string username) {
             try {
-                //if (string.IsNullOrEmpty(email)) {
-                //    throw new ArgumentNullException();
-                //}
+                if (string.IsNullOrEmpty(username)) {
+                    throw new ArgumentNullException();
+                }
+                string userId = string.Empty;
 
-                //UserDto oUser = _postgre.Users.Where(u => u.UserEmail.Equals(email)).FirstOrDefault();
+                // Выбирает юзера по логину.
+                UserDto oUser = await _iden.AspNetUsers
+                    .Where(u => u.UserName
+                    .Equals(username))
+                    .FirstOrDefaultAsync();
 
-                //if (oUser != null) {
-                //    userId = oUser.Id;
-                //}
+                // В зависимости от роли юзера формирует хидер.
+                IList<HeaderTypeDto> aHeaderFields = await GetHeader(oUser.UserRole);
 
-                //return oUser.Token != null ? true : false;
-                return false;
+                if (oUser != null) {
+                    userId = oUser.Id;
+                }
+
+                // Авторизован ли юзер.
+                bool bAuth = oUser.UserToken != null ? true : false;  
+
+                return new {
+                    aHeaderFields,
+                    bAuth,
+                    userId
+                };
             }
 
             catch (ArgumentNullException ex) {
@@ -259,13 +230,12 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="role">Роль юзера.</param>
         /// <returns></returns>
-        public IList<HeaderTypeDto> GetHeader(string role) {
+        private async Task<IList<HeaderTypeDto>> GetHeader(string role) {
             try {
-                if (string.IsNullOrEmpty(role)) {
-                    throw new ArgumentNullException();
-                }
-
-                return _db.Headers.Where(h => h.HeaderType.Equals(role)).ToList();
+                return await _db.Headers
+                    .Where(h => h.HeaderType
+                    .Equals(role))
+                    .ToListAsync();
             }
 
             catch (IndexOutOfRangeException ex) {
@@ -301,9 +271,9 @@ namespace Barbuuuda.Services {
                 return await _postgre.Users
                     .Where(u => u.Id.Equals(userId))
                     .Select(up => new {
-                        //up.UserLogin,
-                        //up.UserEmail,
-                        //up.UserPhone,
+                        up.UserName,
+                        up.Email,
+                        up.PhoneNumber,
                         up.LastName,
                         up.FirstName,
                         up.Patronymic,
@@ -364,9 +334,9 @@ namespace Barbuuuda.Services {
             oldUser.LastName = needUserUpdate.LastName;
             oldUser.FirstName = needUserUpdate.FirstName;
             oldUser.Patronymic = needUserUpdate.Patronymic;
-            //oldUser.UserEmail = needUserUpdate.UserEmail;
+            oldUser.Email = needUserUpdate.Email;
             oldUser.City = needUserUpdate.City;
-            //oldUser.Gender = needUserUpdate.Gender;            
+            oldUser.Gender = needUserUpdate.Gender;            
         }
     }
 }

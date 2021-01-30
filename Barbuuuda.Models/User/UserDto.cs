@@ -14,8 +14,8 @@ namespace Barbuuuda.Models.User {
         [Column("UserPassword", TypeName = "varchar(100)")]
         public string UserPassword { get; set; }
 
-        [Column("UserType", TypeName = "varchar(50)")]
-        public string UserType { get; set; }    // Тип пользователя: Заказчик или Исполнитель.
+        [Column("UserRole", TypeName = "varchar(1)")]
+        public string UserRole { get; set; }    // Роль пользователя: Заказчик или Исполнитель.
 
         [Column("LastName", TypeName = "varchar(100)")]
         public string LastName { get; set; }    // Фамилия.
@@ -62,7 +62,10 @@ namespace Barbuuuda.Models.User {
         [Column("Gender", TypeName = "varchar(1)")]
         public string Gender { get; set; }    // M - мужчина, F - женщина.
 
-        [Column("RememberMe", TypeName = "boolean ")]
+        [Column("RememberMe", TypeName = "boolean")]
         public bool RememberMe { get; set; }
+
+        [Column("UserToken", TypeName = "text")]
+        public string UserToken { get; set; }   // Токен юзера.
     }
 }

@@ -7,56 +7,50 @@ using System.Text;
 
 namespace Barbuuuda.Models.Task {
     /// <summary>
-    /// Модель сопоставляется с таблизей заданий.
+    /// Модель сопоставляется с таблицей заданий.
     /// </summary>
     [Table("Tasks", Schema = "dbo")]
     public sealed class TaskDto {
-        [Key, Column("task_id")]
+        [Key, Column("TaskId")]
         public int TaskId { get; set; }
 
-        [Required, Column("owner_id", TypeName = "integer")]
-        public int OwnerId { get; set; }    // Id заказчика, который создал задание.
+        [Required, Column("OwnerId", TypeName = "varchar(150)")]
+        public string OwnerId { get; set; }    // Id заказчика, который создал задание.
 
-        [ForeignKey("OwnerId")]
-        public UserDto Owner { get; set; }
+        [Column("ExecutorId", TypeName = "varchar(150)")]
+        public string ExecutorId { get; set; }  // Id исполнителя, который выполняет задание.
 
-        [Column("executor_id", TypeName = "integer")]
-        public int? ExecutorId { get; set; }
-
-        [ForeignKey("ExecutorId")]
-        public UserDto Executor { get; set; }   // Id исполнителя, который выполняет задание.
-
-        [Column("task_begda", TypeName = "timestamp")]
+        [Column("TaskBegda", TypeName = "timestamp")]
         public DateTime TaskBegda { get; set; }    // Дата создания задачи.
 
-        [Column("task_endda", TypeName = "timestamp")]
+        [Column("TaskEndda", TypeName = "timestamp")]
         public DateTime TaskEndda { get; set; }    // Дата завершения задачи.
 
-        [Column("count_offers", TypeName = "integer")]
+        [Column("CountOffers", TypeName = "integer")]
         public int CountOffers { get; set; }    // Кол-во ставок к заданию.
 
-        [Column("count_views", TypeName = "integer")]
+        [Column("CountViews", TypeName = "integer")]
         public int CountViews { get; set; }     // Кол-во просмотров задания.
 
-        [Column("type_code", TypeName = "varchar(100)")]
+        [Column("TypeCode", TypeName = "varchar(100)")]
         public string TypeCode { get; set; } // Код типа заданий (для всех, для про).
 
-        [Column("status_code", TypeName = "varchar(100)")]
+        [Column("StatusCode", TypeName = "varchar(100)")]
         public string StatusCode { get; set; }   // Код статуса задания.
 
-        [Column("category_code", TypeName = "varchar(100)")]
+        [Column("CategoryCode", TypeName = "varchar(100)")]
         public string CategoryCode { get; set; }     // Код категории задания (программирование и тд).
 
-        [Column("task_price", TypeName = "numeric(12,2)")]
+        [Column("TaskPrice", TypeName = "numeric(12,2)")]
         public decimal? TaskPrice { get; set; }   // Бюджет задания в цифрах либо по дефолту "По договоренности".
 
-        [Column("task_title", TypeName = "text")]
+        [Column("TaskTitle", TypeName = "text")]
         public string TaskTitle { get; set; }   // Заголовок задания.
 
-        [Column("task_detail", TypeName = "text")]
+        [Column("TaskDetail", TypeName = "text")]
         public string TaskDetail { get; set; }  // Описание задания.
 
-        [Column("spec_code", TypeName = "varchar(100)")]
+        [Column("SpecCode", TypeName = "varchar(100)")]
         public string SpecCode { get; set; }    // Код специализации.        
     }
 }
