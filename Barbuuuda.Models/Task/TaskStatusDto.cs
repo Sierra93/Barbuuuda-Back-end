@@ -4,12 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace Barbuuuda.Models.Task {
+namespace Barbuuuda.Models.Task
+{
     /// <summary>
     /// Модель сопоставляется с таблицей типов статусов.
     /// </summary>
     [Table("TaskStatuses", Schema = "dbo")]
-    public sealed class TaskStatusDto {
+    public sealed class TaskStatusDto
+    {
         [Key, Column("status_id")]
         public int StatusId { get; set; }
 

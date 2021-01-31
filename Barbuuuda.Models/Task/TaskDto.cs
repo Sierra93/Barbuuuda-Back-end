@@ -5,12 +5,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace Barbuuuda.Models.Task {
+namespace Barbuuuda.Models.Task
+{
     /// <summary>
     /// Модель сопоставляется с таблицей заданий.
     /// </summary>
     [Table("Tasks", Schema = "dbo")]
-    public sealed class TaskDto {
+    public sealed class TaskDto
+    {
         [Key, Column("TaskId")]
         public int TaskId { get; set; }
 

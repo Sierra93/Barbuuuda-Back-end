@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Barbuuuda.Core.Data {
-    public class PostgreDbContext : DbContext {
+namespace Barbuuuda.Core.Data
+{
+    public class PostgreDbContext : DbContext
+    {
         public DbSet<UserDto> Users { get; set; }    // Таблица информации аккаунтов пользователей.
 
         public DbSet<TaskDto> Tasks { get; set; }    // Таблица предложений поставщикам.

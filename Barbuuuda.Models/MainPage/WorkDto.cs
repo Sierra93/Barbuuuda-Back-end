@@ -4,12 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace Barbuuuda.Models.MainPage {
+namespace Barbuuuda.Models.MainPage
+{
     /// <summary>
     /// Модель описывает таблицу "Как это работает".
     /// </summary>
     [Table("Works", Schema = "dbo")]
-    public sealed class WorkDto {
+    public sealed class WorkDto
+    {
         [Key, Column("work_id")]
         public int WorkId { get; set; }
 

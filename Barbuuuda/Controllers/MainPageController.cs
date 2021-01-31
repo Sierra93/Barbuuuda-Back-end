@@ -10,16 +10,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Barbuuuda.Controllers {
+namespace Barbuuuda.Controllers
+{
     /// <summary>
     /// Контроллер главной страницы.
     /// </summary>
     [ApiController, Route("main")]
-    public class MainPageController : Controller {
+    public class MainPageController : Controller
+    {
         ApplicationDbContext _db;
         PostgreDbContext _postgre;
 
-        public MainPageController(ApplicationDbContext db, PostgreDbContext postgre) {
+        public MainPageController(ApplicationDbContext db, PostgreDbContext postgre)
+        {
             _db = db;
             _postgre = postgre;
         }
@@ -29,7 +32,8 @@ namespace Barbuuuda.Controllers {
         /// </summary>
         /// <returns>Объект фона.</returns>
         [HttpPost, Route("get-fon")]
-        public async Task<IActionResult> GetFonContent() {
+        public async Task<IActionResult> GetFonContent()
+        {
             IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetFonContent());
         }
@@ -39,7 +43,8 @@ namespace Barbuuuda.Controllers {
         /// </summary>
         /// <returns>Все объекты WhyDto</returns>
         [HttpPost, Route("get-why")]
-        public async Task<IActionResult> GetWhyContent() {
+        public async Task<IActionResult> GetWhyContent()
+        {
             IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetWhyContent());
         }
@@ -49,7 +54,8 @@ namespace Barbuuuda.Controllers {
         /// </summary>
         /// <returns>Все объекты WorkDto</returns>
         [HttpPost, Route("get-work")]
-        public async Task<IActionResult> GetWorkContent() {
+        public async Task<IActionResult> GetWorkContent()
+        {
             IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetWorkContent());
         }
@@ -59,7 +65,8 @@ namespace Barbuuuda.Controllers {
         /// </summary>
         /// <returns>Все объекты PrivilegeDto</returns>
         [HttpPost, Route("get-privilege")]
-        public async Task<IActionResult> GetPrivilegeContent() {
+        public async Task<IActionResult> GetPrivilegeContent()
+        {
             IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetPrivilegeContent());
         }
@@ -69,7 +76,8 @@ namespace Barbuuuda.Controllers {
         /// </summary>
         /// <returns>Все объекты Advantage</returns>
         [HttpPost, Route("get-advantage")]
-        public async Task<IActionResult> GetAdvantageContent() {
+        public async Task<IActionResult> GetAdvantageContent()
+        {
             IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetAdvantageContent());
         }
@@ -80,7 +88,8 @@ namespace Barbuuuda.Controllers {
         /// </summary>
         /// <returns></returns>
         [HttpGet, Route("category-list")]
-        public async Task<IActionResult> GetCategoryList() {
+        public async Task<IActionResult> GetCategoryList()
+        {
             IMainPage _mainPage = new MainPageService(_db, _postgre);
             IList aCategories = await _mainPage.GetCategoryList();
 
@@ -92,7 +101,8 @@ namespace Barbuuuda.Controllers {
         /// </summary>
         /// <returns>ОБъект с данными.</returns>
         [HttpGet, Route("get-hope")]
-        public async Task<IActionResult> GetHopeContent() {
+        public async Task<IActionResult> GetHopeContent()
+        {
             IMainPage _mainPage = new MainPageService(_db, _postgre);
             HopeDto oHope = await _mainPage.GetHopeContent();
 

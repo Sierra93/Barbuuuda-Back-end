@@ -4,12 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace Barbuuuda.Models.MainPage {
+namespace Barbuuuda.Models.MainPage
+{
     /// <summary>
     /// Модель сопоставляется с таблицей Преимущества.
     /// </summary>
     [Table("Advantages", Schema = "dbo")]
-    public sealed class AdvantageDto {
+    public sealed class AdvantageDto
+    {
         [Key, Column("id")]
         public int Id { get; set; }
 

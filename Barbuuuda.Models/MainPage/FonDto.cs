@@ -4,12 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace Barbuuuda.Models.MainPage {
+namespace Barbuuuda.Models.MainPage
+{
     /// <summary>
     /// Модель описывает таблицу главного фона на главной странице.
     /// </summary>
     [Table("Fons", Schema = "dbo")]
-    public sealed class FonDto {
+    public sealed class FonDto
+    {
         [Key, Column("fon_id")]
         public int FonId { get; set; }
 

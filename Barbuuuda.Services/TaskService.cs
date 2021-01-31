@@ -18,18 +18,21 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Barbuuuda.Services {
+namespace Barbuuuda.Services
+{
     /// <summary>
     /// Сервис реализует методы заданий.
     /// </summary>
-    public class TaskService : ITask {
+    public class TaskService : ITask
+    {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
         private readonly UserManager<UserDto> _userManager;
         private readonly SignInManager<UserDto> _signInManager;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserDto> userManager, SignInManager<UserDto> signInManager) {
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserDto> userManager, SignInManager<UserDto> signInManager)
+        {
             _db = db;
             _postgre = postgre;
             _userManager = userManager;
@@ -42,9 +45,12 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="task">Объект с данными задания.</param>
         /// <returns>Вернет данные созданного задания.</returns>
-        public async Task<TaskDto> CreateTask(TaskDto oTask) {
-            try {
-                if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail)) {
+        public async Task<TaskDto> CreateTask(TaskDto oTask)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail))
+                {
                     throw new ArgumentException();
                 }
 
@@ -55,7 +61,8 @@ namespace Barbuuuda.Services {
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
 
                 // Если все проверки прошли.
-                if (bCustomer && bCategory) {
+                if (bCustomer && bCategory)
+                {
                     oTask.TaskBegda = DateTime.Now;
 
                     // Запишет код статуса "В аукционе".
@@ -65,8 +72,8 @@ namespace Barbuuuda.Services {
                     .Select(s => s.StatusCode).FirstOrDefaultAsync();
 
                     // TODO: Доработать передачу с фронта для про или для всех.
-                    oTask.TypeCode = "Для всех";                    
-                    
+                    oTask.TypeCode = "Для всех";
+
                     await _postgre.Tasks.AddAsync(oTask);
                     await _postgre.SaveChangesAsync();
 
@@ -76,15 +83,18 @@ namespace Barbuuuda.Services {
                 throw new ArgumentNullException();
             }
 
-            catch (ArgumentNullException ex) {
+            catch (ArgumentNullException ex)
+            {
                 throw new ArgumentNullException($"Не все проверки пройдены {ex.Message}");
             }
 
-            catch (ArgumentException ex) {
+            catch (ArgumentException ex)
+            {
                 throw new ArgumentException($"Не все обязательные поля заполнены {ex.Message}");
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -94,9 +104,12 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="task">Объект с данными задания.</param>
         /// <returns>Вернет данные измененного задания.</returns>
-        public async Task<TaskDto> EditTask(TaskDto oTask) {
-            try {
-                if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail)) {
+        public async Task<TaskDto> EditTask(TaskDto oTask)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail))
+                {
                     throw new ArgumentException();
                 }
 
@@ -107,7 +120,8 @@ namespace Barbuuuda.Services {
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
 
                 // Если все проверки прошли.
-                if (bCustomer && bCategory) {
+                if (bCustomer && bCategory)
+                {
                     // Запишет код статуса "В аукционе".
                     oTask.StatusCode = await _postgre.TaskStatuses
                     .Where(s => s.StatusName
@@ -126,15 +140,18 @@ namespace Barbuuuda.Services {
                 throw new ArgumentNullException();
             }
 
-            catch (ArgumentNullException ex) {
+            catch (ArgumentNullException ex)
+            {
                 throw new ArgumentNullException($"Не все проверки пройдены {ex.Message}");
             }
 
-            catch (ArgumentException ex) {
+            catch (ArgumentException ex)
+            {
                 throw new ArgumentException($"Не все обязательные поля заполнены {ex.Message}");
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -144,9 +161,12 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>true/false</returns>
-        async Task<bool> IdentityCustomer(string userId) {
-            try {
-                if (string.IsNullOrEmpty(userId)) {
+        async Task<bool> IdentityCustomer(string userId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userId))
+                {
                     throw new ArgumentNullException();
                 }
 
@@ -155,11 +175,13 @@ namespace Barbuuuda.Services {
                 return oUser != null ? true : throw new ArgumentNullException();
             }
 
-            catch (ArgumentNullException ex) {
+            catch (ArgumentNullException ex)
+            {
                 throw new ArgumentNullException($"Заказчик с таким Id не найден {ex.Message}");
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -169,15 +191,18 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="category">Название категории.</param>
         /// <returns>true/false</returns>
-        async Task<bool> IdentityCategory(string categoryCode) {
-           try {
+        async Task<bool> IdentityCategory(string categoryCode)
+        {
+            try
+            {
                 return await _postgre.TaskCategories
                     .Where(c => c.CategoryCode
                     .Equals(categoryCode))
                     .FirstOrDefaultAsync() != null ? true : throw new ArgumentNullException();
             }
 
-            catch (ArgumentNullException ex) {
+            catch (ArgumentNullException ex)
+            {
                 throw new ArgumentNullException($"Такой категории не найдено {ex.Message}");
             }
         }
@@ -186,15 +211,18 @@ namespace Barbuuuda.Services {
         /// Метод выгружает список категорий заданий.
         /// </summary>
         /// <returns>Коллекцию категорий.</returns>
-        public async Task<IList> GetTaskCategories() {
-            try {
+        public async Task<IList> GetTaskCategories()
+        {
+            try
+            {
                 return await _postgre
                     .TaskCategories
                     .OrderBy(t => t.CategoryId)
                     .ToListAsync();
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -205,25 +233,30 @@ namespace Barbuuuda.Services {
         /// <param name="userId">Id заказчика.</param>
         /// <param name="type">Параметр получения заданий либо все либо одно.</param>
         /// <returns>Коллекция заданий.</returns>
-        public async Task<IList> GetTasksList(string userId, int? taskId, string type) {
-            try {
+        public async Task<IList> GetTasksList(string userId, int? taskId, string type)
+        {
+            try
+            {
                 IList aResultTaskObj = null;
 
-                if (string.IsNullOrEmpty(userId)) {
+                if (string.IsNullOrEmpty(userId))
+                {
                     throw new ArgumentNullException();
                 }
 
                 // Вернет либо все задания либо одно.
-                return aResultTaskObj = type.Equals(GetTaskTypeEnum.All.ToString()) 
+                return aResultTaskObj = type.Equals(GetTaskTypeEnum.All.ToString())
                     ? aResultTaskObj = await GetAllTasks(userId)
                     : aResultTaskObj = await GetSingleTask(userId, taskId);
             }
-           
-            catch (ArgumentNullException ex) {
+
+            catch (ArgumentNullException ex)
+            {
                 throw new ArgumentNullException($"Не передан Id {ex.Message}");
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -233,14 +266,16 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="userId">Id заказчика.</param>
         /// <returns>Коллекцию заданий.</returns>
-        async Task<IList> GetAllTasks(string userId) {
+        async Task<IList> GetAllTasks(string userId)
+        {
             string userName = await GetUserLoginById(userId);
 
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                           join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
                           where tasks.OwnerId.Equals(userId)
-                          select new {
+                          select new
+                          {
                               tasks.CategoryCode,
                               tasks.CountOffers,
                               tasks.CountViews,
@@ -259,7 +294,7 @@ namespace Barbuuuda.Services {
                               userName
                           })
                           .OrderBy(o => o.TaskId)
-                          .ToListAsync(); 
+                          .ToListAsync();
         }
 
         /// <summary>
@@ -268,7 +303,8 @@ namespace Barbuuuda.Services {
         /// <param name="id">Id задачи.</param>
         /// <param name="taskId">Id задачи. Может быть null.</param>
         /// <returns>Коллекцию заданий.</returns>
-        async Task<IList> GetSingleTask(string userId, int? taskId) {
+        async Task<IList> GetSingleTask(string userId, int? taskId)
+        {
             // Выбирает объект задачи, который нужно редактировать.
             TaskDto oEditTask = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
 
@@ -280,8 +316,10 @@ namespace Barbuuuda.Services {
             string specName = string.Empty;
 
             // Выбирает название специализации.
-            foreach (Specialization spec in aTaskSpecializations) {
-                if (spec.SpecCode.Equals(oEditTask.SpecCode)) {
+            foreach (Specialization spec in aTaskSpecializations)
+            {
+                if (spec.SpecCode.Equals(oEditTask.SpecCode))
+                {
                     specName = spec.SpecName;
                 }
             }
@@ -292,7 +330,8 @@ namespace Barbuuuda.Services {
                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
                                where tasks.OwnerId.Equals(userId)
                                where tasks.TaskId.Equals(taskId)
-                               select new {
+                               select new
+                               {
                                    tasks.CategoryCode,
                                    tasks.CountOffers,
                                    tasks.CountViews,
@@ -321,9 +360,12 @@ namespace Barbuuuda.Services {
         /// Метод удаляет задание.
         /// </summary>
         /// <param name="taskId">Id задачи.</param>
-        public async Task DeleteTask(int taskId) {
-            try {
-                if (taskId == 0) {
+        public async Task DeleteTask(int taskId)
+        {
+            try
+            {
+                if (taskId == 0)
+                {
                     throw new ArgumentNullException();
                 }
 
@@ -332,11 +374,13 @@ namespace Barbuuuda.Services {
                 await _postgre.SaveChangesAsync();
             }
 
-            catch (ArgumentNullException ex) {
+            catch (ArgumentNullException ex)
+            {
                 throw new ArgumentNullException($"TaskId не передан {ex.Message}");
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message);
             }
         }
@@ -346,16 +390,20 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="query">Параметр фильтрации.</param>
         /// <returns>Отфильтрованные данные.</returns>
-        public async Task<IList> FilterTask(string query) {
-            try {
+        public async Task<IList> FilterTask(string query)
+        {
+            try
+            {
                 IList aFilterCollection = null;
 
-                if (string.IsNullOrEmpty(query)) {
+                if (string.IsNullOrEmpty(query))
+                {
                     throw new ArgumentNullException();
                 }
 
                 // Фильтрует список заданий в зависимости от параметра фильтрации.
-                switch (query) {
+                switch (query)
+                {
                     // Фильтрует по дате создания задания.
                     case TaskFilterType.DATE_BEGDA:
                         aFilterCollection = await _postgre.Tasks.OrderBy(s => s.TaskBegda).ToListAsync();
@@ -370,11 +418,13 @@ namespace Barbuuuda.Services {
                 return aFilterCollection;
             }
 
-            catch (ArgumentNullException ex) {
+            catch (ArgumentNullException ex)
+            {
                 throw new ArgumentNullException($"Не передан параметр запроса {ex.Message}");
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message);
             }
         }
@@ -385,16 +435,20 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="param">Поисковый параметр.</param>
         /// <returns>Результат поиска.</returns>
-        public async Task<IList> SearchTask(string param) {
-            try {
+        public async Task<IList> SearchTask(string param)
+        {
+            try
+            {
                 // Если ничего, значит выгрузить все.
-                if (string.IsNullOrEmpty(param)) {
+                if (string.IsNullOrEmpty(param))
+                {
                     return await _postgre.Tasks.ToListAsync();
                 }
 
                 // Если передали Id.
-                if (int.TryParse(param, out int bIntParse)) {
-                    int taskId = Convert.ToInt32(param);                    
+                if (int.TryParse(param, out int bIntParse))
+                {
+                    int taskId = Convert.ToInt32(param);
                     return await _postgre.Tasks
                     .Where(t => t.TaskId == taskId)
                     .ToListAsync();
@@ -402,7 +456,8 @@ namespace Barbuuuda.Services {
 
                 // Если передали строку.
                 // Находит задание переводя все в нижний регистр для поиска.
-                if (param is string) {
+                if (param is string)
+                {
                     return await _postgre.Tasks
                         .Where(t => t.TaskTitle.ToLower()
                         .Contains(param.ToLower()))
@@ -412,7 +467,8 @@ namespace Barbuuuda.Services {
                 return null;
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message);
             }
         }
@@ -422,16 +478,20 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="date">Параметр даты.</param>
         /// <returns>Найденные задания.</returns>
-        public async Task<IList> GetSearchTaskDate(string date) {
-            try {
-                if (string.IsNullOrEmpty(date)) {
+        public async Task<IList> GetSearchTaskDate(string date)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(date))
+                {
                     throw new ArgumentNullException();
                 }
 
                 List<TaskDto> aTasks = new List<TaskDto>();
 
                 // Выбирает задания форматируя даты для сравнений.
-                foreach (TaskDto task in _postgre.Tasks) {
+                foreach (TaskDto task in _postgre.Tasks)
+                {
                     DateTime dt = Convert.ToDateTime(date);
 
                     // Форматирует дату с фронта оставляет только день, месяц и год.
@@ -440,13 +500,15 @@ namespace Barbuuuda.Services {
                     // Форматирует дату с БД оставляет только день, месяц и год.
                     string dbFormatDate = task.TaskEndda.ToString("d");
 
-                    if (dbFormatDate.Equals(formatDate)) {
+                    if (dbFormatDate.Equals(formatDate))
+                    {
                         aTasks.Add(task);
                     }
                 }
 
                 // Выбирает нужные задания форматируя даты к нужному виду.
-                foreach (TaskDto oTask in aTasks) {
+                foreach (TaskDto oTask in aTasks)
+                {
                     IList aResultTasks = await GetTasksByIds(oTask.TaskId);
 
                     return aResultTasks;
@@ -455,11 +517,13 @@ namespace Barbuuuda.Services {
                 return null;
             }
 
-            catch (ArgumentNullException ex) {
+            catch (ArgumentNullException ex)
+            {
                 throw new ArgumentNullException($"Дата не передана {ex.Message}");
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -469,30 +533,32 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="taskId">Id задания.</param>
         /// <returns>Список заданий.</returns>
-        async Task<IList> GetTasksByIds(int taskId) {
+        async Task<IList> GetTasksByIds(int taskId)
+        {
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                           join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
                           join users in _postgre.Users on tasks.OwnerId equals users.Id
                           where tasks.TaskId == taskId
-                          select new {
-                                  tasks.CategoryCode,
-                                  tasks.CountOffers,
-                                  tasks.CountViews,
-                                  tasks.OwnerId,
-                                  tasks.SpecCode,
-                                  categories.CategoryName,
-                                  tasks.StatusCode,
-                                  statuses.StatusName,
-                                  taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                  taskEndda = string.Format("{0:f}", tasks.TaskEndda),
-                                  tasks.TaskTitle,
-                                  tasks.TaskDetail,
-                                  tasks.TaskId,
-                                  taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                                  tasks.TypeCode,
-                                  users.UserName
-                              })
+                          select new
+                          {
+                              tasks.CategoryCode,
+                              tasks.CountOffers,
+                              tasks.CountViews,
+                              tasks.OwnerId,
+                              tasks.SpecCode,
+                              categories.CategoryName,
+                              tasks.StatusCode,
+                              statuses.StatusName,
+                              taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                              taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                              tasks.TaskTitle,
+                              tasks.TaskDetail,
+                              tasks.TaskId,
+                              taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                              tasks.TypeCode,
+                              users.UserName
+                          })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
         }
@@ -502,16 +568,20 @@ namespace Barbuuuda.Services {
         /// Активными считаются задания в статусе в аукционе и в работе.
         /// </summary>
         /// <returns>Список активных заданий.</returns>
-        public async Task<IList> LoadActiveTasks(string userId) {
-            try {
+        public async Task<IList> LoadActiveTasks(string userId)
+        {
+            try
+            {
                 return !string.IsNullOrEmpty(userId) ? await GetActiveTasks(userId) : throw new ArgumentNullException();
             }
 
-            catch (ArgumentNullException ex) {
+            catch (ArgumentNullException ex)
+            {
                 throw new ArgumentNullException($"Не передан Id {ex.Message}");
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogError();
                 throw new Exception(ex.Message.ToString());
@@ -523,7 +593,8 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="taskId"></param>
         /// <returns></returns>
-        async Task<IList> GetActiveTasks(string userId) {
+        async Task<IList> GetActiveTasks(string userId)
+        {
             string userName = await GetUserLoginById(userId);
 
             return await (from tasks in _postgre.Tasks
@@ -533,7 +604,8 @@ namespace Barbuuuda.Services {
                           where statuses.StatusName.Equals(StatusTask.AUCTION) ||
                           statuses.StatusName.Equals(StatusTask.IN_WORK)
                           where users.Id.Equals(userId)
-                          select new {
+                          select new
+                          {
                               tasks.CategoryCode,
                               tasks.CountOffers,
                               tasks.CountViews,
@@ -560,13 +632,15 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="taskId"></param>
         /// <returns></returns>
-        async Task<IList> GetAuctionTasks() {
+        async Task<IList> GetAuctionTasks()
+        {
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                           join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
                           join users in _postgre.Users on tasks.OwnerId equals users.Id
                           where statuses.StatusName.Equals(StatusTask.AUCTION)
-                          select new {
+                          select new
+                          {
                               tasks.CategoryCode,
                               tasks.CountOffers,
                               tasks.CountViews,
@@ -593,8 +667,10 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="status">Имя статуса, кол-во задач которых нужно получить.</param>
         /// <returns>Число кол-ва задач.</returns>
-        public async Task<object> GetCountTaskStatuses() {
-            try {
+        public async Task<object> GetCountTaskStatuses()
+        {
+            try
+            {
                 int countTotal = await GetStatusName(StatusTask.TOTAL);
                 int countAuction = await GetStatusName(StatusTask.AUCTION);
                 int countWork = await GetStatusName(StatusTask.IN_WORK);
@@ -603,7 +679,8 @@ namespace Barbuuuda.Services {
                 int countPerechet = await GetStatusName(StatusTask.PERECHET);
                 int countDraft = await GetStatusName(StatusTask.DRAFT);
 
-                return new {
+                return new
+                {
                     total = countTotal,
                     auction = countAuction,
                     work = countWork,
@@ -614,7 +691,8 @@ namespace Barbuuuda.Services {
                 };
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
@@ -626,14 +704,15 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="status"></param>
         /// <returns></returns>
-        async Task<int> GetStatusName(string status) {
+        async Task<int> GetStatusName(string status)
+        {
             return await _postgre.Tasks
                 .Join(_postgre.TaskStatuses,
                 t => t.StatusCode,
-                s => s.StatusCode,                
+                s => s.StatusCode,
                 (t, s) => new { s.StatusName })
                 .Where(s => s.StatusName
-                .Equals(status))                
+                .Equals(status))
                 .CountAsync();
         }
 
@@ -643,46 +722,51 @@ namespace Barbuuuda.Services {
         /// <param name="status">Название статуса.</param>
         /// <param name="userId">Id пользователя.</param>
         /// <returns>Список заданий с определенным статусом.</returns>
-        public async Task<IList> GetStatusTasks(string status, string userId) {
-            try {
+        public async Task<IList> GetStatusTasks(string status, string userId)
+        {
+            try
+            {
                 string userName = await GetUserLoginById(userId);
 
                 return string.IsNullOrEmpty(status) ? throw new ArgumentNullException() :
                      await (from tasks in _postgre.Tasks
-                                   join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                                   join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                                   join users in _postgre.Users on tasks.OwnerId equals users.Id
-                                   where statuses.StatusName.Equals(status)
-                                   where users.Id.Equals(userId)
-                                   select new {
-                                       tasks.CategoryCode,
-                                       tasks.CountOffers,
-                                       tasks.CountViews,
-                                       tasks.OwnerId,
-                                       tasks.SpecCode,
-                                       categories.CategoryName,
-                                       tasks.StatusCode,
-                                       statuses.StatusName,
-                                       taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                       taskEndda = string.Format("{0:f}", tasks.TaskEndda),
-                                       tasks.TaskTitle,
-                                       tasks.TaskDetail,
-                                       tasks.TaskId,
-                                       taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                                       tasks.TypeCode,
-                                       userName
-                                   })
+                            join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                            join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                            join users in _postgre.Users on tasks.OwnerId equals users.Id
+                            where statuses.StatusName.Equals(status)
+                            where users.Id.Equals(userId)
+                            select new
+                            {
+                                tasks.CategoryCode,
+                                tasks.CountOffers,
+                                tasks.CountViews,
+                                tasks.OwnerId,
+                                tasks.SpecCode,
+                                categories.CategoryName,
+                                tasks.StatusCode,
+                                statuses.StatusName,
+                                taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                tasks.TaskTitle,
+                                tasks.TaskDetail,
+                                tasks.TaskId,
+                                taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                tasks.TypeCode,
+                                userName
+                            })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
             }
 
-            catch (ArgumentNullException ex) {
+            catch (ArgumentNullException ex)
+            {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogError();
                 throw new ArgumentNullException($"Не передан статус {ex.Message}");
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
@@ -694,21 +778,25 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="userId">Id пользователя.</param>
         /// <returns></returns>
-        public async Task<int> GetTotalCountTasks(string userId) {
-            try {
+        public async Task<int> GetTotalCountTasks(string userId)
+        {
+            try
+            {
                 return !string.IsNullOrEmpty(userId) ?
                     await _postgre.Tasks
                     .Where(t => t.OwnerId.Equals(userId))
                     .CountAsync() : throw new ArgumentNullException();
             }
 
-            catch (ArgumentNullException ex) {
+            catch (ArgumentNullException ex)
+            {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogError();
                 throw new ArgumentNullException($"Id не передан {ex.Message}");
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
@@ -719,12 +807,15 @@ namespace Barbuuuda.Services {
         /// Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".
         /// </summary>
         /// <returns>Список заданий.</returns>
-        public async Task<IList> LoadAuctionTasks() {
-            try {
+        public async Task<IList> LoadAuctionTasks()
+        {
+            try
+            {
                 return await GetAuctionTasks();
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
@@ -736,7 +827,8 @@ namespace Barbuuuda.Services {
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>Login юзера.</returns>
-        private async Task<string> GetUserLoginById(string userId) {
+        private async Task<string> GetUserLoginById(string userId)
+        {
             return await _iden.AspNetUsers
                 .Where(u => u.Id
                 .Equals(userId))

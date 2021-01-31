@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Barbuuuda.Core.Interfaces {
+namespace Barbuuuda.Core.Interfaces
+{
     /// <summary>
     /// Интерфейс определяет методы главной страницы.
     /// </summary>
-    public interface IMainPage {
+    public interface IMainPage
+    {
         /// <summary>
         /// Метод получает информацию для главного фона.
         /// </summary>

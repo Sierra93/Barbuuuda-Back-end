@@ -4,12 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace Barbuuuda.Models.Task {
+namespace Barbuuuda.Models.Task
+{
     /// <summary>
     /// Модель сопоставляется с таблицей категорий задач.
     /// </summary>
     [Table("TaskCategories", Schema = "dbo")]
-    public sealed class TaskCategoryDto {
+    public sealed class TaskCategoryDto
+    {
         [Key, Column("category_id")]
         public int CategoryId { get; set; }
 
@@ -30,7 +32,8 @@ namespace Barbuuuda.Models.Task {
     /// Класс сопоставляется с json столбцом специализаций.
     /// </summary>
     [NotMapped]
-    public class Specialization {
+    public class Specialization
+    {
         public string SpecName { get; set; }
 
         public string SpecCode { get; set; }

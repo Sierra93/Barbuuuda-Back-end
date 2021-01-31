@@ -6,17 +6,20 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Barbuuuda.Tests {
+namespace Barbuuuda.Tests
+{
     /// <summary>
     /// Тесты контроллера пользователя.
     /// </summary>
     [TestClass]
-    public class UserControllerTests {
+    public class UserControllerTests
+    {
         /// <summary>
         /// Метод тестирует получение информации для профиля юзера.
         /// </summary>
         [TestMethod]
-        public void GetProfileInfoTest() {
+        public void GetProfileInfoTest()
+        {
             var dbOptions = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "GetProfileInfoTest").Options;
             var postgreOptions = new DbContextOptionsBuilder<PostgreDbContext>().UseInMemoryDatabase(databaseName: "GetProfileInfoTest").Options;
             var dbContext = new ApplicationDbContext(dbOptions);
@@ -34,8 +37,10 @@ namespace Barbuuuda.Tests {
         /// Добавляет тестовую информацию профиля юзера.
         /// </summary>
         /// <param name="context"></param>
-        void AddProfileInfo(PostgreDbContext context) {
-            UserDto oUser = new UserDto {
+        void AddProfileInfo(PostgreDbContext context)
+        {
+            UserDto oUser = new UserDto
+            {
                 //UserLogin = "Olyaleya",
                 //UserPassword = "12345!",
                 //UserEmail = "olyaleya@mail.ru",
@@ -46,6 +51,6 @@ namespace Barbuuuda.Tests {
 
             context.Users.Add(oUser);
             context.SaveChanges();
-        }      
+        }
     }
 }

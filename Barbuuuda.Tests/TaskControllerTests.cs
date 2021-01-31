@@ -6,17 +6,20 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Barbuuuda.Tests {
+namespace Barbuuuda.Tests
+{
     /// <summary>
     /// Тесты контроллера заданий.
     /// </summary>
     [TestClass]
-    public class TaskControllerTests {
+    public class TaskControllerTests
+    {
         /// <summary>
         /// Метод проверяет получение тестовых заданий.
         /// </summary>
         [TestMethod]
-        public void GetTasksTest() {
+        public void GetTasksTest()
+        {
             var dbOptions = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "GetTasksTest").Options;
             var postgreOptions = new DbContextOptionsBuilder<PostgreDbContext>().UseInMemoryDatabase(databaseName: "GetTasksTest").Options;
             var dbContext = new ApplicationDbContext(dbOptions);
@@ -34,7 +37,8 @@ namespace Barbuuuda.Tests {
         /// <summary>
         /// Метод добавляет тестовые задания.
         /// </summary>
-        void AddTask(PostgreDbContext context) {
+        void AddTask(PostgreDbContext context)
+        {
             //TaskDto oTask1 = new TaskDto() {
             //    OwnerId = 1,
             //    TaskTitle = "test11",

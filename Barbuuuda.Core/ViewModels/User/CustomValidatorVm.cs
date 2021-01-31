@@ -11,15 +11,18 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Barbuuuda.Core.ViewModels.User {
+namespace Barbuuuda.Core.ViewModels.User
+{
     /// <summary>
     /// Класс валидирует поля при регистрации юзера.
     /// </summary>
-    public sealed class CustomValidatorVm : IUserValidator<UserDto> {
+    public sealed class CustomValidatorVm : IUserValidator<UserDto>
+    {
         private List<IdentityError> aErrors = new List<IdentityError>();
         private readonly IdentityDbContext _iden;
 
-        public CustomValidatorVm(IdentityDbContext iden) {
+        public CustomValidatorVm(IdentityDbContext iden)
+        {
             _iden = iden;
         }
 
@@ -29,8 +32,10 @@ namespace Barbuuuda.Core.ViewModels.User {
         /// <param name="manager">Объект регистрации.</param>
         /// <param name="user">Объект с данными юзера для валидации.</param>
         /// <returns></returns>
-        public async Task<IdentityResult> ValidateAsync(UserManager<UserDto> manager, UserDto user) {
-            try {
+        public async Task<IdentityResult> ValidateAsync(UserManager<UserDto> manager, UserDto user)
+        {
+            try
+            {
                 // Пытается найти такого юзера по логину.
                 UserDto isLogin = await _iden.AspNetUsers
                     .Where(u => u.UserName.Equals(user.UserName))
@@ -42,37 +47,47 @@ namespace Barbuuuda.Core.ViewModels.User {
                     .FirstOrDefaultAsync();
 
                 // Если есть юзер с таким логином.
-                if (isLogin != null) {
-                    aErrors.Add(new IdentityError {
+                if (isLogin != null)
+                {
+                    aErrors.Add(new IdentityError
+                    {
                         Description = ErrorValidate.LOGIN_ERROR
                     });
                 }
 
                 // Если логин содержит admin.
-                if (user.UserName.Contains("admin")) {
-                    aErrors.Add(new IdentityError {
+                if (user.UserName.Contains("admin"))
+                {
+                    aErrors.Add(new IdentityError
+                    {
                         Description = ErrorValidate.LOGIN_NOT_ADMIN
                     });
                 }
 
                 // Проверяет Email на корректность.
                 Match isCorrectEmail = Regex.Match(user.Email, @"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}");
-                if (!isCorrectEmail.Success) {
-                    aErrors.Add(new IdentityError {
+                if (!isCorrectEmail.Success)
+                {
+                    aErrors.Add(new IdentityError
+                    {
                         Description = ErrorValidate.EMAIL_NOT_CORRECT_FORMAT
                     });
                 }
 
                 // Если есть юзер с таким email.
-                if (isEmail != null) {
-                    aErrors.Add(new IdentityError {
+                if (isEmail != null)
+                {
+                    aErrors.Add(new IdentityError
+                    {
                         Description = ErrorValidate.EMAIL_ERROR
                     });
                 }
 
                 // Если email содержит admin.
-                if (user.Email.Contains("admin")) {
-                    aErrors.Add(new IdentityError {
+                if (user.Email.Contains("admin"))
+                {
+                    aErrors.Add(new IdentityError
+                    {
                         Description = ErrorValidate.LOGIN_NOT_EMAIL
                     });
                 }
@@ -96,7 +111,8 @@ namespace Barbuuuda.Core.ViewModels.User {
                IdentityResult.Success : IdentityResult.Failed(aErrors.ToArray()));
             }
 
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message.ToString());
             }
         }

@@ -4,12 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace Barbuuuda.Models.MainPage {
+namespace Barbuuuda.Models.MainPage
+{
     /// <summary>
     /// Класс сопоставляется с таблицей "Надеемся на долгое сотрудничество".
     /// </summary>
     [Table("Hopes", Schema = "dbo")]
-    public sealed class HopeDto {
+    public sealed class HopeDto
+    {
         [Key, Column("hope_id")]
         public int HopeId { get; set; }
 

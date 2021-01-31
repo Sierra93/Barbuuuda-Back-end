@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Barbuuuda.Core.Interfaces {
+namespace Barbuuuda.Core.Interfaces
+{
     /// <summary>
     /// Интерфейс содержит логику работы с заданиями.
     /// </summary>
-    public interface ITask {
+    public interface ITask
+    {
         /// <summary>
         /// Метод создает новое задание.
         /// </summary>

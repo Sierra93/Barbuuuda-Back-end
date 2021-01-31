@@ -4,12 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace Barbuuuda.Models.User {
+namespace Barbuuuda.Models.User
+{
     /// <summary>
     /// Модель сопоставляется с таблицей наборов полей для хидера.
     /// </summary>
     [Table("Headers", Schema = "dbo")]
-    public sealed class HeaderTypeDto {
+    public sealed class HeaderTypeDto
+    {
         [Key, Column("id")]
         public int Id { get; set; }
 

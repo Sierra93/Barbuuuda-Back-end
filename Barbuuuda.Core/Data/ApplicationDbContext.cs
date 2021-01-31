@@ -7,8 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Barbuuuda.Core.Data {
-    public class ApplicationDbContext : DbContext {
+namespace Barbuuuda.Core.Data
+{
+    public class ApplicationDbContext : DbContext
+    {
         public DbSet<LoggerDto> Logs { get; set; }   // Таблица логов.
 
         public DbSet<FonDto> Fons { get; set; }     // Таблица фона.

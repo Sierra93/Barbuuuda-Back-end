@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Barbuuuda.Core.Interfaces {
+namespace Barbuuuda.Core.Interfaces
+{
     /// <summary>
     /// Интерфейс определяет методы работы с пользователями.
     /// </summary>
-    public interface IUser {
+    public interface IUser
+    {
         /// <summary>
         /// Метод создает нового пользователя.
         /// </summary>

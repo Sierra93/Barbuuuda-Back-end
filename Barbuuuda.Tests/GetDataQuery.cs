@@ -6,15 +6,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Barbuuuda.Tests {
+namespace Barbuuuda.Tests
+{
     /// <summary>
     /// Класс получения тестовых данных.
     /// </summary>
-    public class GetDataQuery {
+    public class GetDataQuery
+    {
         ApplicationDbContext _db;
         PostgreDbContext _postgre;
 
-        public GetDataQuery(ApplicationDbContext db, PostgreDbContext postgre) {
+        public GetDataQuery(ApplicationDbContext db, PostgreDbContext postgre)
+        {
             _db = db;
             _postgre = postgre;
         }
@@ -23,7 +26,8 @@ namespace Barbuuuda.Tests {
         /// Метод получает список тестовых заданий.
         /// </summary>
         /// <returns></returns>
-        public IList GetTasksList() {
+        public IList GetTasksList()
+        {
             return _postgre.Tasks.ToList();
         }
 
@@ -31,7 +35,8 @@ namespace Barbuuuda.Tests {
         /// Метод получает всю информацию профиля.
         /// </summary>
         /// <returns></returns>
-        public object GetProfileInfo() {
+        public object GetProfileInfo()
+        {
             //int userId = 1;
 
             //return _postgre.Users

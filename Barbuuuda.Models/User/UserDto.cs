@@ -5,12 +5,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace Barbuuuda.Models.User {
+namespace Barbuuuda.Models.User
+{
     /// <summary>
     /// Класс сопоставляется с таблицей пользователей.
     /// </summary>
     [Table("AspNetUsers")]
-    public sealed class UserDto : IdentityUser {
+    public sealed class UserDto : IdentityUser
+    {
         [Column("UserPassword", TypeName = "varchar(100)")]
         public string UserPassword { get; set; }
 
