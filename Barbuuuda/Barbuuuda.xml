@@ -156,20 +156,20 @@
             Контроллер содержит логику работы с пользователями.
             </summary>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.Create(Barbuuuda.Models.User.UserDto)">
+        <member name="M:Barbuuuda.Controllers.UserController.CreateUserAsync(Barbuuuda.Models.User.UserDto)">
             <summary>
             Метод создает нового пользователя.
             <paramref name="user">Объект с данными юзера.</paramref>
             </summary>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.ConfirmEmail(System.String,System.String)">
+        <member name="M:Barbuuuda.Controllers.UserController.ConfirmAsync(System.String,System.String)">
             <summary>
-            Метод перенаправляет на главную страницу сервиса.
+            Метод проставит подтверждение регистрации в true и перенаправит на главную страницу сервиса.
             </summary>
             <param name="userId">Id юзера.</param>
             <param name="code">Временный код токена.</param>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.Login(Barbuuuda.Models.User.UserDto)">
+        <member name="M:Barbuuuda.Controllers.UserController.LoginUserAsync(Barbuuuda.Models.User.UserDto)">
             <summary>
             Метод авторизует пользователя.
             <paramref name="user">Объект с данными юзера.</paramref>
@@ -182,14 +182,14 @@
             <param name="user">Объект с данными юзера.</param>
             <returns>Объект с данными авторизованного юзера.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.GetProfileInfo(System.String)">
+        <member name="M:Barbuuuda.Controllers.UserController.GetProfileInfoAsync(System.String)">
             <summary>
             Метод получает информацию о пользователе для профиля.
             </summary>
             <param name="userId">Id юзера.</param>
             <returns>Объект с данными о профиле пользователя.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.SaveProfileData(Barbuuuda.Models.User.UserDto)">
+        <member name="M:Barbuuuda.Controllers.UserController.SaveProfileDataAsync(Barbuuuda.Models.User.UserDto)">
             <summary>
             Метод сохраняет личные данные юзера.
             </summary>

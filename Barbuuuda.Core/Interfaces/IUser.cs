@@ -12,12 +12,6 @@ namespace Barbuuuda.Core.Interfaces
     public interface IUser
     {
         /// <summary>
-        /// Метод создает нового пользователя.
-        /// </summary>
-        /// <param name="user">Объект с данными регистрации пользователя.</param>
-        Task<object> CreateAsync(UserDto user);
-
-        /// <summary>
         /// Метод авторизует пользователя.
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>

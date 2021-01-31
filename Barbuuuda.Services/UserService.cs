@@ -1,5 +1,4 @@
 ﻿using Barbuuuda.Core.Data;
-using Barbuuuda.Core.Extensions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Core.ViewModels.User;
@@ -9,14 +8,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web.Mvc;
 
 namespace Barbuuuda.Services
 {
@@ -38,43 +34,6 @@ namespace Barbuuuda.Services
             _userManager = userManager;
             _signInManager = signInManager;
             _iden = iden;
-        }
-
-        /// <summary>
-        /// Метод создает нового пользователя.
-        /// </summary>
-        /// <param name="user">Объект с данными регистрации пользователя.</param>
-        public async Task<object> CreateAsync(UserDto user)
-        {
-            try
-            {
-                // Добавляет юзера.
-                user.DateRegister = DateTime.UtcNow;
-                var addedUser = await _userManager.CreateAsync(user, user.UserPassword);
-
-                // Если регистрация успешна.
-                if (addedUser.Succeeded)
-                {
-                    return addedUser;
-                }
-
-                else
-                {
-                    // Что-то пошло не так, собирает ошибки запуская цепочку проверок валидации.
-                    CustomValidatorVm custom = new CustomValidatorVm(_iden);
-
-                    return await custom.ValidateAsync(_userManager, user);
-                }
-
-                throw new Exception();
-            }
-
-            catch (Exception ex)
-            {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                await _logger.LogError();
-                throw new Exception(ex.Message.ToString());
-            }
         }
 
         /// <summary>

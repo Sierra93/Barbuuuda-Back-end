@@ -8,12 +8,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Controllers
@@ -45,37 +42,66 @@ namespace Barbuuuda.Controllers
         /// <paramref name="user">Объект с данными юзера.</paramref>
         /// </summary>
         [HttpPost, Route("create")]
-        public async Task<IActionResult> Create([FromBody] UserDto user)
+        public async Task<IActionResult> CreateUserAsync([FromBody] UserDto user)
         {
-            // Добавляет юзера.
-            user.DateRegister = DateTime.UtcNow;
-            var addedUser = await _userManager.CreateAsync(user, user.UserPassword);
+            try
+            {                
+                // Ищет такой email в БД.
+                bool bErrorEmail = await IdentityUserEmail(user.Email);
 
-            // Если регистрация успешна.
-            if (addedUser.Succeeded)
-            {
-                // Генерит временный токен для юзера.
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var callbackUrl = Url.Action(
-                    "ConfirmAsync",
-                    "User",
-                    new { userId = user.Id, code = code },
-                    protocol: HttpContext.Request.Scheme);
-                EmailService emailService = new EmailService(_iden);
-                await emailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
-                    $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
+                if (!bErrorEmail)
+                {
+                    // Добавляет юзера.
+                    user.DateRegister = DateTime.UtcNow;
+                    var oAddedUser = await _userManager.CreateAsync(user, user.UserPassword);
 
-                return Ok();
+                    if (oAddedUser.Succeeded)
+                    {
+                        // Генерит временный токен для юзера.
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var callbackUrl = Url.Action(
+                            "ConfirmAsync",
+                            "User",
+                            new { userId = user.Id, code = code },
+                            protocol: HttpContext.Request.Scheme);
+                        await EmailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
+                            $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
+
+                        return Ok(oAddedUser);
+                    }
+
+                    else
+                    {
+                        // Что-то пошло не так, собирает ошибки запуская цепочку проверок валидации.
+                        CustomValidatorVm custom = new CustomValidatorVm(_iden);
+                        var aErrors = await custom.ValidateAsync(_userManager, user);
+
+                        return Ok(aErrors);
+                    }
+                }
+
+                throw new Exception();
             }
 
-            else
+            catch (Exception ex)
             {
-                // Что-то пошло не так, собирает ошибки запуская цепочку проверок валидации.
-                CustomValidatorVm custom = new CustomValidatorVm(_iden);
-                var aErrors = await custom.ValidateAsync(_userManager, user);
-
-                return Ok(aErrors);
+                throw new Exception(ex.Message.ToString());
             }
+        }
+
+        /// <summary>
+        /// Метод проверяет в БД существование юзера с таким email.
+        /// </summary>
+        /// <param name="email">Почта юзера.</param>
+        /// <returns>true - если существует, иначе false.</returns>
+        private async Task<bool> IdentityUserEmail(string email)
+        {
+            UserDto oUser = await _iden.AspNetUsers
+                    .Where(u => u.Email
+                    .Equals(email))
+                    .FirstOrDefaultAsync();
+
+            return oUser != null ? true : false;
         }
 
         /// <summary>
@@ -83,12 +109,11 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <param name="userId">Id юзера.</param>
         /// <param name="code">Временный код токена.</param>
-        [HttpGet]
-        [AllowAnonymous]
+        [HttpGet, AllowAnonymous]
         public async Task<IActionResult> ConfirmAsync(string userId, string code)
-        {            
+        {
             var user = await _userManager.FindByIdAsync(userId);
-            await _userManager.ConfirmEmailAsync(user, code);            
+            await _userManager.ConfirmEmailAsync(user, code);
 
             return new RedirectResult("https://publico-dev.xyz");
         }
@@ -98,7 +123,7 @@ namespace Barbuuuda.Controllers
         /// <paramref name="user">Объект с данными юзера.</paramref>
         /// </summary>
         [HttpPost, Route("login")]
-        public async Task<IActionResult> Login([FromBody] UserDto user)
+        public async Task<IActionResult> LoginUserAsync([FromBody] UserDto user)
         {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
             var oAuth = await _user.LoginAsync(user);
@@ -125,7 +150,7 @@ namespace Barbuuuda.Controllers
         /// <param name="userId">Id юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
         [HttpPost, Route("profile")]
-        public async Task<IActionResult> GetProfileInfo([FromQuery] string userId)
+        public async Task<IActionResult> GetProfileInfoAsync([FromQuery] string userId)
         {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
             object oUser = await _user.GetProfileInfo(userId);
@@ -138,7 +163,7 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
         [HttpPost, Route("save-data")]
-        public async Task<IActionResult> SaveProfileData([FromBody] UserDto user)
+        public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserDto user)
         {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
             await _user.SaveProfileData(user);

@@ -3,19 +3,14 @@ using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Enums;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
-using Barbuuuda.Models.Logger;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Services

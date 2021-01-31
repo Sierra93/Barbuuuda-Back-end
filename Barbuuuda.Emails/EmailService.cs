@@ -14,22 +14,15 @@ namespace Barbuuuda.Emails
     /// <summary>
     /// Класс реализует методы Email-рассылок.
     /// </summary>
-    public sealed class EmailService
+    public static class EmailService
     {
-        private readonly IdentityDbContext _iden;
-
-        public EmailService(IdentityDbContext iden)
-        {
-            _iden = iden;
-        }
-
         /// <summary>
         /// Метод отправляет оповещение о подтверждении почты юзеру.
         /// </summary>
         /// <param name="email">Email-адрес, на который отправит подтверждение.</param>
         /// <param name="subject">Тема сообщения.</param>
         /// <param name="message">Сообщение.</param>
-        public async Task SendEmailAsync(string email, string subject, string message)
+        public async static Task SendEmailAsync(string email, string subject, string message)
         {
             try
             {
