@@ -1,8 +1,10 @@
 ﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.ViewModels.User;
+using Barbuuuda.Emails;
 using Barbuuuda.Models.User;
 using Barbuuuda.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Controllers
@@ -43,10 +47,50 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("create")]
         public async Task<IActionResult> Create([FromBody] UserDto user)
         {
-            IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
-            var oUser = await _user.CreateAsync(user);
+            // Добавляет юзера.
+            user.DateRegister = DateTime.UtcNow;
+            var addedUser = await _userManager.CreateAsync(user, user.UserPassword);
 
-            return Ok(oUser);
+            // Если регистрация успешна.
+            if (addedUser.Succeeded)
+            {
+                // Генерит временный токен для юзера.
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var callbackUrl = Url.Action(
+                    "ConfirmAsync",
+                    "User",
+                    new { userId = user.Id, code = code },
+                    protocol: HttpContext.Request.Scheme);
+                EmailService emailService = new EmailService(_iden);
+                await emailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
+                    $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
+
+                return Ok();
+            }
+
+            else
+            {
+                // Что-то пошло не так, собирает ошибки запуская цепочку проверок валидации.
+                CustomValidatorVm custom = new CustomValidatorVm(_iden);
+                var aErrors = await custom.ValidateAsync(_userManager, user);
+
+                return Ok(aErrors);
+            }
+        }
+
+        /// <summary>
+        /// Метод проставит подтверждение регистрации в true и перенаправит на главную страницу сервиса.
+        /// </summary>
+        /// <param name="userId">Id юзера.</param>
+        /// <param name="code">Временный код токена.</param>
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmAsync(string userId, string code)
+        {            
+            var user = await _userManager.FindByIdAsync(userId);
+            await _userManager.ConfirmEmailAsync(user, code);            
+
+            return new RedirectResult("https://publico-dev.xyz");
         }
 
         /// <summary>

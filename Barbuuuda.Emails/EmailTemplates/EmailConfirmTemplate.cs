@@ -9,6 +9,6 @@ namespace Barbuuuda.Emails.EmailTemplates
     /// </summary>
     public class EmailConfirmTemplate : BaseEmailTemplate
     {
-        public string RedirectUrl { get; set; } // Url для перехода после подтверждения почты юзером.
+        public string EmailSendTo { get; set; } // Кому отправит подтверждение.        
     }
 }

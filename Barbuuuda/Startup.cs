@@ -55,7 +55,8 @@ namespace Barbuuuda {
                 opts.Password.RequireUppercase = false; // Требуются ли символы в верхнем регистре
                 opts.Password.RequireDigit = false; // Требуются ли цифры
             })
-                .AddEntityFrameworkStores<IdentityDbContext>();
+                .AddEntityFrameworkStores<IdentityDbContext>()
+                .AddDefaultTokenProviders(); 
 
             //services.AddDbContext<ApplicationDbContext>(options =>
             //  options.UseSqlServer(

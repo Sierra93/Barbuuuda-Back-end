@@ -162,6 +162,13 @@
             <paramref name="user">Объект с данными юзера.</paramref>
             </summary>
         </member>
+        <member name="M:Barbuuuda.Controllers.UserController.ConfirmEmail(System.String,System.String)">
+            <summary>
+            Метод перенаправляет на главную страницу сервиса.
+            </summary>
+            <param name="userId">Id юзера.</param>
+            <param name="code">Временный код токена.</param>
+        </member>
         <member name="M:Barbuuuda.Controllers.UserController.Login(Barbuuuda.Models.User.UserDto)">
             <summary>
             Метод авторизует пользователя.

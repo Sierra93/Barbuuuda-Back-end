@@ -16,6 +16,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace Barbuuuda.Services
 {
@@ -51,13 +52,9 @@ namespace Barbuuuda.Services
                 user.DateRegister = DateTime.UtcNow;
                 var addedUser = await _userManager.CreateAsync(user, user.UserPassword);
 
-                //Если регистрация успешна.
+                // Если регистрация успешна.
                 if (addedUser.Succeeded)
                 {
-                    // Отправит юзеру на почту сообщение о необходимости подтвердить свой email.
-                    EmailService _email = new EmailService(_iden);
-                    //await _email.ConfirmEmailAsync(user.UserName);
-
                     return addedUser;
                 }
 
