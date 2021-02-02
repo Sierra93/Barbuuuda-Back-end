@@ -27,7 +27,7 @@ namespace Barbuuuda.Emails
             try
             {
                 var emailMessage = new MimeMessage();
-                emailMessage.From.Add(new MailboxAddress("Администрация сервиса Barbuuuda", "sierra_93@mail.ru"));
+                emailMessage.From.Add(new MailboxAddress("Администрация сервиса Barbuuuda", "info.barbuuuda@mail.ru"));
                 emailMessage.To.Add(new MailboxAddress("", email));
                 emailMessage.Subject = subject;
                 emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
@@ -38,7 +38,7 @@ namespace Barbuuuda.Emails
                 using (var client = new SmtpClient())
                 {
                     await client.ConnectAsync("smtp.mail.ru", 2525, MailKit.Security.SecureSocketOptions.StartTls);
-                    await client.AuthenticateAsync("sierra_93@mail.ru", "13467kvm");
+                    await client.AuthenticateAsync("info.barbuuuda@mail.ru", "13467kvm");
                     await client.SendAsync(emailMessage);
                     await client.DisconnectAsync(true);
                 }

@@ -162,6 +162,13 @@
             <paramref name="user">Объект с данными юзера.</paramref>
             </summary>
         </member>
+        <member name="M:Barbuuuda.Controllers.UserController.IdentityUserEmail(System.String)">
+            <summary>
+            Метод проверяет в БД существование юзера с таким email.
+            </summary>
+            <param name="email">Почта юзера.</param>
+            <returns>true - если существует, иначе false.</returns>
+        </member>
         <member name="M:Barbuuuda.Controllers.UserController.ConfirmAsync(System.String,System.String)">
             <summary>
             Метод проставит подтверждение регистрации в true и перенаправит на главную страницу сервиса.

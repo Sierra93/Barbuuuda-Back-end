@@ -17,25 +17,38 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Barbuuuda {
-    public class Startup {
-        public Startup(IConfiguration configuration) {
+namespace Barbuuuda
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services) {
+        public void ConfigureServices(IServiceCollection services)
+        {
             services.AddControllers();
 
-            services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder => {
-                builder.WithOrigins(                    
-                    "https://publico-dev.xyz",
-                    "https://publico-dev.xyz/",
-                    "http://localhost:8080/",
-                    "http://localhost:8080")
-                .AllowAnyMethod().AllowAnyHeader();
+            services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
+            {
+                //builder.WithOrigins(
+                //    "https://testdevi.site",
+                //    "https://testdevi.site/",
+                //    "https://publico-dev.xyz",
+                //    "https://publico-dev.xyz/",
+                //    "http://localhost:8080/",
+                //    "http://localhost:8080")
+                //.AllowAnyMethod().AllowAnyHeader();
+                builder.AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .WithOrigins("*")
+                        .WithMethods("*")
+                        .WithHeaders("*")
+                        .DisallowCredentials();
             }));
 
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -48,7 +61,8 @@ namespace Barbuuuda {
             services.AddDbContext<IdentityDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            services.AddIdentity<UserDto, IdentityRole>(opts => {
+            services.AddIdentity<UserDto, IdentityRole>(opts =>
+            {
                 opts.Password.RequiredLength = 5;   // Минимальная длина
                 opts.Password.RequireNonAlphanumeric = false;   // Требуются ли не алфавитно-цифровые символы
                 opts.Password.RequireLowercase = false; // Требуются ли символы в нижнем регистре
@@ -56,13 +70,14 @@ namespace Barbuuuda {
                 opts.Password.RequireDigit = false; // Требуются ли цифры
             })
                 .AddEntityFrameworkStores<IdentityDbContext>()
-                .AddDefaultTokenProviders(); 
+                .AddDefaultTokenProviders();
 
             //services.AddDbContext<ApplicationDbContext>(options =>
             //  options.UseSqlServer(
             //      Configuration.GetConnectionString("TestConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            services.AddSwaggerGen(c => {
+            services.AddSwaggerGen(c =>
+            {
                 //c.SwaggerDoc("v1", new OpenApiInfo {
                 //    Version = "v1",
                 //    Title = "ToDo API",
@@ -87,14 +102,16 @@ namespace Barbuuuda {
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
             app.UseCors("ApiCorsPolicy");
-            
-            if (env.IsDevelopment()) {
+
+            if (env.IsDevelopment())
+            {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseStaticFiles();   
+            app.UseStaticFiles();
 
             app.UseHttpsRedirection();
 
@@ -103,12 +120,14 @@ namespace Barbuuuda {
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => {
+            app.UseEndpoints(endpoints =>
+            {
                 endpoints.MapControllers();
             });
 
             app.UseSwagger();
-            app.UseSwaggerUI(c => {
+            app.UseSwaggerUI(c =>
+            {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Documents API");
             });
         }
