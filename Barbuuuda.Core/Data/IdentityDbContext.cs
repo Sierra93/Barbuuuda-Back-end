@@ -9,9 +9,9 @@ using System.Data;
 
 namespace Barbuuuda.Core.Data
 {
-    public sealed class IdentityDbContext : IdentityDbContext<UserDto>
+    public sealed class IdentityDbContext : IdentityDbContext<UserEntity>
     {
-        public DbSet<UserDto> AspNetUsers { get; set; }
+        public DbSet<UserEntity> AspNetUsers { get; set; }
 
         public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options) { }
     }

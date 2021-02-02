@@ -10,7 +10,7 @@ namespace Barbuuuda.Models.User
     /// Модель сопоставляется с таблицей наборов полей для хидера.
     /// </summary>
     [Table("Headers", Schema = "dbo")]
-    public sealed class HeaderTypeDto
+    public sealed class HeaderTypeEntity
     {
         [Key, Column("id")]
         public int Id { get; set; }

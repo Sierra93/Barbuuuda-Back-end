@@ -10,7 +10,7 @@ namespace Barbuuuda.Models.Task
     /// Модель сопоставляется с таблицей статусов заданий.
     /// </summary>
     [Table("TaskTypes", Schema = "dbo")]
-    public sealed class TaskTypeDto
+    public sealed class TaskTypeEntity
     {
         [Key, Column("type_id")]
         public int TypeId { get; set; }

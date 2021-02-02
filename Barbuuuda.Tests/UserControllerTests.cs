@@ -39,7 +39,7 @@ namespace Barbuuuda.Tests
         /// <param name="context"></param>
         void AddProfileInfo(PostgreDbContext context)
         {
-            UserDto oUser = new UserDto
+            UserEntity oUser = new UserEntity
             {
                 //UserLogin = "Olyaleya",
                 //UserPassword = "12345!",

@@ -16,31 +16,31 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод получает информацию для главного фона.
         /// </summary>
         /// <returns>Объект фона.</returns>
-        Task<FonDto> GetFonContent();
+        Task<FonEntity> GetFonContent();
 
         /// <summary>
         /// Метод выгружает данные для блока "ПОЧЕМУ BARBUUUDA"
         /// </summary>
         /// <returns>Все объекты WhyDto</returns>
-        Task<IList<WhyDto>> GetWhyContent();
+        Task<IList<WhyEntity>> GetWhyContent();
 
         /// <summary>
         /// Метод выгружает данные для блока "КАК ЭТО РАБОТАЕТ"
         /// </summary>
         /// <returns>Объект WorkDto</returns>
-        Task<IList<WorkDto>> GetWorkContent();
+        Task<IList<WorkEntity>> GetWorkContent();
 
         /// <summary>
         /// Метод выгружает данные для блока "ЧТО ВЫ ПОЛУЧАЕТЕ"
         /// </summary>
         /// <returns>Все объекты PrivilegeDto</returns>
-        Task<IList<PrivilegeDto>> GetPrivilegeContent();
+        Task<IList<PrivilegeEntity>> GetPrivilegeContent();
 
         /// <summary>
         /// Метод выгружает данные для блока "Преимущества"
         /// </summary>
         /// <returns>Объект Advantage</returns>
-        Task<IList<AdvantageDto>> GetAdvantageContent();
+        Task<IList<AdvantageEntity>> GetAdvantageContent();
 
         /// <summary>
         /// Метод выгружает список категорий заданий.
@@ -53,6 +53,6 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод полчает данные долгосрочного сотрудничества.
         /// </summary>
         /// <returns>ОБъект с данными.</returns>
-        Task<HopeDto> GetHopeContent();
+        Task<HopeEntity> GetHopeContent();
     }
 }

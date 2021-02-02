@@ -10,7 +10,7 @@ namespace Barbuuuda.Models.Task
     /// Модель сопоставляется с таблицей категорий задач.
     /// </summary>
     [Table("TaskCategories", Schema = "dbo")]
-    public sealed class TaskCategoryDto
+    public sealed class TaskCategoryEntity
     {
         [Key, Column("category_id")]
         public int CategoryId { get; set; }

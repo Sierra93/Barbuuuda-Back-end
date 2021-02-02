@@ -9,7 +9,7 @@ namespace Barbuuuda.Models.Logger {
     /// Класс сопоставляется с таблицей логов.
     /// </summary>
     [Table("Logs", Schema = "dbo")]
-    public class LoggerDto {
+    public class LoggerEntity {
         [Key, Column("log_id", TypeName = "int")]
         public int LogId { get; set; }
 

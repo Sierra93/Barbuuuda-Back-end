@@ -16,7 +16,7 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>
         /// <returns>Статус true/false</returns>
-        Task<object> LoginAsync(UserDto user);
+        Task<object> LoginAsync(UserEntity user);
 
         /// <summary>
         /// Метод проверяет, авторизован ли юзер.
@@ -35,6 +35,6 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод сохраняет личные данные юзера.
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
-        Task SaveProfileData(UserDto user);
+        Task SaveProfileData(UserEntity user);
     }
 }

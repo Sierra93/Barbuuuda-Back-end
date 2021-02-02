@@ -10,7 +10,7 @@ namespace Barbuuuda.Models.MainPage
     /// Модель описывает таблицу "Как это работает".
     /// </summary>
     [Table("Works", Schema = "dbo")]
-    public sealed class WorkDto
+    public sealed class WorkEntity
     {
         [Key, Column("work_id")]
         public int WorkId { get; set; }

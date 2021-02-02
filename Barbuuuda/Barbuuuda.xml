@@ -56,14 +56,14 @@
             Контроллер содержит логику работы с заданиями.
             </summary>
         </member>
-        <member name="M:Barbuuuda.Controllers.TaskController.CreateTask(Barbuuuda.Models.Task.TaskDto)">
+        <member name="M:Barbuuuda.Controllers.TaskController.CreateTask(Barbuuuda.Models.Task.TaskEntity)">
             <summary>
             Метод создает новое задание.
             </summary>
             <param name="oTask">Объект с данными задания.</param>
             <returns>Вернет данные созданного задания.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.TaskController.EditTask(Barbuuuda.Models.Task.TaskDto)">
+        <member name="M:Barbuuuda.Controllers.TaskController.EditTask(Barbuuuda.Models.Task.TaskEntity)">
             <summary>
             Метод создает новое задание.
             </summary>
@@ -156,7 +156,7 @@
             Контроллер содержит логику работы с пользователями.
             </summary>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.CreateUserAsync(Barbuuuda.Models.User.UserDto)">
+        <member name="M:Barbuuuda.Controllers.UserController.CreateUserAsync(Barbuuuda.Models.User.UserEntity)">
             <summary>
             Метод создает нового пользователя.
             <paramref name="user">Объект с данными юзера.</paramref>
@@ -176,13 +176,13 @@
             <param name="userId">Id юзера.</param>
             <param name="code">Временный код токена.</param>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.LoginUserAsync(Barbuuuda.Models.User.UserDto)">
+        <member name="M:Barbuuuda.Controllers.UserController.LoginUserAsync(Barbuuuda.Models.User.UserEntity)">
             <summary>
             Метод авторизует пользователя.
             <paramref name="user">Объект с данными юзера.</paramref>
             </summary>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize(Barbuuuda.Models.User.UserDto)">
+        <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize(Barbuuuda.Models.User.UserEntity)">
             <summary>
             Метод проверяет, авторизован ли юзер.
             </summary>
@@ -196,7 +196,7 @@
             <param name="userId">Id юзера.</param>
             <returns>Объект с данными о профиле пользователя.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.SaveProfileDataAsync(Barbuuuda.Models.User.UserDto)">
+        <member name="M:Barbuuuda.Controllers.UserController.SaveProfileDataAsync(Barbuuuda.Models.User.UserEntity)">
             <summary>
             Метод сохраняет личные данные юзера.
             </summary>

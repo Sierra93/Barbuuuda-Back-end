@@ -24,10 +24,10 @@ namespace Barbuuuda.Controllers
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
-        private readonly UserManager<UserDto> _userManager;
-        private readonly SignInManager<UserDto> _signInManager;
+        private readonly UserManager<UserEntity> _userManager;
+        private readonly SignInManager<UserEntity> _signInManager;
 
-        public UserController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserDto> userManager, SignInManager<UserDto> signInManager)
+        public UserController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
         {
             _db = db;
             _postgre = postgre;
@@ -42,7 +42,7 @@ namespace Barbuuuda.Controllers
         /// <paramref name="user">Объект с данными юзера.</paramref>
         /// </summary>
         [HttpPost, Route("create")]
-        public async Task<IActionResult> CreateUserAsync([FromBody] UserDto user)
+        public async Task<IActionResult> CreateUserAsync([FromBody] UserEntity user)
         {
             try
             {                
@@ -96,7 +96,7 @@ namespace Barbuuuda.Controllers
         /// <returns>true - если существует, иначе false.</returns>
         private async Task<bool> IdentityUserEmail(string email)
         {
-            UserDto oUser = await _iden.AspNetUsers
+            UserEntity oUser = await _iden.AspNetUsers
                     .Where(u => u.Email
                     .Equals(email))
                     .FirstOrDefaultAsync();
@@ -123,7 +123,7 @@ namespace Barbuuuda.Controllers
         /// <paramref name="user">Объект с данными юзера.</paramref>
         /// </summary>
         [HttpPost, Route("login")]
-        public async Task<IActionResult> LoginUserAsync([FromBody] UserDto user)
+        public async Task<IActionResult> LoginUserAsync([FromBody] UserEntity user)
         {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
             var oAuth = await _user.LoginAsync(user);
@@ -136,7 +136,7 @@ namespace Barbuuuda.Controllers
         /// <param name="user">Объект с данными юзера.</param>
         /// <returns>Объект с данными авторизованного юзера.</returns>
         [HttpPost, Route("authorize")]
-        public async Task<IActionResult> GetUserAuthorize([FromBody] UserDto user)
+        public async Task<IActionResult> GetUserAuthorize([FromBody] UserEntity user)
         {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
             object oAuthorize = await _user.GetUserAuthorize(user.UserName);
@@ -163,7 +163,7 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
         [HttpPost, Route("save-data")]
-        public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserDto user)
+        public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserEntity user)
         {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
             await _user.SaveProfileData(user);

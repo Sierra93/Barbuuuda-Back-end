@@ -10,7 +10,7 @@ namespace Barbuuuda.Models.MainPage
     /// Класс сопоставляется с таблицей ЧТО ВЫ ПОЛУЧАЕТЕ.
     /// </summary>
     [Table("Privileges", Schema = "dbo")]
-    public sealed class PrivilegeDto
+    public sealed class PrivilegeEntity
     {
         [Key, Column("id")]
         public int Id { get; set; }

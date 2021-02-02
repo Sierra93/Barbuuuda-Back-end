@@ -101,7 +101,7 @@ namespace Barbuuuda.Controllers
         public async Task<IActionResult> GetHopeContent()
         {
             IMainPage _mainPage = new MainPageService(_db, _postgre);
-            HopeDto oHope = await _mainPage.GetHopeContent();
+            HopeEntity oHope = await _mainPage.GetHopeContent();
 
             return Ok(oHope);
         }

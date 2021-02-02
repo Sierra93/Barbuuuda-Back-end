@@ -29,11 +29,11 @@ namespace Barbuuuda.Services
         /// Метод получает информацию для главного фона.
         /// </summary>
         /// <returns>Объект фона.</returns>
-        public async Task<FonDto> GetFonContent()
+        public async Task<FonEntity> GetFonContent()
         {
             try
             {
-                FonDto oFon = await _db.Fons.FirstOrDefaultAsync();
+                FonEntity oFon = await _db.Fons.FirstOrDefaultAsync();
 
                 return oFon != null ? oFon : throw new ArgumentNullException();
             }
@@ -57,7 +57,7 @@ namespace Barbuuuda.Services
         /// Метод выгружает данные для блока "ПОЧЕМУ BARBUUUDA"
         /// </summary>
         /// <returns>Все объекты WhyDto</returns>
-        public async Task<IList<WhyDto>> GetWhyContent()
+        public async Task<IList<WhyEntity>> GetWhyContent()
         {
             try
             {
@@ -76,7 +76,7 @@ namespace Barbuuuda.Services
         /// Метод выгружает данные для блока "ЧТО ВЫ ПОЛУЧАЕТЕ"
         /// </summary>
         /// <returns>Все объекты PrivilegeDto</returns>
-        public async Task<IList<PrivilegeDto>> GetPrivilegeContent()
+        public async Task<IList<PrivilegeEntity>> GetPrivilegeContent()
         {
             try
             {
@@ -95,7 +95,7 @@ namespace Barbuuuda.Services
         /// Метод выгружает данные для блока "КАК ЭТО РАБОТАЕТ"
         /// </summary>
         /// <returns>Все объекты WorkDto</returns>
-        public async Task<IList<WorkDto>> GetWorkContent()
+        public async Task<IList<WorkEntity>> GetWorkContent()
         {
             try
             {
@@ -114,7 +114,7 @@ namespace Barbuuuda.Services
         /// Выгружает данные для раздела "Преимущества"
         /// </summary>
         /// <returns>Все объекты Advantage</returns>
-        public async Task<IList<AdvantageDto>> GetAdvantageContent()
+        public async Task<IList<AdvantageEntity>> GetAdvantageContent()
         {
 
             try
@@ -158,7 +158,7 @@ namespace Barbuuuda.Services
         /// Метод полчает данные долгосрочного сотрудничества.
         /// </summary>
         /// <returns>ОБъект с данными.</returns>
-        public async Task<HopeDto> GetHopeContent()
+        public async Task<HopeEntity> GetHopeContent()
         {
             try
             {

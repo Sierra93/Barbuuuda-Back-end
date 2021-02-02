@@ -17,14 +17,14 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="task">Объект с данными задания.</param>
         /// <returns>Вернет данные созданного задания.</returns>
-        Task<TaskDto> CreateTask(TaskDto oTask);
+        Task<TaskEntity> CreateTask(TaskEntity oTask);
 
         /// <summary>
         /// Метод редактирует задание.
         /// </summary>
         /// <param name="task">Объект с данными задания.</param>
         /// <returns>Вернет данные созданного задания.</returns>
-        Task<TaskDto> EditTask(TaskDto oTask);
+        Task<TaskEntity> EditTask(TaskEntity oTask);
 
         /// <summary>
         /// Метод выгружает список категорий заданий.

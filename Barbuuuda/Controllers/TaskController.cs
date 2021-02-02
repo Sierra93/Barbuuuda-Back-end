@@ -20,10 +20,10 @@ namespace Barbuuuda.Controllers
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
-        private readonly UserManager<UserDto> _userManager;
-        private readonly SignInManager<UserDto> _signInManager;
+        private readonly UserManager<UserEntity> _userManager;
+        private readonly SignInManager<UserEntity> _signInManager;
 
-        public TaskController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserDto> userManager, SignInManager<UserDto> signInManager)
+        public TaskController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
         {
             _db = db;
             _postgre = postgre;
@@ -39,10 +39,10 @@ namespace Barbuuuda.Controllers
         /// <param name="oTask">Объект с данными задания.</param>
         /// <returns>Вернет данные созданного задания.</returns>
         [HttpPost, Route("create")]
-        public async Task<IActionResult> CreateTask([FromBody] TaskDto oTask)
+        public async Task<IActionResult> CreateTask([FromBody] TaskEntity oTask)
         {
             ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
-            TaskDto oResultTask = await _task.CreateTask(oTask);
+            TaskEntity oResultTask = await _task.CreateTask(oTask);
 
             return Ok(oResultTask);
         }
@@ -53,10 +53,10 @@ namespace Barbuuuda.Controllers
         /// <param name="oTask">Объект с данными задания.</param>
         /// <returns>Вернет данные измененного задания.</returns>
         [HttpPost, Route("edit")]
-        public async Task<IActionResult> EditTask([FromBody] TaskDto oTask)
+        public async Task<IActionResult> EditTask([FromBody] TaskEntity oTask)
         {
             ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
-            TaskDto oResultTask = await _task.EditTask(oTask);
+            TaskEntity oResultTask = await _task.EditTask(oTask);
 
             return Ok(oResultTask);
         }

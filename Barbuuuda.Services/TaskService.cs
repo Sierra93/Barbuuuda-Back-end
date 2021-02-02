@@ -23,10 +23,10 @@ namespace Barbuuuda.Services
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
-        private readonly UserManager<UserDto> _userManager;
-        private readonly SignInManager<UserDto> _signInManager;
+        private readonly UserManager<UserEntity> _userManager;
+        private readonly SignInManager<UserEntity> _signInManager;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserDto> userManager, SignInManager<UserDto> signInManager)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
         {
             _db = db;
             _postgre = postgre;
@@ -40,7 +40,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="task">Объект с данными задания.</param>
         /// <returns>Вернет данные созданного задания.</returns>
-        public async Task<TaskDto> CreateTask(TaskDto oTask)
+        public async Task<TaskEntity> CreateTask(TaskEntity oTask)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="task">Объект с данными задания.</param>
         /// <returns>Вернет данные измененного задания.</returns>
-        public async Task<TaskDto> EditTask(TaskDto oTask)
+        public async Task<TaskEntity> EditTask(TaskEntity oTask)
         {
             try
             {
@@ -165,7 +165,7 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                UserDto oUser = await _postgre.Users.Where(u => u.Id.Equals(userId)).FirstOrDefaultAsync();
+                UserEntity oUser = await _postgre.Users.Where(u => u.Id.Equals(userId)).FirstOrDefaultAsync();
 
                 return oUser != null ? true : throw new ArgumentNullException();
             }
@@ -301,7 +301,7 @@ namespace Barbuuuda.Services
         async Task<IList> GetSingleTask(string userId, int? taskId)
         {
             // Выбирает объект задачи, который нужно редактировать.
-            TaskDto oEditTask = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
+            TaskEntity oEditTask = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
 
             // Выбирает список специализаций конкретной категории по коду категории.
             IList aTaskSpecializations = await _postgre.TaskCategories
@@ -364,7 +364,7 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                TaskDto oRemovedTask = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
+                TaskEntity oRemovedTask = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
                 _postgre.Tasks.Remove(oRemovedTask);
                 await _postgre.SaveChangesAsync();
             }
@@ -482,10 +482,10 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                List<TaskDto> aTasks = new List<TaskDto>();
+                List<TaskEntity> aTasks = new List<TaskEntity>();
 
                 // Выбирает задания форматируя даты для сравнений.
-                foreach (TaskDto task in _postgre.Tasks)
+                foreach (TaskEntity task in _postgre.Tasks)
                 {
                     DateTime dt = Convert.ToDateTime(date);
 
@@ -502,7 +502,7 @@ namespace Barbuuuda.Services
                 }
 
                 // Выбирает нужные задания форматируя даты к нужному виду.
-                foreach (TaskDto oTask in aTasks)
+                foreach (TaskEntity oTask in aTasks)
                 {
                     IList aResultTasks = await GetTasksByIds(oTask.TaskId);
 

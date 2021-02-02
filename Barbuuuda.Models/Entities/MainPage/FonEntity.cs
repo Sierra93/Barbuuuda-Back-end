@@ -10,7 +10,7 @@ namespace Barbuuuda.Models.MainPage
     /// Модель описывает таблицу главного фона на главной странице.
     /// </summary>
     [Table("Fons", Schema = "dbo")]
-    public sealed class FonDto
+    public sealed class FonEntity
     {
         [Key, Column("fon_id")]
         public int FonId { get; set; }

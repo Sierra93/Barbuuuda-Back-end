@@ -16,7 +16,7 @@ namespace Barbuuuda.Core.ViewModels.User
     /// <summary>
     /// Класс валидирует поля при регистрации юзера.
     /// </summary>
-    public sealed class CustomValidatorVm : IUserValidator<UserDto>
+    public sealed class CustomValidatorVm : IUserValidator<UserEntity>
     {
         private List<IdentityError> aErrors = new List<IdentityError>();
         private readonly IdentityDbContext _iden;
@@ -32,17 +32,17 @@ namespace Barbuuuda.Core.ViewModels.User
         /// <param name="manager">Объект регистрации.</param>
         /// <param name="user">Объект с данными юзера для валидации.</param>
         /// <returns></returns>
-        public async Task<IdentityResult> ValidateAsync(UserManager<UserDto> manager, UserDto user)
+        public async Task<IdentityResult> ValidateAsync(UserManager<UserEntity> manager, UserEntity user)
         {
             try
             {
                 // Пытается найти такого юзера по логину.
-                UserDto isLogin = await _iden.AspNetUsers
+                UserEntity isLogin = await _iden.AspNetUsers
                     .Where(u => u.UserName.Equals(user.UserName))
                     .FirstOrDefaultAsync();
 
                 // Пытается найти такого юзера по email.
-                UserDto isEmail = await _iden.AspNetUsers
+                UserEntity isEmail = await _iden.AspNetUsers
                     .Where(u => u.Email.Equals(user.Email))
                     .FirstOrDefaultAsync();
 

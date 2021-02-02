@@ -10,7 +10,7 @@ namespace Barbuuuda.Models.MainPage
     /// Класс сопоставляется с таблицей Почему Барбуда.
     /// </summary>
     [Table("Whies", Schema = "dbo")]
-    public sealed class WhyDto
+    public sealed class WhyEntity
     {
         [Key, Column("id")]
         public int Id { get; set; }

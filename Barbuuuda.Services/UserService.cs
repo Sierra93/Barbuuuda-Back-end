@@ -24,10 +24,10 @@ namespace Barbuuuda.Services
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
-        private readonly UserManager<UserDto> _userManager;
-        private readonly SignInManager<UserDto> _signInManager;
+        private readonly UserManager<UserEntity> _userManager;
+        private readonly SignInManager<UserEntity> _signInManager;
 
-        public UserService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserDto> userManager, SignInManager<UserDto> signInManager)
+        public UserService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
         {
             _db = db;
             _postgre = postgre;
@@ -41,7 +41,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>
         /// <returns>Статус true/false</returns>
-        public async Task<object> LoginAsync(UserDto user)
+        public async Task<object> LoginAsync(UserEntity user)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
         /// <returns>Токен юзера.</returns>
-        private async Task<string> GetToken(UserDto user)
+        private async Task<string> GetToken(UserEntity user)
         {
             ClaimsIdentity oClaim = GetClaim(user.UserName);
             var now = DateTime.UtcNow;
@@ -138,7 +138,7 @@ namespace Barbuuuda.Services
         /// <param name="token">Токен юзера.</param>
         private async Task SetUserToken(string token, string username)
         {
-            UserDto oUser = await _iden.AspNetUsers
+            UserEntity oUser = await _iden.AspNetUsers
                 .Where(u => u.UserName
                 .Equals(username))
                 .FirstOrDefaultAsync();
@@ -175,13 +175,13 @@ namespace Barbuuuda.Services
                 string userId = string.Empty;
 
                 // Выбирает юзера по логину.
-                UserDto oUser = await _iden.AspNetUsers
+                UserEntity oUser = await _iden.AspNetUsers
                     .Where(u => u.UserName
                     .Equals(username))
                     .FirstOrDefaultAsync();
 
                 // В зависимости от роли юзера формирует хидер.
-                IList<HeaderTypeDto> aHeaderFields = await GetHeader(oUser.UserRole);
+                IList<HeaderTypeEntity> aHeaderFields = await GetHeader(oUser.UserRole);
 
                 if (oUser != null)
                 {
@@ -219,7 +219,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="role">Роль юзера.</param>
         /// <returns></returns>
-        private async Task<IList<HeaderTypeDto>> GetHeader(string role)
+        private async Task<IList<HeaderTypeEntity>> GetHeader(string role)
         {
             try
             {
@@ -302,7 +302,7 @@ namespace Barbuuuda.Services
         /// Метод сохраняет личные данные юзера.
         /// </summary>
         /// <param name="needUserUpdate">Объект с данными юзера.</param>
-        public async Task SaveProfileData(UserDto needUserUpdate)
+        public async Task SaveProfileData(UserEntity needUserUpdate)
         {
             try
             {
@@ -329,9 +329,9 @@ namespace Barbuuuda.Services
         /// Метод изменяет объект юзера.
         /// </summary>
         /// <param name="needUserUpdate">Исходный объект юзера для изменения.</param>
-        private async Task ChangeProfileData(UserDto needUserUpdate)
+        private async Task ChangeProfileData(UserEntity needUserUpdate)
         {
-            UserDto oldUser = await _postgre.Users
+            UserEntity oldUser = await _postgre.Users
                     .Where(u => u.Id.Equals(needUserUpdate.Id))
                     .FirstOrDefaultAsync();
 

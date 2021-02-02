@@ -10,7 +10,7 @@ namespace Barbuuuda.Models.MainPage
     /// Класс сопоставляется с таблицей "Надеемся на долгое сотрудничество".
     /// </summary>
     [Table("Hopes", Schema = "dbo")]
-    public sealed class HopeDto
+    public sealed class HopeEntity
     {
         [Key, Column("hope_id")]
         public int HopeId { get; set; }

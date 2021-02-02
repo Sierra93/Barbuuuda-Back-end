@@ -14,12 +14,12 @@ namespace Barbuuuda.Core.Logger
     public class Logger
     {
         ApplicationDbContext _db;
-        LoggerDto _logger;
+        LoggerEntity _logger;
 
         public Logger(ApplicationDbContext db, string typeException, string exception, string stackTrace)
         {
             _db = db;
-            _logger = new LoggerDto()
+            _logger = new LoggerEntity()
             {
                 TypeException = typeException,
                 Exception = exception,

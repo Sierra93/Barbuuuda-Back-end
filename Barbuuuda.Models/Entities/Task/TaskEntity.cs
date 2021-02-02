@@ -11,7 +11,7 @@ namespace Barbuuuda.Models.Task
     /// Модель сопоставляется с таблицей заданий.
     /// </summary>
     [Table("Tasks", Schema = "dbo")]
-    public sealed class TaskDto
+    public sealed class TaskEntity
     {
         [Key, Column("TaskId")]
         public int TaskId { get; set; }
