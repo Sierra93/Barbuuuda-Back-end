@@ -822,7 +822,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>Login юзера.</returns>
-        private async Task<string> GetUserLoginById(string userId)
+        public async Task<string> GetUserLoginById(string userId)
         {
             return await _iden.AspNetUsers
                 .Where(u => u.Id

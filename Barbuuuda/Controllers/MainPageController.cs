@@ -15,8 +15,8 @@ namespace Barbuuuda.Controllers
     [ApiController, Route("main")]
     public class MainPageController : Controller
     {
-        ApplicationDbContext _db;
-        PostgreDbContext _postgre;
+        private readonly ApplicationDbContext _db;
+        private readonly PostgreDbContext _postgre;
 
         public MainPageController(ApplicationDbContext db, PostgreDbContext postgre)
         {

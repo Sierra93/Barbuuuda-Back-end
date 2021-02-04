@@ -1,7 +1,11 @@
 ﻿using Barbuuuda.Core.Data;
+using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Outpoot;
 using Barbuuuda.Models.Task;
+using Barbuuuda.Models.User;
+using Barbuuuda.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,25 +21,61 @@ namespace Barbuuuda.Controllers
     [ApiController, Route("pagination")]
     public class PaginationController : ControllerBase
     {
+        private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
+        private readonly IdentityDbContext _iden;
+        private readonly UserManager<UserEntity> _userManager;
+        private readonly SignInManager<UserEntity> _signInManager;
 
-        public PaginationController(PostgreDbContext postgre)
+        public PaginationController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
         {
+            _db = db;
             _postgre = postgre;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _iden = iden;
         }
 
         /// <summary>
         /// Метод пагинации.
         /// </summary>
         /// <param name="pageIdx"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
         [HttpGet, Route("page")]
-        public async Task<IActionResult> Index([FromQuery] int pageIdx = 1)
+        public async Task<IActionResult> Index([FromQuery] string userId, int pageIdx = 1)
         {            
             int countTasksPage = 5;   // Кол-во заданий на странице.
-            IQueryable<TaskEntity> tasks = _postgre.Tasks;
-            var count = await tasks.CountAsync();
-            var items = await tasks.Skip((pageIdx - 1) * countTasksPage).Take(countTasksPage).ToListAsync();
+            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
+            string userName = await _task.GetUserLoginById(userId);
+
+            var aTasks = (from tasks in _postgre.Tasks
+                                                  join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                                                  join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                                                  where tasks.OwnerId.Equals(userId)
+                                                  select new
+                                                  {
+                                                      tasks.CategoryCode,
+                                                      tasks.CountOffers,
+                                                      tasks.CountViews,
+                                                      tasks.OwnerId,
+                                                      tasks.SpecCode,
+                                                      categories.CategoryName,
+                                                      tasks.StatusCode,
+                                                      statuses.StatusName,
+                                                      taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                                      taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                                      tasks.TaskTitle,
+                                                      tasks.TaskDetail,
+                                                      tasks.TaskId,
+                                                      taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                                      tasks.TypeCode,
+                                                      userName
+                                                  })
+                          .OrderBy(o => o.TaskId)
+                          .AsQueryable();
+            var count = await aTasks.CountAsync();
+            var items = await aTasks.Skip((pageIdx - 1) * countTasksPage).Take(countTasksPage).ToListAsync();
 
             ModelPaginationOutpoot pageData = new ModelPaginationOutpoot(count, pageIdx, countTasksPage);
             ModelIndexOutpoot data = new ModelIndexOutpoot

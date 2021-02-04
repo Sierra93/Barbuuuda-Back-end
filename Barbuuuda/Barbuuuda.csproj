@@ -31,4 +31,7 @@
     <ProjectReference Include="..\Barbuuuda.Models\Barbuuuda.Models.csproj" />
     <ProjectReference Include="..\Barbuuuda.Services\Barbuuuda.Services.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
 </Project>

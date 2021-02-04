@@ -101,5 +101,7 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <returns>Список заданий.</returns>
         Task<IList> LoadAuctionTasks();
+
+        Task<string> GetUserLoginById(string userId);
     }
 }
