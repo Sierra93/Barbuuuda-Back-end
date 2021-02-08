@@ -321,6 +321,8 @@ namespace Barbuuuda.Services
 
             catch (Exception ex)
             {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }

@@ -4,6 +4,17 @@
         <name>Barbuuuda</name>
     </assembly>
     <members>
+        <member name="T:Barbuuuda.Controllers.ExecutorController">
+            <summary>
+            Контроллер содержит методы по работе с исполнителями сервиса.
+            </summary>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetExecutorListAsync">
+            <summary>
+            Метод выгружает список исполнителей сервиса.
+            </summary>
+            <returns>Список исполнителей.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>
             Контроллер главной страницы.
