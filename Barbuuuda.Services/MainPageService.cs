@@ -191,7 +191,6 @@ namespace Barbuuuda.Services
         {
             try
             {
-                ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
                 var aTasks = await (from tasks in _postgre.Tasks
                               join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                               join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
