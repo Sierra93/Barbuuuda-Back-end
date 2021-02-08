@@ -64,6 +64,8 @@ namespace Barbuuuda.Controllers
                             "User",
                             new { userId = user.Id, code = code },
                             protocol: HttpContext.Request.Scheme);
+
+                        // Отправит уведомление на email.
                         await EmailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
                             $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
 
