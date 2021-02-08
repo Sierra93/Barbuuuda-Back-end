@@ -51,6 +51,12 @@
             </summary>
             <returns>ОБъект с данными.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.MainPageController.GetLastTasksAsync">
+            <summary>
+            Метод выгружает 5 последних заданий. Не важно, чьи они.
+            </summary>
+            <returns>Список с 5 заданиями.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.PaginationController">
             <summary>
             Контроллер работы с пагинацией.

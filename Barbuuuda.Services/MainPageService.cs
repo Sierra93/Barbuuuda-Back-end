@@ -1,7 +1,11 @@
-﻿using Barbuuuda.Core.Data;
+﻿using Barbuuuda.Core.Consts;
+using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.MainPage;
+using Barbuuuda.Models.Task;
+using Barbuuuda.Models.User;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
@@ -16,13 +20,19 @@ namespace Barbuuuda.Services
     /// </summary>
     public class MainPageService : IMainPage
     {
-        ApplicationDbContext _db;
-        PostgreDbContext _postgre;
+        private readonly ApplicationDbContext _db;
+        private readonly PostgreDbContext _postgre;
+        private readonly IdentityDbContext _iden;
+        private readonly UserManager<UserEntity> _userManager;
+        private readonly SignInManager<UserEntity> _signInManager;
 
-        public MainPageService(ApplicationDbContext db, PostgreDbContext postgre)
+        public MainPageService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
         {
             _db = db;
             _postgre = postgre;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _iden = iden;
         }
 
         /// <summary>
@@ -172,5 +182,51 @@ namespace Barbuuuda.Services
                 throw new Exception(ex.Message.ToString());
             }
         }
+
+        /// <summary>
+        /// Метод выгружает 5 последних заданий. Не важно, чьи они.
+        /// </summary>
+        /// <returns>Список с 5 заданиями.</returns>
+        public async Task<IEnumerable> GetLastTasksAsync()
+        {
+            try
+            {
+                ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
+                var aTasks = await (from tasks in _postgre.Tasks
+                              join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                              join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                              join users in _postgre.Users on tasks.OwnerId equals users.Id
+                              where statuses.StatusName.Equals(StatusTask.AUCTION)
+                              select new
+                              {
+                                  tasks.CategoryCode,
+                                  tasks.CountOffers,
+                                  tasks.CountViews,
+                                  tasks.OwnerId,
+                                  tasks.SpecCode,
+                                  categories.CategoryName,
+                                  tasks.StatusCode,
+                                  statuses.StatusName,
+                                  taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                  taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                  tasks.TaskTitle,
+                                  tasks.TaskDetail,
+                                  tasks.TaskId,
+                                  taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                  tasks.TypeCode,
+                                  users.UserName
+                              })
+                          .OrderBy(o => o.TaskId)
+                          .ToListAsync();
+                IEnumerable aReverseTasks = ExtensionService.Reverse(aTasks).Take(5);
+
+                return aReverseTasks;
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+        }        
     }
 }

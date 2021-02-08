@@ -60,5 +60,14 @@ namespace Barbuuuda.Tests
             //        .FirstOrDefault();
             return null;
         }
+
+        /// <summary>
+        /// Метод возвращает последние 5 заданий. Не важно, чьи они.
+        /// </summary>
+        /// <returns></returns>
+        public IList GetLastTasks()
+        {
+            return _postgre.Tasks.Reverse().Take(5).ToList();
+        }
     }
 }

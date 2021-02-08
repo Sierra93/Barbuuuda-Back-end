@@ -19,6 +19,10 @@ namespace Barbuuuda.Core.Logger
         public Logger(ApplicationDbContext db, string typeException, string exception, string stackTrace)
         {
             _db = db;
+
+            /// <summary>
+            /// Инициализация объекта логера.
+            /// </summary>
             _logger = new LoggerEntity()
             {
                 TypeException = typeException,

@@ -54,5 +54,11 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <returns>ОБъект с данными.</returns>
         Task<HopeEntity> GetHopeContent();
+
+          /// <summary>
+        /// Метод выгружает 5 последних заданий. Не важно, чьи они.
+        /// </summary>
+        /// <returns>Список с 5 заданиями.</returns>
+        Task<IEnumerable> GetLastTasksAsync();
     }
 }
