@@ -5,17 +5,19 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Barbuuuda.Core.Data {
-    public class PostgreDbContext : DbContext {
-        public DbSet<UserDto> Users { get; set; }    // Таблица пользователей.
+namespace Barbuuuda.Core.Data
+{
+    public class PostgreDbContext : DbContext
+    {
+        public DbSet<UserEntity> Users { get; set; }    // Таблица информации аккаунтов пользователей.
 
-        public DbSet<TaskDto> Tasks { get; set; }    // Таблица предложений поставщикам.
+        public DbSet<TaskEntity> Tasks { get; set; }    // Таблица предложений поставщикам.
 
-        public DbSet<TaskStatusDto> TaskStatuses { get; set; }   // Таблица статусов заданий.
+        public DbSet<TaskStatusEntity> TaskStatuses { get; set; }   // Таблица статусов заданий.
 
-        public DbSet<TaskCategoryDto> TaskCategories { get; set; }   // Таблица категорий заданий.
+        public DbSet<TaskCategoryEntity> TaskCategories { get; set; }   // Таблица категорий заданий.
 
-        public DbSet<TaskTypeDto> TaskTypes { get; set; }   // Таблица типов заданий.
+        public DbSet<TaskTypeEntity> TaskTypes { get; set; }   // Таблица типов заданий.
 
         public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options) { }
 

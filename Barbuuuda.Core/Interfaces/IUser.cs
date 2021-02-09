@@ -4,36 +4,37 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Barbuuuda.Core.Interfaces {
+namespace Barbuuuda.Core.Interfaces
+{
     /// <summary>
     /// Интерфейс определяет методы работы с пользователями.
     /// </summary>
-    public interface IUser {
-        /// <summary>
-        /// Метод создает нового пользователя.
-        /// </summary>
-        /// <param name="user">Объект с данными регистрации пользователя.</param>
-        Task<UserDto> Create(UserDto user);
-
+    public interface IUser
+    {
         /// <summary>
         /// Метод авторизует пользователя.
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>
         /// <returns>Статус true/false</returns>
-        Task<object> Login(UserDto user);
+        Task<object> LoginAsync(UserEntity user);
 
         /// <summary>
-        /// Метод проверяет, авторизован ли юзер, если нет, то вернет false, иначе true.
+        /// Метод проверяет, авторизован ли юзер.
+        /// </summary>
+        /// <param name="username">login юзера.</param>
+        /// <returns>Объект с данными авторизованного юзера.</returns>
+        Task<object> GetUserAuthorize(string username);
+        /// <summary>
+        /// Метод получает информацию о пользователе для профиля.
         /// </summary>
         /// <param name="userId">Id юзера.</param>
-        /// <returns>true/false</returns>
-        bool Authorize(string login, ref int userId);
+        /// <returns>Объект с данными о профиле пользователя.</returns>
+        Task<object> GetProfileInfo(string userId);
 
         /// <summary>
-        /// Метод получает хидер в зависимости от роли.
+        /// Метод сохраняет личные данные юзера.
         /// </summary>
-        /// <param name="role">Роль юзера.</param>
-        /// <returns></returns>
-        IList<HeaderTypeDto> GetHeader(string role);
+        /// <param name="user">Объект с данными юзера.</param>
+        Task SaveProfileData(UserEntity user);
     }
 }

@@ -5,11 +5,15 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barbuuuda", "Barbuuuda\Barbuuuda.csproj", "{0B6BDB4F-0A2A-4651-BE05-71A268FF43BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barbuuuda.Core", "Barbuuuda.Core\Barbuuuda.Core.csproj", "{8BE0EF31-279A-4A6C-8501-DE1DE99DBA8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barbuuuda.Core", "Barbuuuda.Core\Barbuuuda.Core.csproj", "{8BE0EF31-279A-4A6C-8501-DE1DE99DBA8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barbuuuda.Models", "Barbuuuda.Models\Barbuuuda.Models.csproj", "{7737412B-8FD6-47D8-B96C-CC493A0887DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barbuuuda.Models", "Barbuuuda.Models\Barbuuuda.Models.csproj", "{7737412B-8FD6-47D8-B96C-CC493A0887DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barbuuuda.Services", "Barbuuuda.Services\Barbuuuda.Services.csproj", "{FD47E9C7-1F07-4D68-99ED-57BA6F3291D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barbuuuda.Services", "Barbuuuda.Services\Barbuuuda.Services.csproj", "{FD47E9C7-1F07-4D68-99ED-57BA6F3291D2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barbuuuda.Tests", "Barbuuuda.Tests\Barbuuuda.Tests.csproj", "{621AF1CB-2E8E-44C5-BDB8-08943F2F39F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barbuuuda.Emails", "Barbuuuda.Emails\Barbuuuda.Emails.csproj", "{44D4D520-52B8-4865-8794-F800858C4431}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{FD47E9C7-1F07-4D68-99ED-57BA6F3291D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD47E9C7-1F07-4D68-99ED-57BA6F3291D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD47E9C7-1F07-4D68-99ED-57BA6F3291D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{621AF1CB-2E8E-44C5-BDB8-08943F2F39F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{621AF1CB-2E8E-44C5-BDB8-08943F2F39F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{621AF1CB-2E8E-44C5-BDB8-08943F2F39F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{621AF1CB-2E8E-44C5-BDB8-08943F2F39F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44D4D520-52B8-4865-8794-F800858C4431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44D4D520-52B8-4865-8794-F800858C4431}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44D4D520-52B8-4865-8794-F800858C4431}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44D4D520-52B8-4865-8794-F800858C4431}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

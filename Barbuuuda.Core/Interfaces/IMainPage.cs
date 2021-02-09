@@ -1,42 +1,64 @@
 ﻿using Barbuuuda.Models.MainPage;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Barbuuuda.Core.Interfaces {
+namespace Barbuuuda.Core.Interfaces
+{
     /// <summary>
     /// Интерфейс определяет методы главной страницы.
     /// </summary>
-    public interface IMainPage {
+    public interface IMainPage
+    {
         /// <summary>
         /// Метод получает информацию для главного фона.
         /// </summary>
         /// <returns>Объект фона.</returns>
-        Task<FonDto> GetFonContent();
+        Task<FonEntity> GetFonContent();
 
         /// <summary>
         /// Метод выгружает данные для блока "ПОЧЕМУ BARBUUUDA"
         /// </summary>
         /// <returns>Все объекты WhyDto</returns>
-        Task<IList<WhyDto>> GetWhyContent();
+        Task<IList<WhyEntity>> GetWhyContent();
 
         /// <summary>
         /// Метод выгружает данные для блока "КАК ЭТО РАБОТАЕТ"
         /// </summary>
         /// <returns>Объект WorkDto</returns>
-        Task<IList<WorkDto>> GetWorkContent();
+        Task<IList<WorkEntity>> GetWorkContent();
 
         /// <summary>
         /// Метод выгружает данные для блока "ЧТО ВЫ ПОЛУЧАЕТЕ"
         /// </summary>
         /// <returns>Все объекты PrivilegeDto</returns>
-        Task<IList<PrivilegeDto>> GetPrivilegeContent();
+        Task<IList<PrivilegeEntity>> GetPrivilegeContent();
 
         /// <summary>
         /// Метод выгружает данные для блока "Преимущества"
         /// </summary>
         /// <returns>Объект Advantage</returns>
-        Task<IList<AdvantageDto>> GetAdvantageContent();
+        Task<IList<AdvantageEntity>> GetAdvantageContent();
+
+        /// <summary>
+        /// Метод выгружает список категорий заданий.
+        /// </summary>
+        /// <returns></returns>
+        Task<IList> GetCategoryList();
+
+
+        /// <summary>
+        /// Метод полчает данные долгосрочного сотрудничества.
+        /// </summary>
+        /// <returns>ОБъект с данными.</returns>
+        Task<HopeEntity> GetHopeContent();
+
+          /// <summary>
+        /// Метод выгружает 5 последних заданий. Не важно, чьи они.
+        /// </summary>
+        /// <returns>Список с 5 заданиями.</returns>
+        Task<IEnumerable> GetLastTasksAsync();
     }
 }
