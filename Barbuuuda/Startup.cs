@@ -34,13 +34,15 @@ namespace Barbuuuda
             services.AddControllers();
 
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
-            {
-                builder.AllowAnyMethod()
-                .AllowAnyHeader()
-                .WithOrigins("*")
-                .WithMethods("*")
-                .WithHeaders("*")
-                .DisallowCredentials();
+            {     
+                builder.WithOrigins(
+                    "https://testdevi.site",
+                    "https://testdevi.site/",
+                    "https://publico-dev.xyz",
+                    "https://publico-dev.xyz/",
+                    "http://localhost:8080/",
+                    "http://localhost:8080")
+                .AllowAnyMethod().AllowAnyHeader();
             }));
 
             services.AddDbContext<ApplicationDbContext>(options =>
