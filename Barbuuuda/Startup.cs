@@ -34,13 +34,7 @@ namespace Barbuuuda
             services.AddControllers();
 
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
-            {
-                //builder.AllowAnyMethod()
-                //.AllowAnyHeader()
-                //.WithOrigins("*")
-                //.WithMethods("*")
-                //.WithHeaders("*")
-                //.DisallowCredentials();
+            {     
                 builder.WithOrigins(
                     "https://testdevi.site",
                     "https://testdevi.site/",
