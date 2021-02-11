@@ -222,7 +222,7 @@ namespace Barbuuuda.Controllers
         public async Task<IActionResult> LoadAuctionTasks()
         {
             ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
-            IList aAuctionTasks = await _task.LoadAuctionTasks();
+            object aAuctionTasks = await _task.LoadAuctionTasks();
 
             return Ok(aAuctionTasks);
         }

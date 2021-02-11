@@ -18,7 +18,7 @@ namespace Barbuuuda.Services
     /// <summary>
     /// Сервис реализует методы заданий.
     /// </summary>
-    public class TaskService : ITask
+    public sealed class TaskService : ITask
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
@@ -627,34 +627,40 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="taskId"></param>
         /// <returns></returns>
-        async Task<IList> GetAuctionTasks()
+        async Task<object> GetAuctionTasks()
         {
-            return await (from tasks in _postgre.Tasks
-                          join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                          join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                          join users in _postgre.Users on tasks.OwnerId equals users.Id
-                          where statuses.StatusName.Equals(StatusTask.AUCTION)
-                          select new
-                          {
-                              tasks.CategoryCode,
-                              tasks.CountOffers,
-                              tasks.CountViews,
-                              tasks.OwnerId,
-                              tasks.SpecCode,
-                              categories.CategoryName,
-                              tasks.StatusCode,
-                              statuses.StatusName,
-                              taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                              taskEndda = string.Format("{0:f}", tasks.TaskEndda),
-                              tasks.TaskTitle,
-                              tasks.TaskDetail,
-                              tasks.TaskId,
-                              taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                              tasks.TypeCode,
-                              users.UserName
-                          })
+            var aAuctionTasks = await (from tasks in _postgre.Tasks
+                                         join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                                         join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                                         join users in _postgre.Users on tasks.OwnerId equals users.Id
+                                         where statuses.StatusName.Equals(StatusTask.AUCTION)
+                                         select new
+                                         {
+                                             tasks.CategoryCode,
+                                             tasks.CountOffers,
+                                             tasks.CountViews,
+                                             tasks.OwnerId,
+                                             tasks.SpecCode,
+                                             categories.CategoryName,
+                                             tasks.StatusCode,
+                                             statuses.StatusName,
+                                             taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                             taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                             tasks.TaskTitle,
+                                             tasks.TaskDetail,
+                                             tasks.TaskId,
+                                             taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                             tasks.TypeCode,
+                                             users.UserName
+                                         })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
+
+            return new
+            {
+                aTasks = aAuctionTasks,
+                countTasks = aAuctionTasks.Count
+            };
         }
 
         /// <summary>
@@ -802,7 +808,7 @@ namespace Barbuuuda.Services
         /// Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".
         /// </summary>
         /// <returns>Список заданий.</returns>
-        public async Task<IList> LoadAuctionTasks()
+        public async Task<object> LoadAuctionTasks()
         {
             try
             {
