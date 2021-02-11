@@ -18,7 +18,7 @@ namespace Barbuuuda.Services
     /// <summary>
     /// Сервис реализует методы главной страницы.
     /// </summary>
-    public class MainPageService : IMainPage
+    public sealed class MainPageService : IMainPage
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;

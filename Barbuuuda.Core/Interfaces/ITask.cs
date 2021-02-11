@@ -100,7 +100,7 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".
         /// </summary>
         /// <returns>Список заданий.</returns>
-        Task<IList> LoadAuctionTasks();
+        Task<object> LoadAuctionTasks();
 
         Task<string> GetUserLoginById(string userId);
     }
