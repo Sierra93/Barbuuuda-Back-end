@@ -69,5 +69,17 @@ namespace Barbuuuda.Models.User
 
         [Column("UserToken", TypeName = "text")]
         public string UserToken { get; set; }   // Токен юзера.
+
+        [Column("ExecutorSpecializations", TypeName = "jsonb")]
+        public ExecutorSpecialization[] Specializations { get; set; }
+    }
+
+    /// <summary>
+    /// Класс сопоставляется с json столбцом специализаций таблицы юзеров (Используется только для исполнителей).
+    /// </summary>
+    [NotMapped]
+    public sealed class ExecutorSpecialization
+    {
+        public string SpecName { get; set; }
     }
 }

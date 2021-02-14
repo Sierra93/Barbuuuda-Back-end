@@ -77,8 +77,8 @@ namespace Barbuuuda.Controllers
             var count = await aTasks.CountAsync();
             var items = await aTasks.Skip((pageIdx - 1) * countTasksPage).Take(countTasksPage).ToListAsync();
 
-            ModelPaginationOutpoot pageData = new ModelPaginationOutpoot(count, pageIdx, countTasksPage);
-            ModelIndexOutpoot data = new ModelIndexOutpoot
+            PaginationOutpoot pageData = new PaginationOutpoot(count, pageIdx, countTasksPage);
+            IndexOutpoot data = new IndexOutpoot
             {
                 PageData = pageData,
                 Tasks = items
