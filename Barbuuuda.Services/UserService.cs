@@ -1,8 +1,6 @@
 ﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
-using Barbuuuda.Core.ViewModels.User;
-using Barbuuuda.Emails;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -46,22 +44,45 @@ namespace Barbuuuda.Services
             try
             {
                 // Авторизует юзера.
-                var oAuth = await _signInManager.PasswordSignInAsync(user.UserName, user.UserPassword, user.RememberMe, false);
-
-                // Выбирает роли юзера.
-                IList<string> aRoles = await GetUserRole(user.UserName);
+                var oAuth = await _signInManager.PasswordSignInAsync(user.UserName, user.UserPassword, user.RememberMe, false);                
 
                 // Если авторизация успешна.
                 if (oAuth.Succeeded)
                 {
-                    string sToken = await GetToken(user); // Генерит токен юзеру.
+                    ClaimsIdentity oClaim = GetIdentityClaim(user);
+                    // Выбирает роли юзера.
+                    IList<string> aRoles = await GetUserRole(user.UserName);
+
+                    //string sToken = await GetToken(user); 
+                    //var sToken = await GetToken(user);
+
+                    //return new
+                    //{
+                    //    oAuth.Succeeded,
+                    //    oAuth.IsLockedOut,
+                    //    user = user.UserName,
+                    //    userToken = sToken,
+                    //    userId = user.Id,
+                    //    role = aRoles
+                    //};                    
+
+                    // Генерит токен юзеру.
+                    var now = DateTime.UtcNow;
+                    var jwt = new JwtSecurityToken(
+                        issuer: AuthOptions.ISSUER,
+                        audience: AuthOptions.AUDIENCE,
+                        notBefore: now,
+                        claims: oClaim.Claims,
+                        expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                        signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                    var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
                     return new
                     {
                         oAuth.Succeeded,
                         oAuth.IsLockedOut,
-                        user = user.UserName,
-                        userToken = sToken,
+                        user = oClaim.Name,
+                        userToken = encodedJwt,
                         userId = user.Id,
                         role = aRoles
                     };
@@ -114,22 +135,12 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
         /// <returns>Токен юзера.</returns>
-        private async Task<string> GetToken(UserEntity user)
+        private ClaimsIdentity GetIdentityClaim(UserEntity user)
         {
-            ClaimsIdentity oClaim = GetClaim(user.UserName);
-            var now = DateTime.UtcNow;
-            var jwt = new JwtSecurityToken(
-                issuer: AuthOptions.ISSUER,
-                audience: AuthOptions.AUDIENCE,
-                notBefore: now,
-                claims: oClaim.Claims,
-                expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
-                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            ClaimsIdentity oClaim = GetClaim(user.UserName);           
+            //await SetUserToken(encodedJwt, user.UserName);   // Запишет токен юзера в БД.
 
-            await SetUserToken(encodedJwt, user.UserName);   // Запишет токен юзера в БД.
-
-            return encodedJwt;
+            return oClaim;
         }
 
         /// <summary>

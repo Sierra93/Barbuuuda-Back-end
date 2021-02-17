@@ -123,12 +123,13 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод авторизует пользователя.
         /// <paramref name="user">Объект с данными юзера.</paramref>
-        /// </summary>
+        /// </summary>        
         [HttpPost, Route("login")]
         public async Task<IActionResult> LoginUserAsync([FromBody] UserEntity user)
         {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
             var oAuth = await _user.LoginAsync(user);
+            //var res = User.Identity.Name;
 
             return Ok(oAuth);
         }
@@ -151,6 +152,7 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <param name="userId">Id юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
+        [Authorize]
         [HttpPost, Route("profile")]
         public async Task<IActionResult> GetProfileInfoAsync([FromQuery] string userId)
         {
@@ -164,6 +166,7 @@ namespace Barbuuuda.Controllers
         /// Метод сохраняет личные данные юзера.
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
+        [Authorize]
         [HttpPost, Route("save-data")]
         public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserEntity user)
         {

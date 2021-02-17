@@ -2,6 +2,7 @@
 using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
+using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
@@ -25,7 +26,7 @@ namespace Barbuuuda.Services
             _postgre = postgre;
             _iden = iden;
         }
-
+       
         /// <summary>
         /// Метод выгружает список исполнителей сервиса.
         /// </summary>
@@ -51,6 +52,62 @@ namespace Barbuuuda.Services
                 _ = _logger.LogError();
                 throw new Exception(ex.Message.ToString());
             }
+        }
+
+
+        /// <summary>
+        /// Метод добавляет специализации исполнителя.
+        /// </summary>
+        /// <param name="specializations">Массив специализаций.</param>
+        public async Task AddExecutorSpecializations(ExecutorSpecialization[] specializations, string executorName)
+        {
+            try
+            {
+                if (specializations == null)
+                {
+                    throw new ArgumentNullException();
+                }
+
+                UserEntity oExecutor = await _iden.AspNetUsers
+                    .Where(e => e.UserName
+                    .Equals(executorName))
+                    .FirstOrDefaultAsync();
+
+                oExecutor.Specializations = CheckEmptySpec(oExecutor, specializations);
+                await _iden.SaveChangesAsync();
+            }
+
+            catch (ArgumentNullException ex)
+            {
+                throw new ArgumentNullException($"Передан пустой массив специализаций {ex.Message}");
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        private ExecutorSpecialization[] CheckEmptySpec(UserEntity oExecutor, ExecutorSpecialization[] specializations)
+        {
+            ///<summary>
+            /// Если массив в БД был пустой.
+            /// </summary>
+            if (oExecutor.Specializations == null)
+            {
+                oExecutor.Specializations = specializations;
+            }
+
+            ///<summary>
+            /// Если массив в БД не был пустой.
+            /// </summary>
+            else
+            {
+                oExecutor.Specializations = Array.Empty<ExecutorSpecialization>();
+                oExecutor.Specializations = specializations;
+            }
+
+            return oExecutor.Specializations;
         }
     }
 }

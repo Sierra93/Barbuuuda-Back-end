@@ -1,12 +1,10 @@
 ﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Models.User;
 using Barbuuuda.Services;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Controllers
@@ -14,6 +12,7 @@ namespace Barbuuuda.Controllers
     /// <summary>
     /// Контроллер содержит методы по работе с исполнителями сервиса.
     /// </summary>
+    [Authorize]
     [ApiController, Route("executor")]
     public class ExecutorController : ControllerBase
     {
@@ -39,6 +38,16 @@ namespace Barbuuuda.Controllers
             IEnumerable aExecutors = await _executor.GetExecutorListAsync();
 
             return Ok(aExecutors);
+        }
+
+        /// <summary>
+        /// Метод добавляет специализации исполнителя.
+        /// </summary>
+        /// <param name="executor">Объект юзера.</param>             
+        [HttpPost, Route("add-spec")]
+        public async Task<IActionResult> AddExecutorSpecializations([FromBody] UserEntity executor)
+        {
+            return Ok();
         }
     }
 }

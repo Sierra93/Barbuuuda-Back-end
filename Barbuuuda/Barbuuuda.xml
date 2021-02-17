@@ -15,6 +15,12 @@
             </summary>
             <returns>Список исполнителей.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.AddExecutorSpecializations(Barbuuuda.Models.User.UserEntity)">
+            <summary>
+            Метод добавляет специализации исполнителя.
+            </summary>
+            <param name="executor">Объект юзера.</param>             
+        </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>
             Контроллер главной страницы.
@@ -210,7 +216,7 @@
             <summary>
             Метод авторизует пользователя.
             <paramref name="user">Объект с данными юзера.</paramref>
-            </summary>
+            </summary>        
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize(Barbuuuda.Models.User.UserEntity)">
             <summary>

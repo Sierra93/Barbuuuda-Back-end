@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Barbuuuda.Models.User;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -16,5 +17,12 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <returns>Список исполнителей.</returns>
         Task<IEnumerable> GetExecutorListAsync();
+
+
+        /// <summary>
+        /// Метод добавляет специализации исполнителя.
+        /// </summary>
+        /// <param name="specializations">Массив специализаций.</param>
+        Task AddExecutorSpecializations(ExecutorSpecialization[] specializations, string executorName);
     }
 }
