@@ -1,4 +1,5 @@
-﻿using Barbuuuda.Core.Data;
+﻿using Barbuuuda.Core.Custom;
+using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.ViewModels.User;
 using Barbuuuda.Emails;
@@ -18,6 +19,7 @@ namespace Barbuuuda.Controllers
     /// <summary>
     /// Контроллер содержит логику работы с пользователями.
     /// </summary>
+    [CustomAuthorization]
     [ApiController, Route("user")]
     public class UserController : ControllerBase
     {

@@ -4,6 +4,17 @@
         <name>Barbuuuda</name>
     </assembly>
     <members>
+        <member name="T:Barbuuuda.Controllers.BaseController">
+            <summary>
+            Базовый контроллер для всех контроллеров.
+            </summary>
+        </member>
+        <member name="M:Barbuuuda.Controllers.BaseController.GetUserName">
+            <summary>
+            Метод получает имя текущего юзера.
+            </summary>
+            <returns>Имя юзера.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.ExecutorController">
             <summary>
             Контроллер содержит методы по работе с исполнителями сервиса.

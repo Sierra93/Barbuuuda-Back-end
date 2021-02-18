@@ -1,8 +1,8 @@
-﻿using Barbuuuda.Core.Data;
+﻿using Barbuuuda.Core.Custom;
+using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.User;
 using Barbuuuda.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using System.Threading.Tasks;
@@ -12,15 +12,16 @@ namespace Barbuuuda.Controllers
     /// <summary>
     /// Контроллер содержит методы по работе с исполнителями сервиса.
     /// </summary>
-    [Authorize]
+    [CustomAuthorization]
     [ApiController, Route("executor")]
-    public class ExecutorController : ControllerBase
+    public class ExecutorController : BaseController
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
+        public static string Module => "Barbuuuda.Executor";
 
-        public ExecutorController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden)
+        public ExecutorController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden) : base(Module)
         {
             _db = db;
             _postgre = postgre;

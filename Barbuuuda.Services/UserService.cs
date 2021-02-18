@@ -50,21 +50,9 @@ namespace Barbuuuda.Services
                 if (oAuth.Succeeded)
                 {
                     ClaimsIdentity oClaim = GetIdentityClaim(user);
+
                     // Выбирает роли юзера.
-                    IList<string> aRoles = await GetUserRole(user.UserName);
-
-                    //string sToken = await GetToken(user); 
-                    //var sToken = await GetToken(user);
-
-                    //return new
-                    //{
-                    //    oAuth.Succeeded,
-                    //    oAuth.IsLockedOut,
-                    //    user = user.UserName,
-                    //    userToken = sToken,
-                    //    userId = user.Id,
-                    //    role = aRoles
-                    //};                    
+                    IEnumerable<string> aRoles = await GetUserRole(user.UserName);                 
 
                     // Генерит токен юзеру.
                     var now = DateTime.UtcNow;
@@ -79,11 +67,8 @@ namespace Barbuuuda.Services
 
                     return new
                     {
-                        oAuth.Succeeded,
-                        oAuth.IsLockedOut,
                         user = oClaim.Name,
                         userToken = encodedJwt,
-                        userId = user.Id,
                         role = aRoles
                     };
                 }

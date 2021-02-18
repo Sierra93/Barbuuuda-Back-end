@@ -1,9 +1,9 @@
-﻿using Barbuuuda.Core.Data;
+﻿using Barbuuuda.Core.Custom;
+using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Barbuuuda.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -15,7 +15,7 @@ namespace Barbuuuda.Controllers
     /// <summary>
     /// Контроллер содержит логику работы с заданиями.
     /// </summary>
-    [Authorize]
+    [CustomAuthorization]
     [ApiController, Route("task")]
     public class TaskController : ControllerBase
     {
