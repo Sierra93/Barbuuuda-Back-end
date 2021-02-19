@@ -187,12 +187,7 @@ namespace Barbuuuda.Services
                 // Авторизован ли юзер.
                 bool bAuth = oUser.UserToken != null ? true : false;
 
-                return new
-                {
-                    aHeaderFields,
-                    bAuth,
-                    userId
-                };
+                return new { aHeaderFields };
             }
 
             catch (ArgumentNullException ex)
@@ -252,17 +247,17 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userId">Id юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        public async Task<object> GetProfileInfo(string userId)
+        public async Task<object> GetProfileInfo(string userName)
         {
             try
             {
-                if (string.IsNullOrEmpty(userId))
+                if (string.IsNullOrEmpty(userName))
                 {
                     throw new ArgumentNullException();
                 }
 
                 return await _postgre.Users
-                    .Where(u => u.Id.Equals(userId))
+                    .Where(u => u.UserName.Equals(userName))
                     .Select(up => new
                     {
                         up.UserName,

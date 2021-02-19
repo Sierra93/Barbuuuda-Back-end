@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Barbuuuda.Core.Exceptions;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System;
+using System.Net;
 
 namespace Barbuuuda.Core.Custom
 {
@@ -9,7 +11,7 @@ namespace Barbuuuda.Core.Custom
         {
             if (string.IsNullOrEmpty(context.HttpContext.User.Identity.Name))
             {
-                throw new UnauthorizedAccessException();
+                throw new NoAuthorize(HttpStatusCode.Unauthorized, "Пользователь сервиса не авторизован. Пожалуйста, авторизуйтесь.");
             }
         }
     }

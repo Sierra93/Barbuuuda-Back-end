@@ -201,7 +201,7 @@
         <member name="T:Barbuuuda.Controllers.UserController">
             <summary>
             Контроллер содержит логику работы с пользователями.
-            </summary>
+            </summary>    
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.CreateUserAsync(Barbuuuda.Models.User.UserEntity)">
             <summary>
@@ -229,18 +229,16 @@
             <paramref name="user">Объект с данными юзера.</paramref>
             </summary>        
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize(Barbuuuda.Models.User.UserEntity)">
+        <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize">
             <summary>
             Метод проверяет, авторизован ли юзер.
             </summary>
-            <param name="user">Объект с данными юзера.</param>
             <returns>Объект с данными авторизованного юзера.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.GetProfileInfoAsync(System.String)">
+        <member name="M:Barbuuuda.Controllers.UserController.GetProfileInfoAsync">
             <summary>
             Метод получает информацию о пользователе для профиля.
             </summary>
-            <param name="userId">Id юзера.</param>
             <returns>Объект с данными о профиле пользователя.</returns>
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.SaveProfileDataAsync(Barbuuuda.Models.User.UserEntity)">

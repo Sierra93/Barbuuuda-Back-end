@@ -18,18 +18,18 @@ namespace Barbuuuda.Controllers
 {
     /// <summary>
     /// Контроллер содержит логику работы с пользователями.
-    /// </summary>
-    [CustomAuthorization]
+    /// </summary>    
     [ApiController, Route("user")]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
         private readonly UserManager<UserEntity> _userManager;
         private readonly SignInManager<UserEntity> _signInManager;
+        public static string Module => "Barbuuuda.User";
 
-        public UserController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
+        public UserController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager) : base(Module)
         {
             _db = db;
             _postgre = postgre;
@@ -131,20 +131,19 @@ namespace Barbuuuda.Controllers
         {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
             var oAuth = await _user.LoginAsync(user);
-            //var res = User.Identity.Name;
 
             return Ok(oAuth);
         }
         /// <summary>
         /// Метод проверяет, авторизован ли юзер.
         /// </summary>
-        /// <param name="user">Объект с данными юзера.</param>
         /// <returns>Объект с данными авторизованного юзера.</returns>
-        [HttpPost, Route("authorize")]
-        public async Task<IActionResult> GetUserAuthorize([FromBody] UserEntity user)
+        [CustomAuthorization]
+        [HttpGet, Route("authorize")]
+        public async Task<IActionResult> GetUserAuthorize()
         {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
-            object oAuthorize = await _user.GetUserAuthorize(user.UserName);
+            object oAuthorize = await _user.GetUserAuthorize(GetUserName());
 
             return Ok(oAuthorize);
         }
@@ -152,14 +151,13 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод получает информацию о пользователе для профиля.
         /// </summary>
-        /// <param name="userId">Id юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        [Authorize]
-        [HttpPost, Route("profile")]
-        public async Task<IActionResult> GetProfileInfoAsync([FromQuery] string userId)
+        //[CustomAuthorization]
+        [HttpGet, Route("profile")]
+        public async Task<IActionResult> GetProfileInfoAsync()
         {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
-            object oUser = await _user.GetProfileInfo(userId);
+            object oUser = await _user.GetProfileInfo(GetUserName());
 
             return Ok(oUser);
         }
@@ -168,7 +166,7 @@ namespace Barbuuuda.Controllers
         /// Метод сохраняет личные данные юзера.
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
-        [Authorize]
+        [CustomAuthorization]
         [HttpPost, Route("save-data")]
         public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserEntity user)
         {
