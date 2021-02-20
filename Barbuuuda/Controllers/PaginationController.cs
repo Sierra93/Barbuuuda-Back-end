@@ -1,14 +1,11 @@
 ﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Outpoot;
-using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Barbuuuda.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,7 +43,7 @@ namespace Barbuuuda.Controllers
         public async Task<IActionResult> Index([FromQuery] string userId, int pageIdx = 1)
         {            
             int countTasksPage = 5;   // Кол-во заданий на странице.
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
+            ITask _task = new TaskService(_db, _postgre, _iden);
             string userName = await _task.GetUserLoginById(userId);
 
             var aTasks = (from tasks in _postgre.Tasks

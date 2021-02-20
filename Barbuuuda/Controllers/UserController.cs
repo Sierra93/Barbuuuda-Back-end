@@ -131,19 +131,20 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("login")]
         public async Task<IActionResult> LoginUserAsync([FromBody] UserEntity user)
         {
-            IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
+            IUser _user = new UserService(_db, _postgre, _iden, _signInManager);
             var oAuth = await _user.LoginAsync(user);
 
             return Ok(oAuth);
         }
         /// <summary>
+        /// TODO: нужно убрать этот метод, так как авторизация переделана на основе токенов и доступ и так будет отваливаться когда токен протухнет.
         /// Метод проверяет, авторизован ли юзер.
         /// </summary>
         /// <returns>Объект с данными авторизованного юзера.</returns>       
-        [HttpPost, Route("authorize")]
+        [HttpGet, Route("authorize")]
         public async Task<IActionResult> GetUserAuthorize()
         {
-            IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
+            IUser _user = new UserService(_db, _postgre, _iden, _signInManager);
             object oAuthorize = await _user.GetUserAuthorize(GetUserName());
 
             return Ok(oAuthorize);
@@ -157,7 +158,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("profile")]
         public async Task<IActionResult> GetProfileInfoAsync()
         {
-            IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
+            IUser _user = new UserService(_db, _postgre, _iden, _signInManager);
             object oUser = await _user.GetProfileInfo(GetUserName());
 
             return Ok(oUser);
@@ -170,7 +171,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("save-data")]
         public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserEntity user)
         {
-            IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
+            IUser _user = new UserService(_db, _postgre, _iden, _signInManager);
             await _user.SaveProfileData(user);
 
             return Ok();

@@ -3,9 +3,6 @@ using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.MainPage;
-using Barbuuuda.Models.Task;
-using Barbuuuda.Models.User;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
@@ -22,17 +19,11 @@ namespace Barbuuuda.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IdentityDbContext _iden;
-        private readonly UserManager<UserEntity> _userManager;
-        private readonly SignInManager<UserEntity> _signInManager;
 
-        public MainPageService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
+        public MainPageService(ApplicationDbContext db, PostgreDbContext postgre)
         {
             _db = db;
             _postgre = postgre;
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _iden = iden;
         }
 
         /// <summary>

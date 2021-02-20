@@ -231,6 +231,7 @@
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize">
             <summary>
+            TODO: нужно убрать этот метод, так как авторизация переделана на основе токенов и доступ и так будет отваливаться когда токен протухнет.
             Метод проверяет, авторизован ли юзер.
             </summary>
             <returns>Объект с данными авторизованного юзера.</returns>       
