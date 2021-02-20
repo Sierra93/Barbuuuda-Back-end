@@ -1,8 +1,9 @@
-﻿using Barbuuuda.Core.Custom;
-using Barbuuuda.Core.Data;
+﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.User;
 using Barbuuuda.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace Barbuuuda.Controllers
     /// <summary>
     /// Контроллер содержит методы по работе с исполнителями сервиса.
     /// </summary>
-    [CustomAuthorization]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController, Route("executor")]
     public class ExecutorController : BaseController
     {

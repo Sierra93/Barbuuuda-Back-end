@@ -12,7 +12,8 @@ using System.IO;
 using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Threading.Tasks;
+using Microsoft.OpenApi.Models;
+using System.Collections.Generic;
 
 namespace Barbuuuda
 {
@@ -35,8 +36,6 @@ namespace Barbuuuda
                 builder.WithOrigins(
                     "https://testdevi.site",
                     "https://testdevi.site/",
-                    "https://publico-dev.xyz",
-                    "https://publico-dev.xyz/",
                     "http://localhost:8080/",
                     "http://localhost:8080")
                 .AllowAnyMethod().AllowAnyHeader();
@@ -67,7 +66,7 @@ namespace Barbuuuda
             //  options.UseSqlServer(
             //      Configuration.GetConnectionString("TestConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(options =>
             {
                 //c.SwaggerDoc("v1", new OpenApiInfo {
                 //    Version = "v1",
@@ -83,12 +82,12 @@ namespace Barbuuuda
                 //        Name = "Use under LICX",
                 //        Url = new Uri("https://example.com/license"),
                 //    }
-                //});
+                //});               
 
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
+                options.IncludeXmlComments(xmlPath);
             });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -114,7 +113,7 @@ namespace Barbuuuda
                             // валидация ключа безопасности
                             ValidateIssuerSigningKey = true,
                         };
-                    });
+                    });   
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -134,6 +133,7 @@ namespace Barbuuuda
             app.UseRouting();
 
             app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -142,6 +142,7 @@ namespace Barbuuuda
             });
 
             app.UseSwagger();
+
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Documents API");

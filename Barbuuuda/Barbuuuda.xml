@@ -201,7 +201,7 @@
         <member name="T:Barbuuuda.Controllers.UserController">
             <summary>
             Контроллер содержит логику работы с пользователями.
-            </summary>    
+            </summary>        
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.CreateUserAsync(Barbuuuda.Models.User.UserEntity)">
             <summary>
@@ -233,7 +233,7 @@
             <summary>
             Метод проверяет, авторизован ли юзер.
             </summary>
-            <returns>Объект с данными авторизованного юзера.</returns>
+            <returns>Объект с данными авторизованного юзера.</returns>       
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.GetProfileInfoAsync">
             <summary>

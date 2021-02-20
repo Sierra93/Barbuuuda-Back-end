@@ -1,10 +1,10 @@
-﻿using Barbuuuda.Core.Custom;
-using Barbuuuda.Core.Data;
+﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.ViewModels.User;
 using Barbuuuda.Emails;
 using Barbuuuda.Models.User;
 using Barbuuuda.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -18,7 +18,8 @@ namespace Barbuuuda.Controllers
 {
     /// <summary>
     /// Контроллер содержит логику работы с пользователями.
-    /// </summary>    
+    /// </summary>        
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController, Route("user")]
     public class UserController : BaseController
     {
@@ -119,13 +120,14 @@ namespace Barbuuuda.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             await _userManager.ConfirmEmailAsync(user, code);
 
-            return new RedirectResult("https://publico-dev.xyz");
+            return new RedirectResult("https://testdevi.site");
         }
 
         /// <summary>
         /// Метод авторизует пользователя.
         /// <paramref name="user">Объект с данными юзера.</paramref>
         /// </summary>        
+        [AllowAnonymous]
         [HttpPost, Route("login")]
         public async Task<IActionResult> LoginUserAsync([FromBody] UserEntity user)
         {
@@ -137,9 +139,8 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод проверяет, авторизован ли юзер.
         /// </summary>
-        /// <returns>Объект с данными авторизованного юзера.</returns>
-        [CustomAuthorization]
-        [HttpGet, Route("authorize")]
+        /// <returns>Объект с данными авторизованного юзера.</returns>       
+        [HttpPost, Route("authorize")]
         public async Task<IActionResult> GetUserAuthorize()
         {
             IUser _user = new UserService(_db, _postgre, _iden, _userManager, _signInManager);
@@ -166,7 +167,6 @@ namespace Barbuuuda.Controllers
         /// Метод сохраняет личные данные юзера.
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
-        [CustomAuthorization]
         [HttpPost, Route("save-data")]
         public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserEntity user)
         {

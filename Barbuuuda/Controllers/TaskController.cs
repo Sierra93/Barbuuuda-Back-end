@@ -1,5 +1,4 @@
-﻿using Barbuuuda.Core.Custom;
-using Barbuuuda.Core.Data;
+﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
@@ -9,13 +8,15 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Barbuuuda.Controllers
 {
     /// <summary>
     /// Контроллер содержит логику работы с заданиями.
     /// </summary>
-    [CustomAuthorization]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController, Route("task")]
     public class TaskController : ControllerBase
     {
