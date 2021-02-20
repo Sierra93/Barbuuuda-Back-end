@@ -16,15 +16,16 @@ namespace Barbuuuda.Controllers
     /// Контроллер работы с пагинацией.
     /// </summary>
     [ApiController, Route("pagination")]
-    public class PaginationController : ControllerBase
+    public class PaginationController : BaseController
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
         private readonly UserManager<UserEntity> _userManager;
         private readonly SignInManager<UserEntity> _signInManager;
+        public static string Module => "Barbuuuda.Pagination";
 
-        public PaginationController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
+        public PaginationController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager) : base(Module)
         {
             _db = db;
             _postgre = postgre;
@@ -36,39 +37,38 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод пагинации.
         /// </summary>
-        /// <param name="pageIdx"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <param name="pageIdx">Страница по умолчанию.</param>
+        /// <returns>Список заданий.</returns>
         [HttpGet, Route("page")]
-        public async Task<IActionResult> Index([FromQuery] string userId, int pageIdx = 1)
+        public async Task<IActionResult> GetPaginationTasks(int pageIdx = 1)
         {            
             int countTasksPage = 5;   // Кол-во заданий на странице.
             ITask _task = new TaskService(_db, _postgre, _iden);
-            string userName = await _task.GetUserLoginById(userId);
+            string userId = await _task.GetUserByName(GetUserName());
 
             var aTasks = (from tasks in _postgre.Tasks
-                                                  join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                                                  join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                                                  where tasks.OwnerId.Equals(userId)
-                                                  select new
-                                                  {
-                                                      tasks.CategoryCode,
-                                                      tasks.CountOffers,
-                                                      tasks.CountViews,
-                                                      tasks.OwnerId,
-                                                      tasks.SpecCode,
-                                                      categories.CategoryName,
-                                                      tasks.StatusCode,
-                                                      statuses.StatusName,
-                                                      taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                                      taskEndda = string.Format("{0:f}", tasks.TaskEndda),
-                                                      tasks.TaskTitle,
-                                                      tasks.TaskDetail,
-                                                      tasks.TaskId,
-                                                      taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                                                      tasks.TypeCode,
-                                                      userName
-                                                  })
+                          join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                          join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                          where tasks.OwnerId.Equals(userId)
+                          select new
+                          {
+                              tasks.CategoryCode,
+                              tasks.CountOffers,
+                              tasks.CountViews,
+                              tasks.OwnerId,
+                              tasks.SpecCode,
+                              categories.CategoryName,
+                              tasks.StatusCode,
+                              statuses.StatusName,
+                              taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                              taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                              tasks.TaskTitle,
+                              tasks.TaskDetail,
+                              tasks.TaskId,
+                              taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                              tasks.TypeCode,
+                              userName = GetUserName()
+                          })
                           .OrderBy(o => o.TaskId)
                           .AsQueryable();
             var count = await aTasks.CountAsync();

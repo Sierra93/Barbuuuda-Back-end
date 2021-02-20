@@ -291,15 +291,15 @@ namespace Barbuuuda.Services
         /// Метод сохраняет личные данные юзера.
         /// </summary>
         /// <param name="needUserUpdate">Объект с данными юзера.</param>
-        public async Task SaveProfileData(UserEntity needUserUpdate)
+        public async Task SaveProfileData(UserEntity needUserUpdate, string userName)
         {
             try
             {
-                if (string.IsNullOrEmpty(needUserUpdate.Id))
+                if (string.IsNullOrEmpty(userName))
                     throw new ArgumentNullException();
 
                 // Изменяет объект юзера.
-                await ChangeProfileData(needUserUpdate);
+                await ChangeProfileData(needUserUpdate, userName);
                 await _postgre.SaveChangesAsync();
             }
 
@@ -320,10 +320,10 @@ namespace Barbuuuda.Services
         /// Метод изменяет объект юзера.
         /// </summary>
         /// <param name="needUserUpdate">Исходный объект юзера для изменения.</param>
-        private async Task ChangeProfileData(UserEntity needUserUpdate)
+        private async Task ChangeProfileData(UserEntity needUserUpdate, string userName)
         {
             UserEntity oldUser = await _postgre.Users
-                    .Where(u => u.Id.Equals(needUserUpdate.Id))
+                    .Where(u => u.UserName.Equals(userName))
                     .FirstOrDefaultAsync();
 
             // Изменяет некоторые поля.

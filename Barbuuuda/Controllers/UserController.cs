@@ -172,7 +172,7 @@ namespace Barbuuuda.Controllers
         public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserEntity user)
         {
             IUser _user = new UserService(_db, _postgre, _iden, _signInManager);
-            await _user.SaveProfileData(user);
+            await _user.SaveProfileData(user, GetUserName());
 
             return Ok();
         }
