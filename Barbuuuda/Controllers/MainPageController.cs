@@ -5,7 +5,6 @@ using Barbuuuda.Models.User;
 using Barbuuuda.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections;
 using System.Threading.Tasks;
 
@@ -19,17 +18,11 @@ namespace Barbuuuda.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IdentityDbContext _iden;
-        private readonly UserManager<UserEntity> _userManager;
-        private readonly SignInManager<UserEntity> _signInManager;
 
         public MainPageController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
         {
             _db = db;
             _postgre = postgre;
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _iden = iden;
         }
 
         /// <summary>
@@ -39,7 +32,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-fon")]
         public async Task<IActionResult> GetFonContent()
         {
-            IMainPage _mainPage = new MainPageService(_db, _postgre, _iden, _userManager, _signInManager);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetFonContent());
         }
 
@@ -50,7 +43,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-why")]
         public async Task<IActionResult> GetWhyContent()
         {
-            IMainPage _mainPage = new MainPageService(_db, _postgre, _iden, _userManager, _signInManager);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetWhyContent());
         }
 
@@ -61,7 +54,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-work")]
         public async Task<IActionResult> GetWorkContent()
         {
-            IMainPage _mainPage = new MainPageService(_db, _postgre, _iden, _userManager, _signInManager);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetWorkContent());
         }
 
@@ -72,7 +65,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-privilege")]
         public async Task<IActionResult> GetPrivilegeContent()
         {
-            IMainPage _mainPage = new MainPageService(_db, _postgre, _iden, _userManager, _signInManager);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetPrivilegeContent());
         }
 
@@ -83,7 +76,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-advantage")]
         public async Task<IActionResult> GetAdvantageContent()
         {
-            IMainPage _mainPage = new MainPageService(_db, _postgre, _iden, _userManager, _signInManager);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             return Ok(await _mainPage.GetAdvantageContent());
         }
 
@@ -95,7 +88,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("category-list")]
         public async Task<IActionResult> GetCategoryList()
         {
-            IMainPage _mainPage = new MainPageService(_db, _postgre, _iden, _userManager, _signInManager);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             IList aCategories = await _mainPage.GetCategoryList();
 
             return Ok(aCategories);
@@ -108,7 +101,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("get-hope")]
         public async Task<IActionResult> GetHopeContent()
         {
-            IMainPage _mainPage = new MainPageService(_db, _postgre, _iden, _userManager, _signInManager);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             HopeEntity oHope = await _mainPage.GetHopeContent();
 
             return Ok(oHope);
@@ -121,7 +114,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("last")]
         public async Task<IActionResult> GetLastTasksAsync()
         {
-            IMainPage _mainPage = new MainPageService(_db, _postgre, _iden, _userManager, _signInManager);
+            IMainPage _mainPage = new MainPageService(_db, _postgre);
             IEnumerable aLastTasks = await _mainPage.GetLastTasksAsync();
 
             return Ok(aLastTasks);

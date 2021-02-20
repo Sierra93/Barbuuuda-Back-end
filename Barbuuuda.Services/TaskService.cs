@@ -5,7 +5,6 @@ using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
@@ -23,15 +22,11 @@ namespace Barbuuuda.Services
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
-        private readonly UserManager<UserEntity> _userManager;
-        private readonly SignInManager<UserEntity> _signInManager;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden)
         {
             _db = db;
             _postgre = postgre;
-            _userManager = userManager;
-            _signInManager = signInManager;
             _iden = iden;
         }
 
@@ -39,8 +34,9 @@ namespace Barbuuuda.Services
         /// Метод создает новое задание.
         /// </summary>
         /// <param name="task">Объект с данными задания.</param>
+        /// <param name="userName">Login юзера.</param>
         /// <returns>Вернет данные созданного задания.</returns>
-        public async Task<TaskEntity> CreateTask(TaskEntity oTask)
+        public async Task<TaskEntity> CreateTask(TaskEntity oTask, string userName)
         {
             try
             {
@@ -50,7 +46,7 @@ namespace Barbuuuda.Services
                 }
 
                 // Проверяет существование заказчика, который создает задание.
-                bool bCustomer = await IdentityCustomer(oTask.OwnerId);
+                bool bCustomer = await IdentityCustomer(userName);
 
                 // Проверяет, есть ли такая категория в БД.
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
@@ -98,8 +94,9 @@ namespace Barbuuuda.Services
         /// Метод редактирует задание.
         /// </summary>
         /// <param name="task">Объект с данными задания.</param>
+        /// <param name="userName">Login юзера.</param>
         /// <returns>Вернет данные измененного задания.</returns>
-        public async Task<TaskEntity> EditTask(TaskEntity oTask)
+        public async Task<TaskEntity> EditTask(TaskEntity oTask, string userName)
         {
             try
             {
@@ -109,7 +106,7 @@ namespace Barbuuuda.Services
                 }
 
                 // Проверяет существование заказчика, который создал задание.
-                bool bCustomer = await IdentityCustomer(oTask.OwnerId);
+                bool bCustomer = await IdentityCustomer(userName);
 
                 // Проверяет, есть ли такая категория в БД.
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
@@ -156,23 +153,23 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>true/false</returns>
-        async Task<bool> IdentityCustomer(string userId)
+        async Task<bool> IdentityCustomer(string userName)
         {
             try
             {
-                if (string.IsNullOrEmpty(userId))
+                if (string.IsNullOrEmpty(userName))
                 {
                     throw new ArgumentNullException();
                 }
 
-                UserEntity oUser = await _postgre.Users.Where(u => u.Id.Equals(userId)).FirstOrDefaultAsync();
+                UserEntity oUser = await _iden.AspNetUsers.Where(u => u.UserName.Equals(userName)).FirstOrDefaultAsync();
 
                 return oUser != null ? true : throw new ArgumentNullException();
             }
 
             catch (ArgumentNullException ex)
             {
-                throw new ArgumentNullException($"Заказчик с таким Id не найден {ex.Message}");
+                throw new ArgumentNullException($"Заказчик с таким UserName не найден {ex.Message}");
             }
 
             catch (Exception ex)
@@ -225,24 +222,24 @@ namespace Barbuuuda.Services
         /// <summary>
         /// Метод получает список заданий заказчика.
         /// </summary>
-        /// <param name="userId">Id заказчика.</param>
+        /// <param name="userName">Login заказчика.</param>
         /// <param name="type">Параметр получения заданий либо все либо одно.</param>
         /// <returns>Коллекция заданий.</returns>
-        public async Task<IList> GetTasksList(string userId, int? taskId, string type)
+        public async Task<IList> GetTasksList(string userName, int? taskId, string type)
         {
             try
             {
                 IList aResultTaskObj = null;
 
-                if (string.IsNullOrEmpty(userId))
+                if (string.IsNullOrEmpty(userName))
                 {
                     throw new ArgumentNullException();
                 }
 
                 // Вернет либо все задания либо одно.
                 return aResultTaskObj = type.Equals(GetTaskTypeEnum.All.ToString())
-                    ? aResultTaskObj = await GetAllTasks(userId)
-                    : aResultTaskObj = await GetSingleTask(userId, taskId);
+                    ? aResultTaskObj = await GetAllTasks(userName)
+                    : aResultTaskObj = await GetSingleTask(userName, taskId);
             }
 
             catch (ArgumentNullException ex)
@@ -261,9 +258,9 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userId">Id заказчика.</param>
         /// <returns>Коллекцию заданий.</returns>
-        async Task<IList> GetAllTasks(string userId)
+        async Task<IList> GetAllTasks(string userName)
         {
-            string userName = await GetUserLoginById(userId);
+            string userId = await GetUserByName(userName);
 
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
@@ -295,10 +292,10 @@ namespace Barbuuuda.Services
         /// <summary>
         /// Метод получает одно задание заказчика.
         /// </summary>
-        /// <param name="id">Id задачи.</param>
+        /// <param name="userName">Логин юзера.</param>
         /// <param name="taskId">Id задачи. Может быть null.</param>
         /// <returns>Коллекцию заданий.</returns>
-        async Task<IList> GetSingleTask(string userId, int? taskId)
+        async Task<IList> GetSingleTask(string userName, int? taskId)
         {
             // Выбирает объект задачи, который нужно редактировать.
             TaskEntity oEditTask = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
@@ -319,7 +316,7 @@ namespace Barbuuuda.Services
                 }
             }
 
-            string userName = await GetUserLoginById(userId);
+            string userId = await GetUserByName(userName);
             var oTask = await (from tasks in _postgre.Tasks
                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
@@ -563,16 +560,17 @@ namespace Barbuuuda.Services
         /// Активными считаются задания в статусе в аукционе и в работе.
         /// </summary>
         /// <returns>Список активных заданий.</returns>
-        public async Task<IList> LoadActiveTasks(string userId)
+        public async Task<IList> LoadActiveTasks(string userName)
         {
             try
             {
-                return !string.IsNullOrEmpty(userId) ? await GetActiveTasks(userId) : throw new ArgumentNullException();
+                return !string.IsNullOrEmpty(userName) ? await GetActiveTasks(userName) : 
+                    throw new ArgumentNullException();
             }
 
             catch (ArgumentNullException ex)
             {
-                throw new ArgumentNullException($"Не передан Id {ex.Message}");
+                throw new ArgumentNullException($"Не передан UserName {ex.Message}");
             }
 
             catch (Exception ex)
@@ -588,9 +586,9 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="taskId"></param>
         /// <returns></returns>
-        async Task<IList> GetActiveTasks(string userId)
+        async Task<IList> GetActiveTasks(string userName)
         {
-            string userName = await GetUserLoginById(userId);
+            string userId = await GetUserLoginById(userName);
 
             return await (from tasks in _postgre.Tasks
                           join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
@@ -721,21 +719,20 @@ namespace Barbuuuda.Services
         /// Метод получает задания определенного статуса.
         /// </summary>
         /// <param name="status">Название статуса.</param>
-        /// <param name="userId">Id пользователя.</param>
+        /// <param name="userName">Логин пользователя.</param>
         /// <returns>Список заданий с определенным статусом.</returns>
-        public async Task<IList> GetStatusTasks(string status, string userId)
+        public async Task<IList> GetStatusTasks(string status, string userName)
         {
             try
             {
-                string userName = await GetUserLoginById(userId);
+                string userId = await GetUserByName(userName);
 
                 return string.IsNullOrEmpty(status) ? throw new ArgumentNullException() :
                      await (from tasks in _postgre.Tasks
                             join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                             join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                            join users in _postgre.Users on tasks.OwnerId equals users.Id
                             where statuses.StatusName.Equals(status)
-                            where users.Id.Equals(userId)
+                            where tasks.OwnerId.Equals(userId)
                             select new
                             {
                                 tasks.CategoryCode,
@@ -777,13 +774,15 @@ namespace Barbuuuda.Services
         /// <summary>
         /// Метод получает кол-во заданий всего.
         /// </summary>
-        /// <param name="userId">Id пользователя.</param>
+        /// <param name="userName">Login пользователя.</param>
         /// <returns></returns>
-        public async Task<int> GetTotalCountTasks(string userId)
+        public async Task<int> GetTotalCountTasks(string userName)
         {
             try
             {
-                return !string.IsNullOrEmpty(userId) ?
+                string userId = await GetUserLoginById(userName);
+
+                return !string.IsNullOrEmpty(userName) ?
                     await _postgre.Tasks
                     .Where(t => t.OwnerId.Equals(userId))
                     .CountAsync() : throw new ArgumentNullException();
@@ -834,6 +833,20 @@ namespace Barbuuuda.Services
                 .Where(u => u.Id
                 .Equals(userId))
                 .Select(u => u.UserName)
+                .FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Метод выбирает Id юзера по его Login.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>Login юзера.</returns>
+        public async Task<string> GetUserByName(string userName)
+        {
+            return await _iden.AspNetUsers
+                .Where(u => u.UserName
+                .Equals(userName))
+                .Select(u => u.Id)
                 .FirstOrDefaultAsync();
         }
     }

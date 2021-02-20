@@ -1,7 +1,5 @@
 ﻿using Barbuuuda.Models.User;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Collections;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Core.Interfaces
@@ -35,6 +33,6 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод сохраняет личные данные юзера.
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
-        Task SaveProfileData(UserEntity user);
+        Task SaveProfileData(UserEntity user, string userName);
     }
 }

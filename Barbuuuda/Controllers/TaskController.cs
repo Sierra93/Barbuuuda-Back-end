@@ -8,27 +8,27 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Barbuuuda.Controllers
 {
     /// <summary>
     /// Контроллер содержит логику работы с заданиями.
     /// </summary>
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController, Route("task")]
-    public class TaskController : ControllerBase
+    public class TaskController : BaseController
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
-        private readonly UserManager<UserEntity> _userManager;
-        private readonly SignInManager<UserEntity> _signInManager;
+        public static string Module => "Barbuuuda.Task";
 
-        public TaskController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
+        public TaskController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden) : base(Module)
         {
             _db = db;
             _postgre = postgre;
-            _userManager = userManager;
-            _signInManager = signInManager;
             _iden = iden;
         }
 
@@ -41,8 +41,8 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("create")]
         public async Task<IActionResult> CreateTask([FromBody] TaskEntity oTask)
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
-            TaskEntity oResultTask = await _task.CreateTask(oTask);
+            ITask _task = new TaskService(_db, _postgre, _iden);
+            TaskEntity oResultTask = await _task.CreateTask(oTask, GetUserName());
 
             return Ok(oResultTask);
         }
@@ -55,8 +55,8 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("edit")]
         public async Task<IActionResult> EditTask([FromBody] TaskEntity oTask)
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
-            TaskEntity oResultTask = await _task.EditTask(oTask);
+            ITask _task = new TaskService(_db, _postgre, _iden);
+            TaskEntity oResultTask = await _task.EditTask(oTask, GetUserName());
 
             return Ok(oResultTask);
         }
@@ -68,13 +68,14 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-categories")]
         public async Task<IActionResult> GetCategories()
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
+            ITask _task = new TaskService(_db, _postgre, _iden);
             IList aCategories = await _task.GetTaskCategories();
 
             return Ok(aCategories);
         }
 
         /// <summary>
+        /// TODO убрать.
         /// Метод выгружает список специализаций заданий.
         /// </summary>
         /// <returns>Коллекцию специализаций.</returns>
@@ -91,15 +92,14 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод получает список заданий заказчика или конкретное задание.
         /// </summary>
-        /// <param name="userId">Id заказчика.</param>
         /// <param name="taskId">Id задания.</param>
         /// <param name="type">Параметр получения заданий либо все либо одно.</param>
         /// <returns>Коллекция заданий.</returns>
         [HttpPost, Route("tasks-list")]
-        public async Task<IActionResult> GetTasksList([FromQuery] string userId, [FromQuery] int? taskId, [FromQuery] string type)
+        public async Task<IActionResult> GetTasksList([FromQuery] int? taskId, [FromQuery] string type)
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
-            IList aCustomerTasks = await _task.GetTasksList(userId, taskId, type);
+            ITask _task = new TaskService(_db, _postgre, _iden);
+            IList aCustomerTasks = await _task.GetTasksList(GetUserName(), taskId, type);
 
             return Ok(aCustomerTasks);
         }
@@ -111,7 +111,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("delete/{taskId}")]
         public async Task<IActionResult> DeleteTask([FromRoute] int taskId)
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
+            ITask _task = new TaskService(_db, _postgre, _iden);
             await _task.DeleteTask(taskId);
 
             return Ok();
@@ -125,7 +125,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("filter")]
         public async Task<IActionResult> FilterTask([FromQuery] string query)
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
+            ITask _task = new TaskService(_db, _postgre, _iden);
             IList aTasks = await _task.FilterTask(query);
 
             return Ok(aTasks);
@@ -139,7 +139,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("search")]
         public async Task<IActionResult> SearchTask([FromQuery] string param)
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
+            ITask _task = new TaskService(_db, _postgre, _iden);
             IList aTasks = await _task.SearchTask(param);
 
             return Ok(aTasks);
@@ -153,7 +153,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("concretely-date")]
         public async Task<IActionResult> GetSearchTaskDate([FromQuery] string date)
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
+            ITask _task = new TaskService(_db, _postgre, _iden);
             IList aTasks = await _task.GetSearchTaskDate(date);
 
             return Ok(aTasks);
@@ -164,10 +164,10 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <returns>Список активных заданий.</returns>
         [HttpGet, Route("active")]
-        public async Task<IActionResult> LoadActiveTasks([FromQuery] string userId)
+        public async Task<IActionResult> LoadActiveTasks()
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
-            IList aTasks = await _task.LoadActiveTasks(userId);
+            ITask _task = new TaskService(_db, _postgre, _iden);
+            IList aTasks = await _task.LoadActiveTasks(GetUserName());
 
             return Ok(aTasks);
         }
@@ -179,7 +179,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("count-status")]
         public async Task<IActionResult> GetCountTaskStatuses()
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
+            ITask _task = new TaskService(_db, _postgre, _iden);
             object countTask = await _task.GetCountTaskStatuses();
 
             return Ok(countTask);
@@ -189,13 +189,12 @@ namespace Barbuuuda.Controllers
         /// Метод получает задания определенного статуса.
         /// </summary>
         /// <param name="status">Название статуса.</param>
-        /// <param name="userId">Id пользователя.</param>
         /// <returns>Список заданий с определенным статусом.</returns>
         [HttpGet, Route("task-status")]
-        public async Task<IActionResult> GetStatusTasks([FromQuery] string status, string userId)
+        public async Task<IActionResult> GetStatusTasks([FromQuery] string status)
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
-            IList aTasks = await _task.GetStatusTasks(status, userId);
+            ITask _task = new TaskService(_db, _postgre, _iden);
+            IList aTasks = await _task.GetStatusTasks(status, GetUserName());
 
             return Ok(aTasks);
         }
@@ -203,13 +202,12 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод получает кол-во заданий всего.
         /// </summary>
-        /// <param name="userId">Id пользователя.</param>
-        /// <returns></returns>
+        /// <returns>Кол-во заданий.</returns>
         [HttpGet, Route("total")]
-        public async Task<IActionResult> GetTotalCountTasks([FromQuery] string userId)
+        public async Task<IActionResult> GetTotalCountTasks()
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
-            int countTasks = await _task.GetTotalCountTasks(userId);
+            ITask _task = new TaskService(_db, _postgre, _iden);
+            int countTasks = await _task.GetTotalCountTasks(GetUserName());
 
             return Ok(countTasks);
         }
@@ -221,7 +219,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("auction")]
         public async Task<IActionResult> LoadAuctionTasks()
         {
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
+            ITask _task = new TaskService(_db, _postgre, _iden);
             object aAuctionTasks = await _task.LoadAuctionTasks();
 
             return Ok(aAuctionTasks);

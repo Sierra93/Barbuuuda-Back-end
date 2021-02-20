@@ -1,9 +1,6 @@
 ﻿using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Barbuuuda.Core.Data
 {
