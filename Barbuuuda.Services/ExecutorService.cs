@@ -63,7 +63,7 @@ namespace Barbuuuda.Services
         {
             try
             {
-                if (specializations == null)
+                if (specializations.Length == 0)
                 {
                     throw new ArgumentNullException();
                 }
@@ -90,17 +90,13 @@ namespace Barbuuuda.Services
 
         private ExecutorSpecialization[] CheckEmptySpec(UserEntity oExecutor, ExecutorSpecialization[] specializations)
         {
-            ///<summary>
-            /// Если массив в БД был пустой.
-            /// </summary>
+            // Если массив в БД был пустой, то заполнит его.
             if (oExecutor.Specializations == null)
             {
                 oExecutor.Specializations = specializations;
             }
 
-            ///<summary>
-            /// Если массив в БД не был пустой.
-            /// </summary>
+            // Если массив в БД не был пустой, то очистит его и заполнит заново.
             else
             {
                 oExecutor.Specializations = Array.Empty<ExecutorSpecialization>();

@@ -26,11 +26,11 @@
             </summary>
             <returns>Список исполнителей.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.ExecutorController.AddExecutorSpecializations(Barbuuuda.Models.User.UserEntity)">
+        <member name="M:Barbuuuda.Controllers.ExecutorController.AddExecutorSpecializations(Barbuuuda.Models.User.ExecutorSpecialization[])">
             <summary>
             Метод добавляет специализации исполнителя.
             </summary>
-            <param name="executor">Объект юзера.</param>             
+            <param name="specializations">Массив специализаций.</param>             
         </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>

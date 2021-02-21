@@ -45,11 +45,14 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод добавляет специализации исполнителя.
         /// </summary>
-        /// <param name="executor">Объект юзера.</param>             
+        /// <param name="specializations">Массив специализаций.</param>             
         [HttpPost, Route("add-spec")]
-        public async Task<IActionResult> AddExecutorSpecializations([FromBody] UserEntity executor)
+        public async Task<IActionResult> AddExecutorSpecializations([FromBody] ExecutorSpecialization[] specializations)
         {
-            return Ok();
+            IExecutor _executor = new ExecutorService(_db, _postgre, _iden);
+            await _executor.AddExecutorSpecializations(specializations, GetUserName());
+
+            return Ok();  
         }
     }
 }
