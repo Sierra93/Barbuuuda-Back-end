@@ -50,23 +50,15 @@ namespace Barbuuuda.Services
                     ClaimsIdentity oClaim = GetIdentityClaim(user);
 
                     // Выбирает роли юзера.
-                    IEnumerable<string> aRoles = await GetUserRole(user.UserName);                 
+                    IEnumerable<string> aRoles = await GetUserRole(user.UserName);
 
                     // Генерит токен юзеру.
-                    var now = DateTime.UtcNow;
-                    var jwt = new JwtSecurityToken(
-                        issuer: AuthOptions.ISSUER,
-                        audience: AuthOptions.AUDIENCE,
-                        notBefore: now,
-                        claims: oClaim.Claims,
-                        expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
-                        signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-                    var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+                    string sToken = GenerateToken(oClaim).Result;
 
                     return new
                     {
                         user = oClaim.Name,
-                        userToken = encodedJwt,
+                        userToken = sToken,
                         role = aRoles
                     };
                 }
@@ -333,6 +325,65 @@ namespace Barbuuuda.Services
             oldUser.Email = needUserUpdate.Email;
             oldUser.City = needUserUpdate.City;
             oldUser.Gender = needUserUpdate.Gender;
+        }
+
+        /// <summary>
+        /// Метод генерит токен юзеру.
+        /// </summary>
+        /// <param name="claimsIdentity">Объект полномочий.</param>
+        /// <returns>Строку токена.</returns>
+        public Task<string> GenerateToken(ClaimsIdentity claimsIdentity)
+        {
+            var now = DateTime.UtcNow;
+            var jwt = new JwtSecurityToken(
+                issuer: AuthOptions.ISSUER,
+                audience: AuthOptions.AUDIENCE,
+                notBefore: now,
+                claims: claimsIdentity.Claims,
+                expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+            return Task.FromResult(encodedJwt);
+        }
+
+
+        /// <summary>
+        /// Метод обновит токен юзеру.
+        /// </summary>
+        /// <param name="claimsIdentity">Объект полномочий.</param>
+        /// <returns>Строку токена.</returns>
+        public Task<string> GenerateToken(string userName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userName))
+                {
+                    throw new ArgumentNullException();
+                }
+
+                var now = DateTime.UtcNow;
+                var jwt = new JwtSecurityToken(
+                    issuer: AuthOptions.ISSUER,
+                    audience: AuthOptions.AUDIENCE,
+                    notBefore: now,
+                    claims: new ClaimsIdentity().Claims,
+                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+                return Task.FromResult(encodedJwt);
+            }
+
+            catch (ArgumentNullException ex)
+            {
+                throw new ArgumentNullException($"Не передано имя пользователя {ex.Message}");
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
         }
     }
 }

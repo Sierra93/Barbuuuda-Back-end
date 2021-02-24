@@ -12,19 +12,20 @@ using System.IO;
 using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
+using Autofac;
 
 namespace Barbuuuda
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+        public ContainerBuilder containerBuilder { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
+            containerBuilder = new ContainerBuilder();
+        }       
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)

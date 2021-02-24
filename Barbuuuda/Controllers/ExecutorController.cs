@@ -1,7 +1,5 @@
-﻿using Barbuuuda.Core.Data;
-using Barbuuuda.Core.Interfaces;
+﻿using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.User;
-using Barbuuuda.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,16 +15,16 @@ namespace Barbuuuda.Controllers
     [ApiController, Route("executor")]
     public class ExecutorController : BaseController
     {
-        private readonly ApplicationDbContext _db;
-        private readonly PostgreDbContext _postgre;
-        private readonly IdentityDbContext _iden;
         public static string Module => "Barbuuuda.Executor";
 
-        public ExecutorController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden) : base(Module)
+        /// <summary>
+        /// Сервис исполнителя.
+        /// </summary>
+        private readonly IExecutor _executor;
+
+        public ExecutorController(IExecutor executor) : base(Module)
         {
-            _db = db;
-            _postgre = postgre;
-            _iden = iden;
+            _executor = executor;
         }
 
         /// <summary>
@@ -35,8 +33,7 @@ namespace Barbuuuda.Controllers
         /// <returns>Список исполнителей.</returns>
         [HttpPost, Route("list")]
         public async Task<IActionResult> GetExecutorListAsync()
-        {
-            IExecutor _executor = new ExecutorService(_db, _postgre, _iden);
+        {            
             IEnumerable aExecutors = await _executor.GetExecutorListAsync();
 
             return Ok(aExecutors);
@@ -49,7 +46,6 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("add-spec")]
         public async Task<IActionResult> AddExecutorSpecializations([FromBody] ExecutorSpecialization[] specializations)
         {
-            IExecutor _executor = new ExecutorService(_db, _postgre, _iden);
             await _executor.AddExecutorSpecializations(specializations, GetUserName());
 
             return Ok();  
