@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Barbuuuda.Core.Data
 {
+    /// <summary>
+    /// Класс представляет контекст для работы с PostgreSQL.
+    /// </summary>
     public class PostgreDbContext : DbContext
     {
         public DbSet<UserEntity> Users { get; set; }    // Таблица информации аккаунтов пользователей.
