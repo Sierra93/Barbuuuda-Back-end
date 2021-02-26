@@ -13,21 +13,34 @@ namespace Barbuuuda.Models.Entities.Executor
         public int AnswerVariantId { get; set; }
 
         /// <summary>
-        /// Описание варианта ответа.
+        /// Массив с вариантами ответов.
         /// </summary>
-        [Column("AnswerVariantText", TypeName = "nvarchar(max)")]
-        public string AnswerVariantText { get; set; }
+        [Column("AnswerVariantText", TypeName = "jsonb")]
+        public AnswerVariants[] AnswerVariantText { get; set; }
 
         /// <summary>
         /// Внешний ключ к QuestionId вопроса таблицы Questions.
         /// </summary>
         [Column("QuestionId"), ForeignKey("QuestionId")]
         public int QuestionId { get; set; }
+    }
+
+    /// <summary>
+    /// Нужно для столбца вариантов ответов.
+    /// </summary>
+    [NotMapped]
+    public class AnswerVariants
+    {
+        public string AnswerVariantText { get; set; }
 
         /// <summary>
-        /// Верный ответ или нет. true/false.
+        /// Былы ли выбран ответ.
         /// </summary>
-        [Column("IsTrue", TypeName = "bit")]
-        public bool IsTrue { get; set; }
+        public bool Selected { get; set; }
+
+        /// <summary>
+        /// Является ли ответ верным.
+        /// </summary>
+        public bool IsRight { get; set; }
     }
 }

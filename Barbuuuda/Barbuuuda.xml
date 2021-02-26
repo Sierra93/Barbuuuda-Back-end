@@ -42,6 +42,12 @@
             </summary>
             <param name="specializations">Массив специализаций.</param>             
         </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetExecutorTestAsync">
+            <summary>
+            Метод получает список вопросов с вариантами ответа для теста исполнителя.
+            </summary>
+            <returns>Список вопросов с вариантами ответов.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>
             Контроллер главной страницы.

@@ -1,5 +1,4 @@
-﻿using Barbuuuda.Models.Entities.Executor;
-using Barbuuuda.Models.Logger;
+﻿using Barbuuuda.Models.Logger;
 using Barbuuuda.Models.MainPage;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
@@ -33,11 +32,7 @@ namespace Barbuuuda.Core.Data
         public DbSet<HeaderTypeEntity> Headers { get; set; }   // Таблица полей хидера.
 
         public DbSet<HopeEntity> Hopes { get; set; }  // Таблица НАДЕЕМСЯ НА ДОЛГОЕ СОТРУДНИЧЕСТВО.
-
-        public DbSet<QuestionEntity> Questions { get; set; }    // Таблица вопросов для теста исполнителей.
-
-        public DbSet<AnswerVariant> AnswerVariants { get; set; }    // Таблица ответов к тестам исполнителей.
-
+        
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }

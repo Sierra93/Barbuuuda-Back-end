@@ -50,5 +50,17 @@ namespace Barbuuuda.Controllers
 
             return Ok();  
         }
+
+        /// <summary>
+        /// Метод получает список вопросов с вариантами ответа для теста исполнителя.
+        /// </summary>
+        /// <returns>Список вопросов с вариантами ответов.</returns>
+        [HttpPost, Route("get-tests")]
+        public async Task<IActionResult> GetExecutorTestAsync()
+        {
+            IEnumerable aTests = await _executor.GetExecutorTestAsync();
+
+            return Ok(aTests);
+        }
     }
 }
