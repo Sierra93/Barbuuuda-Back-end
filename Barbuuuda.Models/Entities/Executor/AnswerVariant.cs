@@ -31,10 +31,13 @@ namespace Barbuuuda.Models.Entities.Executor
     [NotMapped]
     public class AnswerVariants
     {
+        /// <summary>
+        /// Вариант ответа.
+        /// </summary>
         public string AnswerVariantText { get; set; }
 
         /// <summary>
-        /// Былы ли выбран ответ.
+        /// Был ли выбран ответ.
         /// </summary>
         public bool Selected { get; set; }
 
