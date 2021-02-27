@@ -21,5 +21,11 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="specializations">Массив специализаций.</param>
         Task AddExecutorSpecializations(ExecutorSpecialization[] specializations, string executorName);
+
+        /// <summary>
+        /// Метод получает список вопросов с вариантами ответа для теста исполнителя.
+        /// </summary>
+        /// <returns>Список вопросов с вариантами ответов.</returns>
+        Task<IEnumerable> GetExecutorTestAsync();
     }
 }

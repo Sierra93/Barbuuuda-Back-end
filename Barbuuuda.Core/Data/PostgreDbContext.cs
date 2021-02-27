@@ -1,9 +1,13 @@
-﻿using Barbuuuda.Models.Task;
+﻿using Barbuuuda.Models.Entities.Executor;
+using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace Barbuuuda.Core.Data
 {
+    /// <summary>
+    /// Класс представляет контекст для работы с PostgreSQL.
+    /// </summary>
     public class PostgreDbContext : DbContext
     {
         public DbSet<UserEntity> Users { get; set; }    // Таблица информации аккаунтов пользователей.
@@ -17,6 +21,10 @@ namespace Barbuuuda.Core.Data
         public DbSet<TaskTypeEntity> TaskTypes { get; set; }   // Таблица типов заданий.
 
         public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options) { }
+
+        public DbSet<QuestionEntity> Questions { get; set; }    // Таблица вопросов для теста исполнителей.
+
+        public DbSet<AnswerVariant> AnswerVariants { get; set; }    // Таблица ответов к тестам исполнителей.
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }
     }

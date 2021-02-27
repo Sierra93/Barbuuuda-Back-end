@@ -63,7 +63,7 @@ namespace Barbuuuda.Services
         {
             try
             {
-                if (specializations == null)
+                if (specializations.Length == 0)
                 {
                     throw new ArgumentNullException();
                 }
@@ -90,17 +90,13 @@ namespace Barbuuuda.Services
 
         private ExecutorSpecialization[] CheckEmptySpec(UserEntity oExecutor, ExecutorSpecialization[] specializations)
         {
-            ///<summary>
-            /// Если массив в БД был пустой.
-            /// </summary>
+            // Если массив в БД был пустой, то заполнит его.
             if (oExecutor.Specializations == null)
             {
                 oExecutor.Specializations = specializations;
             }
 
-            ///<summary>
-            /// Если массив в БД не был пустой.
-            /// </summary>
+            // Если массив в БД не был пустой, то очистит его и заполнит заново.
             else
             {
                 oExecutor.Specializations = Array.Empty<ExecutorSpecialization>();
@@ -108,6 +104,26 @@ namespace Barbuuuda.Services
             }
 
             return oExecutor.Specializations;
+        }
+
+        /// <summary>
+        /// Метод получает список вопросов с вариантами ответа для теста исполнителя.
+        /// </summary>
+        /// <returns>Список вопросов с вариантами ответов.</returns>
+        public async Task<IEnumerable> GetExecutorTestAsync()
+        {
+            IEnumerable aTests = await _postgre.Questions
+                .Join(_postgre.AnswerVariants,
+                t1 => t1.QuestionId,
+                t2 => t2.QuestionId,
+                (t1, t2) => new {
+                    t1.QuestionId,
+                    t1.QuestionText,
+                    t2.AnswerVariantText
+                })
+                .ToListAsync();
+
+            return aTests;
         }
     }
 }

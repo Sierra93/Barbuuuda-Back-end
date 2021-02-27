@@ -3,12 +3,12 @@ using Barbuuuda.Models.MainPage;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Barbuuuda.Core.Data
 {
+    /// <summary>
+    /// Класс представляет контекст для работы с MSSQL.
+    /// </summary>
     public class ApplicationDbContext : DbContext
     {
         public DbSet<LoggerEntity> Logs { get; set; }   // Таблица логов.
@@ -32,7 +32,7 @@ namespace Barbuuuda.Core.Data
         public DbSet<HeaderTypeEntity> Headers { get; set; }   // Таблица полей хидера.
 
         public DbSet<HopeEntity> Hopes { get; set; }  // Таблица НАДЕЕМСЯ НА ДОЛГОЕ СОТРУДНИЧЕСТВО.
-
+        
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }

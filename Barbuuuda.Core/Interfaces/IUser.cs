@@ -1,5 +1,5 @@
 ﻿using Barbuuuda.Models.User;
-using System.Collections;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Core.Interfaces
@@ -34,5 +34,19 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
         Task SaveProfileData(UserEntity user, string userName);
+
+        /// <summary>
+        /// Метод выдаст токен юзеру.
+        /// </summary>
+        /// <param name="claimsIdentity">Объект полномочий.</param>
+        /// <returns>Строку токена.</returns>
+        Task<string> GenerateToken(ClaimsIdentity claimsIdentity);
+
+        /// <summary>
+        /// Метод обновит токен юзеру.
+        /// </summary>
+        /// <param name="claimsIdentity">Объект полномочий.</param>
+        /// <returns>Строку токена.</returns>
+        Task<string> GenerateToken(string userName);
     }
 }

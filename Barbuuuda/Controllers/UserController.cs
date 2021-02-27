@@ -3,7 +3,6 @@ using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.ViewModels.User;
 using Barbuuuda.Emails;
 using Barbuuuda.Models.User;
-using Barbuuuda.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -23,20 +22,20 @@ namespace Barbuuuda.Controllers
     [ApiController, Route("user")]
     public class UserController : BaseController
     {
-        private readonly ApplicationDbContext _db;
-        private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
         private readonly UserManager<UserEntity> _userManager;
-        private readonly SignInManager<UserEntity> _signInManager;
         public static string Module => "Barbuuuda.User";
 
-        public UserController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager) : base(Module)
+        /// <summary>
+        /// Сервис работы с юзерами.
+        /// </summary>
+        private readonly IUser _user;
+
+        public UserController(IdentityDbContext iden, UserManager<UserEntity> userManager, IUser user) : base(Module)
         {
-            _db = db;
-            _postgre = postgre;
             _userManager = userManager;
-            _signInManager = signInManager;
             _iden = iden;
+            _user = user;
         }
 
 
@@ -131,7 +130,6 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("login")]
         public async Task<IActionResult> LoginUserAsync([FromBody] UserEntity user)
         {
-            IUser _user = new UserService(_db, _postgre, _iden, _signInManager);
             var oAuth = await _user.LoginAsync(user);
 
             return Ok(oAuth);
@@ -141,11 +139,11 @@ namespace Barbuuuda.Controllers
         /// Метод проверяет, авторизован ли юзер.
         /// </summary>
         /// <returns>Объект с данными авторизованного юзера.</returns>       
+        [AllowAnonymous]
         [HttpGet, Route("authorize")]
-        public async Task<IActionResult> GetUserAuthorize()
+        public async Task<IActionResult> GetUserAuthorize([FromQuery] string userName)
         {
-            IUser _user = new UserService(_db, _postgre, _iden, _signInManager);
-            object oAuthorize = await _user.GetUserAuthorize(GetUserName());
+            object oAuthorize = await _user.GetUserAuthorize(GetUserName() ?? userName);
 
             return Ok(oAuthorize);
         }
@@ -158,7 +156,6 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("profile")]
         public async Task<IActionResult> GetProfileInfoAsync()
         {
-            IUser _user = new UserService(_db, _postgre, _iden, _signInManager);
             object oUser = await _user.GetProfileInfo(GetUserName());
 
             return Ok(oUser);
@@ -171,10 +168,23 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("save-data")]
         public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserEntity user)
         {
-            IUser _user = new UserService(_db, _postgre, _iden, _signInManager);
             await _user.SaveProfileData(user, GetUserName());
 
             return Ok();
+        }
+
+        /// <summary>
+        /// Метод обновляет токен юзеру.
+        /// </summary>
+        /// <param name="userName">Имя юзера.</param>
+        /// <returns>Строка токена.</returns>
+        [AllowAnonymous]
+        [HttpGet, Route("token")]
+        public async Task<IActionResult> RefreshToken([FromQuery] string userName)
+        {
+            string sToken = await _user.GenerateToken(userName);
+
+            return Ok(sToken);
         }
     }
 }

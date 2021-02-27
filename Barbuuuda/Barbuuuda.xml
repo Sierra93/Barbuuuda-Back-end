@@ -4,6 +4,11 @@
         <name>Barbuuuda</name>
     </assembly>
     <members>
+        <member name="T:Barbuuuda.AutofacModules.AutofacConfig">
+            <summary>
+            Конфигурация Autofac, в которой ругистрируются все сервисы.
+            </summary>
+        </member>
         <member name="T:Barbuuuda.Controllers.BaseController">
             <summary>
             Базовый контроллер для всех контроллеров.
@@ -20,21 +25,37 @@
             Контроллер содержит методы по работе с исполнителями сервиса.
             </summary>
         </member>
+        <member name="F:Barbuuuda.Controllers.ExecutorController._executor">
+            <summary>
+            Сервис исполнителя.
+            </summary>
+        </member>
         <member name="M:Barbuuuda.Controllers.ExecutorController.GetExecutorListAsync">
             <summary>
             Метод выгружает список исполнителей сервиса.
             </summary>
             <returns>Список исполнителей.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.ExecutorController.AddExecutorSpecializations(Barbuuuda.Models.User.UserEntity)">
+        <member name="M:Barbuuuda.Controllers.ExecutorController.AddExecutorSpecializations(Barbuuuda.Models.User.ExecutorSpecialization[])">
             <summary>
             Метод добавляет специализации исполнителя.
             </summary>
-            <param name="executor">Объект юзера.</param>             
+            <param name="specializations">Массив специализаций.</param>             
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetExecutorTestAsync">
+            <summary>
+            Метод получает список вопросов с вариантами ответа для теста исполнителя.
+            </summary>
+            <returns>Список вопросов с вариантами ответов.</returns>
         </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>
             Контроллер главной страницы.
+            </summary>
+        </member>
+        <member name="F:Barbuuuda.Controllers.MainPageController._mainPage">
+            <summary>
+            Сервис стартовой страницы.
             </summary>
         </member>
         <member name="M:Barbuuuda.Controllers.MainPageController.GetFonContent">
@@ -100,6 +121,11 @@
         <member name="T:Barbuuuda.Controllers.TaskController">
             <summary>
             Контроллер содержит логику работы с заданиями.
+            </summary>
+        </member>
+        <member name="F:Barbuuuda.Controllers.TaskController._task">
+            <summary>
+            Сервис заданий.
             </summary>
         </member>
         <member name="M:Barbuuuda.Controllers.TaskController.CreateTask(Barbuuuda.Models.Task.TaskEntity)">
@@ -200,6 +226,11 @@
             Контроллер содержит логику работы с пользователями.
             </summary>        
         </member>
+        <member name="F:Barbuuuda.Controllers.UserController._user">
+            <summary>
+            Сервис работы с юзерами.
+            </summary>
+        </member>
         <member name="M:Barbuuuda.Controllers.UserController.CreateUserAsync(Barbuuuda.Models.User.UserEntity)">
             <summary>
             Метод создает нового пользователя.
@@ -226,7 +257,7 @@
             <paramref name="user">Объект с данными юзера.</paramref>
             </summary>        
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize">
+        <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize(System.String)">
             <summary>
             TODO: нужно убрать этот метод, так как авторизация переделана на основе токенов и доступ и так будет отваливаться когда токен протухнет.
             Метод проверяет, авторизован ли юзер.
@@ -244,6 +275,13 @@
             Метод сохраняет личные данные юзера.
             </summary>
             <param name="user">Объект с данными юзера.</param>
+        </member>
+        <member name="M:Barbuuuda.Controllers.UserController.RefreshToken(System.String)">
+            <summary>
+            Метод обновляет токен юзеру.
+            </summary>
+            <param name="userName">Имя юзера.</param>
+            <returns>Строка токена.</returns>
         </member>
     </members>
 </doc>
