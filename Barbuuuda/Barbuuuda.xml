@@ -49,6 +49,12 @@
             <param name="numberQuestion">Номер вопроса.</param>
             <returns>Вопрос с вариантами ответов.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetAnswersCountAsync">
+            <summary>
+            Метод получает кол-во вопросов для теста исполнителя.
+            </summary>
+            <returns>Кол-во вопросов.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>
             Контроллер главной страницы.

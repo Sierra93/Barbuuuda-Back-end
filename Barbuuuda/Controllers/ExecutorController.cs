@@ -63,5 +63,17 @@ namespace Barbuuuda.Controllers
 
             return Ok(oQuestion);
         }
+
+        /// <summary>
+        /// Метод получает кол-во вопросов для теста исполнителя.
+        /// </summary>
+        /// <returns>Кол-во вопросов.</returns>
+        [HttpGet, Route("answers-count")]
+        public async Task<IActionResult> GetAnswersCountAsync()
+        {
+            int count = await _executor.GetCountAsync();
+
+            return Ok(count);
+        }
     }
 }

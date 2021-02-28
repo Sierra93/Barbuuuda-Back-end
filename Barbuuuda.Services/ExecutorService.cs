@@ -143,5 +143,22 @@ namespace Barbuuuda.Services
                 throw new Exception(ex.Message.ToString());
             }
         }
+
+        /// <summary>
+        /// Метод получает кол-во вопросов для теста исполнителя.
+        /// </summary>
+        /// <returns>Кол-во вопросов.</returns>
+        public async Task<int> GetCountAsync()
+        {
+            try
+            {
+                return await _postgre.Questions.CountAsync();
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
     }
 }

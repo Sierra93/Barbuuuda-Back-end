@@ -28,5 +28,11 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="numberQuestion">Номер вопроса.</param>
         /// <returns>Вопрос с вариантами ответов.</returns>
         Task<object> GetQuestionAsync(int numberQuestion);
+
+        /// <summary>
+        /// Метод получает кол-во вопросов для теста исполнителя.
+        /// </summary>
+        /// <returns>Кол-во вопросов.</returns>
+        Task<int> GetCountAsync();
     }
 }
