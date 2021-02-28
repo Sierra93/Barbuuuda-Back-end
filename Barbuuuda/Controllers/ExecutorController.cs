@@ -52,15 +52,16 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод получает список вопросов с вариантами ответа для теста исполнителя.
+        /// Метод получает вопрос для теста исполнителя в зависимости от номера вопроса, переданного с фронта.
         /// </summary>
-        /// <returns>Список вопросов с вариантами ответов.</returns>
-        [HttpPost, Route("get-tests")]
-        public async Task<IActionResult> GetExecutorTestAsync()
+        /// <param name="numberQuestion">Номер вопроса.</param>
+        /// <returns>Вопрос с вариантами ответов.</returns>
+        [HttpGet, Route("answer")]
+        public async Task<IActionResult> GetExecutorTestAsync([FromQuery] int numberQuestion)
         {
-            IEnumerable aTests = await _executor.GetExecutorTestAsync();
+            var oQuestion = await _executor.GetQuestionAsync(numberQuestion);
 
-            return Ok(aTests);
+            return Ok(oQuestion);
         }
     }
 }

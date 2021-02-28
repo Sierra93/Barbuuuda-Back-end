@@ -37,6 +37,7 @@ namespace Barbuuuda
                 builder.WithOrigins(
                     "https://testdevi.site",
                     "https://testdevi.site/",
+                    "https://barbuuuda.ru",
                     "http://localhost:8080/",
                     "http://localhost:8080")
                 .AllowAnyMethod().AllowAnyHeader();

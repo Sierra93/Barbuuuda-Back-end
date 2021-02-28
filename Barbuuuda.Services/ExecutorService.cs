@@ -107,23 +107,41 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод получает список вопросов с вариантами ответа для теста исполнителя.
+        /// Метод получает вопрос для теста исполнителя в зависимости от номера вопроса, переданного с фронта.
         /// </summary>
-        /// <returns>Список вопросов с вариантами ответов.</returns>
-        public async Task<IEnumerable> GetExecutorTestAsync()
+        /// <param name="numberQuestion">Номер вопроса.</param>
+        /// <returns>Вопрос с вариантами ответов.</returns>
+        public async Task<object> GetQuestionAsync(int numberQuestion)
         {
-            IEnumerable aTests = await _postgre.Questions
+            try
+            {
+                if (numberQuestion == 0)
+                {
+                    throw new ArgumentNullException();
+                }
+
+                return await _postgre.Questions
                 .Join(_postgre.AnswerVariants,
                 t1 => t1.QuestionId,
                 t2 => t2.QuestionId,
                 (t1, t2) => new {
-                    t1.QuestionId,
                     t1.QuestionText,
+                    t1.NumberQuestion,
                     t2.AnswerVariantText
                 })
-                .ToListAsync();
+                .Where(q => q.NumberQuestion == numberQuestion)
+                .FirstOrDefaultAsync(); 
+            }
 
-            return aTests;
+            catch (ArgumentNullException ex)
+            {
+                throw new ArgumentNullException($"Номер вопроса не передан {ex.Message}");
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
         }
     }
 }

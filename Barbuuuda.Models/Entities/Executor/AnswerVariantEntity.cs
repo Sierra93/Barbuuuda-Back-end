@@ -7,7 +7,7 @@ namespace Barbuuuda.Models.Entities.Executor
     /// Класс модели вариантов ответов к вопросам теста для исполнителей.
     /// </summary>
     [Table("AnswerVariants", Schema = "dbo")]
-    public sealed class AnswerVariant
+    public sealed class AnswerVariantEntity
     {
         [Key, Column("AnswerVariantId")]
         public int AnswerVariantId { get; set; }
