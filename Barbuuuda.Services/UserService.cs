@@ -122,17 +122,17 @@ namespace Barbuuuda.Services
         /// Метод запишет токен юзера в БД.
         /// </summary>
         /// <param name="token">Токен юзера.</param>
-        private async Task SetUserToken(string token, string username)
-        {
-            UserEntity oUser = await _iden.AspNetUsers
-                .Where(u => u.UserName
-                .Equals(username))
-                .FirstOrDefaultAsync();
+        //private async Task SetUserToken(string token, string username)
+        //{
+        //    UserEntity oUser = await _iden.AspNetUsers
+        //        .Where(u => u.UserName
+        //        .Equals(username))
+        //        .FirstOrDefaultAsync();
 
-            // Запишет токен.
-            oUser.UserToken = token;
-            await _iden.SaveChangesAsync();
-        }
+        //    // Запишет токен.
+        //    oUser.UserToken = token;
+        //    await _iden.SaveChangesAsync();
+        //}
 
         private ClaimsIdentity GetClaim(string username)
         {

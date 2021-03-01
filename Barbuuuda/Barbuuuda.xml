@@ -287,7 +287,6 @@
             <summary>
             Метод обновляет токен юзеру.
             </summary>
-            <param name="userName">Имя юзера.</param>
             <returns>Строка токена.</returns>
         </member>
     </members>
