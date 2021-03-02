@@ -44,6 +44,6 @@ namespace Barbuuuda.Models.Entities.Executor
         /// <summary>
         /// Является ли ответ верным.
         /// </summary>
-        public bool IsRight { get; set; }
+        public bool? IsRight { get; set; }
     }
 }

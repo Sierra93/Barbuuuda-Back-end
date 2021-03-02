@@ -2,6 +2,7 @@
 using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
+using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -120,7 +121,7 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                return await _postgre.Questions
+                var oQuestion= await _postgre.Questions
                 .Join(_postgre.AnswerVariants,
                 t1 => t1.QuestionId,
                 t2 => t2.QuestionId,
@@ -130,7 +131,15 @@ namespace Barbuuuda.Services
                     t2.AnswerVariantText
                 })
                 .Where(q => q.NumberQuestion == numberQuestion)
-                .FirstOrDefaultAsync(); 
+                .FirstOrDefaultAsync();
+
+                // Затирает верные ответы, чтобы фронт их не видел.
+                foreach (AnswerVariants item in oQuestion.AnswerVariantText)
+                {
+                    item.IsRight = null;
+                }
+
+                return oQuestion;
             }
 
             catch (ArgumentNullException ex)

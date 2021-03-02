@@ -6,12 +6,16 @@ using System.Linq;
 
 namespace Barbuuuda.Tests.Unit_tests.ExecutorTests
 {
+    /// <summary>
+    /// Класс тестирует получение списка вопросов для теста исполнителя.
+    /// </summary>
     [TestClass]
     public class GetExecutorQuestionsTest
     {
+        [TestMethod]
         public void GetQuestionsTest()
         {
-            DbContextOptions<PostgreDbContext> postgreOptions = new DbContextOptionsBuilder<PostgreDbContext>().UseInMemoryDatabase(databaseName: "AddQuestionsTest").Options;
+            DbContextOptions<PostgreDbContext> postgreOptions = new DbContextOptionsBuilder<PostgreDbContext>().UseInMemoryDatabase(databaseName: "GetQuestionsTest").Options;
             PostgreDbContext postgreContext = new PostgreDbContext(postgreOptions);
 
             QuestionEntity[] aQuestions = new[]
