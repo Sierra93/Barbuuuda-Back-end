@@ -6,14 +6,10 @@ using System.Linq;
 
 namespace Barbuuuda.Tests.Unit_tests.ExecutorTests
 {
-    /// <summary>
-    /// Класс тестирует добавление вопросов теста для исполнителя.
-    /// </summary>
     [TestClass]
-    public class AddExecutorQuestionsTest
+    public class GetExecutorQuestionsTest
     {
-        [TestMethod]
-        public void AddQuestionsTest()
+        public void GetQuestionsTest()
         {
             DbContextOptions<PostgreDbContext> postgreOptions = new DbContextOptionsBuilder<PostgreDbContext>().UseInMemoryDatabase(databaseName: "AddQuestionsTest").Options;
             PostgreDbContext postgreContext = new PostgreDbContext(postgreOptions);
@@ -40,7 +36,7 @@ namespace Barbuuuda.Tests.Unit_tests.ExecutorTests
 
             int questionsCount = postgreContext.Questions.Count();
 
-            Assert.IsTrue(questionsCount != 0);
+            Assert.AreEqual(2, questionsCount);
         }
     }
 }
