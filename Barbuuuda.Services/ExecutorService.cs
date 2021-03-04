@@ -27,7 +27,7 @@ namespace Barbuuuda.Services
             _postgre = postgre;
             _iden = iden;
         }
-       
+
         /// <summary>
         /// Метод выгружает список исполнителей сервиса.
         /// </summary>
@@ -121,11 +121,12 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                var oQuestion= await _postgre.Questions
+                var oQuestion = await _postgre.Questions
                 .Join(_postgre.AnswerVariants,
                 t1 => t1.QuestionId,
                 t2 => t2.QuestionId,
-                (t1, t2) => new {
+                (t1, t2) => new
+                {
                     t1.QuestionText,
                     t1.NumberQuestion,
                     t2.AnswerVariantText
@@ -134,10 +135,7 @@ namespace Barbuuuda.Services
                 .FirstOrDefaultAsync();
 
                 // Затирает верные ответы, чтобы фронт их не видел.
-                foreach (AnswerVariants item in oQuestion.AnswerVariantText)
-                {
-                    item.IsRight = null;
-                }
+                oQuestion.AnswerVariantText.IsRight = null;
 
                 return oQuestion;
             }
