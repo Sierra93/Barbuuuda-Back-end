@@ -2,6 +2,7 @@
 using Barbuuuda.Models.Entities.Executor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Barbuuuda.Tests.Unit_tests.ExecutorTests
@@ -23,47 +24,40 @@ namespace Barbuuuda.Tests.Unit_tests.ExecutorTests
 
             AddRightAnswersDB(postgreContext);
 
-            // Тестовые результаты теста.
-            AnswerVariantEntity[] resultsAnswers = new AnswerVariantEntity[]
+            //// Тестовые результаты теста.
+
+            AnswerVariant[] resultsAnswers = new AnswerVariant[]
             {
-                new AnswerVariantEntity()
+              new AnswerVariant()
                 {
                     QuestionId = 1,
-                    AnswerVariantText = new AnswerVariants()
-                    {
-                        AnswerVariantText = "Система аукциона: исполнители сами ищут задания и предлагают за них свою цену, а заказчики выбирают исполнителя"
-                    }
+                    AnswerVariantText = "Система аукциона: исполнители сами ищут задания и предлагают за них свою цену, а заказчики выбирают исполнителя"
                 },
-                new AnswerVariantEntity()
+                new AnswerVariant()
                 {
                     QuestionId = 2,
-                    AnswerVariantText = new AnswerVariants()
-                    {
-                        AnswerVariantText = "Время, в течение которого служба поддержки отвечает на вопросы пользователей с момента их регистрации"
-                    }
+                    AnswerVariantText = "Время, в течение которого служба поддержки отвечает на вопросы пользователей с момента их регистрации"
                 },
-                new AnswerVariantEntity()
+                new AnswerVariant()
                 {
                     QuestionId = 3,
-                    AnswerVariantText = new AnswerVariants()
-                    {
-                        AnswerVariantText = "Через звонки по мобильному телефону"
-                    }
+                    AnswerVariantText = "Через звонки по мобильному телефону"
                 }
             };
 
             // Проверяет кол-во правильных ответов.
             int errorCount = 0; // Кол-во не правильных ответов.
 
-            foreach (AnswerVariantEntity el in resultsAnswers)
+            for (int i = 0; i < resultsAnswers.Length; i++)
             {
-                var answer = postgreContext.AnswerVariants.ToList()
-                   .Where(a => a.QuestionId
+                AnswerVariant el = resultsAnswers[i];
+                var answer = postgreContext.AnswerVariants
+                   .Where(a => el.QuestionId
                    .Equals(el.QuestionId))
                    .Select(a => new
                    {
-                       isRight = a.AnswerVariantText.AnswerVariantText
-                       .Equals(el.AnswerVariantText.AnswerVariantText)
+                       isRight = a.AnswerVariantText[i].AnswerVariantText
+                       .Equals(el.AnswerVariantText)
                    })
                    .FirstOrDefault();
 
@@ -90,46 +84,38 @@ namespace Barbuuuda.Tests.Unit_tests.ExecutorTests
             AddRightAnswersDB(postgreContext);
 
             // Тестовые результаты теста.
-            AnswerVariantEntity[] resultsAnswers = new AnswerVariantEntity[]
+            AnswerVariant[] resultsAnswers = new AnswerVariant[]
             {
-                new AnswerVariantEntity()
+                new AnswerVariant()
                 {
                     QuestionId = 1,
-                    AnswerVariantText = new AnswerVariants()
-                    {
-                        AnswerVariantText = "Система аукциона: исполнители сами ищут задания и предлагают за них свою цену, а заказчики выбирают исполнителя"
-                    }
+                    AnswerVariantText = "Система аукциона: исполнители сами ищут задания и предлагают за них свою цену, а заказчики выбирают исполнителя"
                 },
-                new AnswerVariantEntity()
+                new AnswerVariant()
                 {
                     QuestionId = 2,
-                    AnswerVariantText = new AnswerVariants()
-                    {
-                        AnswerVariantText = "Сумма, за которую Вы готовы выполнить задание"
-                    }
+                     AnswerVariantText = "Сумма, за которую Вы готовы выполнить задание"
                 },
-                new AnswerVariantEntity()
+                new AnswerVariant()
                 {
                     QuestionId = 3,
-                    AnswerVariantText = new AnswerVariants()
-                    {
-                        AnswerVariantText = "Качества выполненных заданий и отзывов заказчиков, а также статистики по сделанным ставкам"
-                    }
+                    AnswerVariantText = "Качества выполненных заданий и отзывов заказчиков, а также статистики по сделанным ставкам"
                 }
             };
 
             // Проверяет кол-во правильных ответов.
             int errorCount = 0; // Кол-во не правильных ответов.
 
-            foreach (var el in resultsAnswers)
+            for (int i = 0; i < resultsAnswers.Length; i++)
             {
+                AnswerVariant el = resultsAnswers[i];
                 var answer = postgreContext.AnswerVariants.ToList()
-                   .Where(a => a.QuestionId
+                   .Where(a => el.QuestionId
                    .Equals(el.QuestionId))
                    .Select(a => new
                    {
-                       isRight = a.AnswerVariantText.AnswerVariantText
-                       .Equals(el.AnswerVariantText.AnswerVariantText)
+                       isRight = a.AnswerVariantText[i].AnswerVariantText
+                       .Equals(el.AnswerVariantText)
                    })
                    .FirstOrDefault();
 
@@ -151,80 +137,61 @@ namespace Barbuuuda.Tests.Unit_tests.ExecutorTests
         private void AddRightAnswersDB(PostgreDbContext postgreContext)
         {
             // Верные варианты ответов.
-            AnswerVariantEntity[] rightAnswers = new AnswerVariantEntity[]
+            AnswerVariant[] rightAnswers = new AnswerVariant[]
             {
-                new AnswerVariantEntity()
+                new AnswerVariant()
                 {
                     QuestionId = 1,
-                    AnswerVariantText = new AnswerVariants()
-                    {
-                        AnswerVariantText = "Система аукциона: исполнители сами ищут задания и предлагают за них свою цену, а заказчики выбирают исполнителя",
+                    AnswerVariantText = "Система аукциона: исполнители сами ищут задания и предлагают за них свою цену, а заказчики выбирают исполнителя",
                           IsRight = true,
                           Selected = false
-                    }
                 },
-                 new AnswerVariantEntity()
+                 new AnswerVariant()
                 {
                       QuestionId = 2,
-                    AnswerVariantText = new AnswerVariants()
-                    {
-                        AnswerVariantText = "Сумма, за которую Вы готовы выполнить задание",
+                     AnswerVariantText = "Сумма, за которую Вы готовы выполнить задание",
                     IsRight = true,
                     Selected = false
-                    }
                 },
-                 new AnswerVariantEntity()
+                 new AnswerVariant()
                 {
                       QuestionId = 3,
-                    AnswerVariantText = new AnswerVariants()
-                    {
+
                        AnswerVariantText = "Качества выполненных заданий и отзывов заказчиков, а также статистики по сделанным ставкам",
                     IsRight = true,
                     Selected = false
-                    }
                 },
-                   new AnswerVariantEntity()
+                   new AnswerVariant()
                 {
                         QuestionId = 4,
-                    AnswerVariantText = new AnswerVariants()
-                    {
-                       AnswerVariantText = "Запрещен",
+                    AnswerVariantText = "Запрещен",
                     IsRight = true,
                     Selected = false
-                    }
                 },
-                    new AnswerVariantEntity()
+                    new AnswerVariant()
                 {
                          QuestionId = 5,
-                    AnswerVariantText = new AnswerVariants()
-                    {
-                        AnswerVariantText = "В режиме комментариев в задании",
+                     AnswerVariantText = "В режиме комментариев в задании",
                     IsRight = true,
                     Selected = false
-                    }
                 },
-                    new AnswerVariantEntity()
+                    new AnswerVariant()
                 {
                          QuestionId = 6,
-                    AnswerVariantText = new AnswerVariants()
-                    {
-                         AnswerVariantText = "Время после сдачи исполнителем задания заказчику, в течение которого заказчик может опротестовать задание или отправить его на доработку исполнителю",
+                    AnswerVariantText = "Время после сдачи исполнителем задания заказчику, в течение которого заказчик может опротестовать задание или отправить его на доработку исполнителю",
                     IsRight = true,
                     Selected = false
-                    }
                 },
-                    new AnswerVariantEntity()
+                    new AnswerVariant()
                 {
                          QuestionId = 7,
-                    AnswerVariantText = new AnswerVariants()
-                    {  AnswerVariantText = "20 дней",
+                    AnswerVariantText = "20 дней",
                     IsRight = true,
                     Selected = false
-                    }
                 }
             };
 
-            postgreContext.AnswerVariants.AddRange(rightAnswers);
+            //postgreContext.AnswerVariants.AddRange(rightAnswers);
             postgreContext.SaveChanges();
         }
     }

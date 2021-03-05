@@ -121,7 +121,7 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                var oQuestion = await _postgre.Questions
+                var question = await _postgre.Questions
                 .Join(_postgre.AnswerVariants,
                 t1 => t1.QuestionId,
                 t2 => t2.QuestionId,
@@ -135,9 +135,9 @@ namespace Barbuuuda.Services
                 .FirstOrDefaultAsync();
 
                 // Затирает верные ответы, чтобы фронт их не видел.
-                oQuestion.AnswerVariantText.IsRight = null;
+                question.AnswerVariantText.ToList().ForEach(el => el.IsRight = null);
 
-                return oQuestion;
+                return question;
             }
 
             catch (ArgumentNullException ex)

@@ -16,7 +16,7 @@ namespace Barbuuuda.Models.Entities.Executor
         /// Массив с вариантами ответов.
         /// </summary>
         [Column("AnswerVariantText", TypeName = "jsonb")]
-        public AnswerVariants AnswerVariantText { get; set; }
+        public AnswerVariant[] AnswerVariantText { get; set; }
 
         /// <summary>
         /// Внешний ключ к QuestionId вопроса таблицы Questions.
@@ -29,7 +29,7 @@ namespace Barbuuuda.Models.Entities.Executor
     /// Нужно для столбца вариантов ответов.
     /// </summary>
     [NotMapped]
-    public sealed class AnswerVariants
+    public sealed class AnswerVariant
     {
         /// <summary>
         /// Вариант ответа.
