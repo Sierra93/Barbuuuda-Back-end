@@ -118,9 +118,17 @@ namespace Barbuuuda.Services
         {
             try
             {
+                int count = await _postgre.Questions.CountAsync();
+
                 if (numberQuestion == 0)
                 {
                     throw new UserMessageException(TextException.ERROR_EMPTY_NUMBER_QUESTION);
+                }
+
+                // Если номер вопроса некорректный.
+                if (numberQuestion > count)
+                {
+                    throw new ErrorRangeAnswerException(numberQuestion);
                 }
 
                 var question = await _postgre.Questions
