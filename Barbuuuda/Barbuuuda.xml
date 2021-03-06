@@ -55,6 +55,13 @@
             </summary>
             <returns>Кол-во вопросов.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.CheckAnswersTestAsync(System.Collections.Generic.List{Barbuuuda.Models.Entities.Executor.AnswerVariant})">
+            <summary>
+            Метод проверяет результаты ответов на тест исполнителем.
+            </summary>
+            <param name="answers">Массив с ответами на тест.</param>
+            <returns>Статус прохождения теста true/false.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>
             Контроллер главной страницы.

@@ -1,9 +1,11 @@
 ﻿using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Controllers
@@ -74,6 +76,19 @@ namespace Barbuuuda.Controllers
             int count = await _executor.GetCountAsync();
 
             return Ok(count);
+        }
+
+        /// <summary>
+        /// Метод проверяет результаты ответов на тест исполнителем.
+        /// </summary>
+        /// <param name="answers">Массив с ответами на тест.</param>
+        /// <returns>Статус прохождения теста true/false.</returns>
+        [HttpPost, Route("check")]
+        public async Task<IActionResult> CheckAnswersTestAsync([FromBody] List<AnswerVariant> answers)
+        {
+            bool isCheck = await _executor.CheckAnswersTestAsync(answers, GetUserName());
+
+            return Ok(isCheck);
         }
     }
 }

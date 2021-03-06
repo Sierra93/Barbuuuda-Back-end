@@ -1,5 +1,7 @@
-﻿using Barbuuuda.Models.User;
+﻿using Barbuuuda.Models.Entities.Executor;
+using Barbuuuda.Models.User;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Core.Interfaces
@@ -34,5 +36,13 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <returns>Кол-во вопросов.</returns>
         Task<int> GetCountAsync();
+
+        /// <summary>
+        /// Метод проверяет результаты ответов на тест исполнителем.
+        /// </summary>
+        /// <param name="answers">Массив с ответами на тест.</param>
+        /// <param name="userName">Логин юзера.</param>
+        /// <returns>Статус прохождения теста true/false.</returns>
+        Task<bool> CheckAnswersTestAsync(List<AnswerVariant> answers, string userName);
     }
 }

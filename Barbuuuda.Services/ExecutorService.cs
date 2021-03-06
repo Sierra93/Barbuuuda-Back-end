@@ -1,5 +1,6 @@
 ﻿using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Data;
+using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Entities.Executor;
@@ -7,6 +8,7 @@ using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -118,7 +120,7 @@ namespace Barbuuuda.Services
             {
                 if (numberQuestion == 0)
                 {
-                    throw new ArgumentNullException();
+                    throw new UserMessageException(TextException.ERROR_EMPTY_NUMBER_QUESTION);
                 }
 
                 var question = await _postgre.Questions
@@ -140,11 +142,6 @@ namespace Barbuuuda.Services
                 return question;
             }
 
-            catch (ArgumentNullException ex)
-            {
-                throw new ArgumentNullException($"Номер вопроса не передан {ex.Message}");
-            }
-
             catch (Exception ex)
             {
                 throw new Exception(ex.Message.ToString());
@@ -160,6 +157,54 @@ namespace Barbuuuda.Services
             try
             {
                 return await _postgre.Questions.CountAsync();
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод проверяет результаты ответов на тест исполнителем.
+        /// </summary>
+        /// <param name="answers">Массив с ответами на тест.</param>
+        ///  /// <param name="userName">Логин юзера.</param>
+        /// <returns>Статус прохождения теста true/false.</returns>
+        public async Task<bool> CheckAnswersTestAsync(List<AnswerVariant> answers, string userName)
+        {
+            try
+            {
+                if (answers.ToList().Count == 0)
+                {
+                    throw new UserMessageException(TextException.ERROR_EMPTY_INPUT_ARRAY_ANSWERS);
+                }
+
+                // Считает кол-во правильных ответов.
+                int countError = 0;
+                for (int i = 0; i < answers.Count; i++)
+                {
+                    bool? isRight = await _postgre.AnswerVariants
+                        .Where(a => a.AnswerVariantText
+                        .Equals(answers[i].AnswerVariantText))
+                        .Select(s => s.AnswerVariantText[i].IsRight)
+                        .SingleOrDefaultAsync();
+
+                    if (!(bool)!isRight)
+                    {
+                        continue;
+                    }
+
+                    countError++;
+                }
+
+                // Если не все ответы были верными, то тест не пройден.
+                if (!countError.Equals(answers.Count))
+                {
+                    return false;
+                }
+
+                return true;
             }
 
             catch (Exception ex)
