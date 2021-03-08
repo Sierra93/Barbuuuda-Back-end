@@ -183,36 +183,47 @@ namespace Barbuuuda.Services
         {
             try
             {
-                if (answers.ToList().Count == 0)
+                if (answers.Count == 0)
                 {
                     throw new UserMessageException(TextException.ERROR_EMPTY_INPUT_ARRAY_ANSWERS);
                 }
 
                 // Считает кол-во правильных ответов.
-                int countError = 0;
+                List<bool> answersEqual = new List<bool>();   // Массив ошибок.
                 for (int i = 0; i < answers.Count; i++)
                 {
-                    bool? isRight = await _postgre.AnswerVariants
-                        .Where(a => a.AnswerVariantText
+                    // Находит такой ответ в БД.
+                    AnswerVariantEntity answer = await _postgre.AnswerVariants
+                        .Where(a => a.AnswerVariantText[i].AnswerVariantText
                         .Equals(answers[i].AnswerVariantText))
-                        .Select(s => s.AnswerVariantText[i].IsRight)
                         .SingleOrDefaultAsync();
 
-                    if (!(bool)!isRight)
+                    // Заменит флаг правильности с null на false.
+                    if (answers[i].IsRight == null)
                     {
-                        continue;
+                        answers[i].IsRight = false;
                     }
 
-                    countError++;
+                    bool? right = answer?.AnswerVariantText
+                        .Where(a => a.AnswerVariantText
+                        .Equals(answers[i]?.AnswerVariantText))
+                        .Select(s => s?.IsRight)
+                        .SingleOrDefault();
+                    answers[i].IsRight = right;
+
+                    answersEqual.Add((bool)(!(answers[i].IsRight is bool) ? false : answers[i].IsRight));
                 }
 
-                // Если не все ответы были верными, то тест не пройден.
-                if (!countError.Equals(answers.Count))
+                // Если не все ответы были верными, то тест не пройден.  
+                bool isSuccessed = answersEqual.All(a => a.Equals(true));
+
+                // Если исполнитель прошел тест, то проставит ему флаг IsSuccessedTest в true.
+                if (isSuccessed)
                 {
-                    return false;
+                    return true;
                 }
 
-                return true;
+                return false;
             }
 
             catch (Exception ex)
