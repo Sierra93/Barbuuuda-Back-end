@@ -22,12 +22,14 @@ namespace Barbuuuda.Services
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
+        private readonly IUser _user;
 
-        public ExecutorService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden)
+        public ExecutorService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, IUser user)
         {
             _db = db;
             _postgre = postgre;
             _iden = iden;
+            _user = user;
         }
 
         /// <summary>
@@ -190,6 +192,7 @@ namespace Barbuuuda.Services
 
                 // Считает кол-во правильных ответов.
                 List<bool> answersEqual = new List<bool>();   // Массив ошибок.
+
                 for (int i = 0; i < answers.Count; i++)
                 {
                     // Находит такой ответ в БД.
@@ -220,6 +223,10 @@ namespace Barbuuuda.Services
                 // Если исполнитель прошел тест, то проставит ему флаг IsSuccessedTest в true.
                 if (isSuccessed)
                 {
+                    UserEntity user = await _user.GetUserByLogin(userName);
+                    user.IsSuccessedTest = true;
+                    await _postgre.SaveChangesAsync();
+
                     return true;
                 }
 

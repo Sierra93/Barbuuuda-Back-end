@@ -174,9 +174,6 @@ namespace Barbuuuda.Services
                     userId = oUser.Id;
                 }
 
-                // Авторизован ли юзер.
-                bool bAuth = oUser.UserToken != null ? true : false;
-
                 return new { aHeaderFields };
             }
 
@@ -384,6 +381,22 @@ namespace Barbuuuda.Services
             {
                 throw new Exception(ex.Message.ToString());
             }
+        }
+
+        /// <summary>
+        /// Метод находит юзера по его логину.
+        /// </summary>
+        /// <param name="userName">Логин юзера.</param>
+        /// <returns>Объект с данными юзера.</returns>
+        public async Task<UserEntity> GetUserByLogin(string userName)
+        {
+            // Находит юзера, чтобы проставить ему успешное прохождение теста.
+            UserEntity user = await _postgre.Users
+                .Where(u => u.UserName
+                .Equals(userName))
+                .SingleOrDefaultAsync();
+
+            return user;
         }
     }
 }
