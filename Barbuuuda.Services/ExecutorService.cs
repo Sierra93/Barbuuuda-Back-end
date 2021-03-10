@@ -189,17 +189,14 @@ namespace Barbuuuda.Services
                 {
                     throw new UserMessageException(TextException.ERROR_EMPTY_INPUT_ARRAY_ANSWERS);
                 }
+                
+                List<bool> answersEqual = new List<bool>(); 
 
                 // Считает кол-во правильных ответов.
-                List<bool> answersEqual = new List<bool>();   // Массив ошибок.
-
                 for (int i = 0; i < answers.Count; i++)
                 {
-                    // Находит такой ответ в БД.
-                    AnswerVariantEntity answer = await _postgre.AnswerVariants
-                        .Where(a => a.AnswerVariantText[i].AnswerVariantText
-                        .Equals(answers[i].AnswerVariantText))
-                        .SingleOrDefaultAsync();
+                    // Уберет пробелы в начале и в конце.
+                    answers[i].AnswerVariantText = CommonMethodsService.ReplaceSpacesString(answers[i].AnswerVariantText);
 
                     // Заменит флаг правильности с null на false.
                     if (answers[i].IsRight == null)
@@ -207,30 +204,36 @@ namespace Barbuuuda.Services
                         answers[i].IsRight = false;
                     }
 
-                    bool? right = answer?.AnswerVariantText
-                        .Where(a => a.AnswerVariantText
-                        .Equals(answers[i]?.AnswerVariantText))
-                        .Select(s => s?.IsRight)
-                        .SingleOrDefault();
-                    answers[i].IsRight = right;
+                    // Находит такой ответ в БД.
+                    AnswerVariantEntity answer = await _postgre.AnswerVariants
+                        .Where(a => a.QuestionId
+                        .Equals(answers[i].QuestionNumber))
+                        .SingleOrDefaultAsync();
 
-                    answersEqual.Add((bool)(!(answers[i].IsRight is bool) ? false : answers[i].IsRight));
+                    // Выбирает конкретный вариант для проверки правильности.
+                    string rightVariant = answer.AnswerVariantText
+                        .Where(a => a.IsRight.Equals(true))
+                        .Select(a => a.AnswerVariantText)
+                        .FirstOrDefault();
+
+                    answers[i].IsRight = answers[i].AnswerVariantText.Equals(rightVariant);
+                    answersEqual.Add((bool)answers[i].IsRight);
                 }
 
                 // Если не все ответы были верными, то тест не пройден.  
                 bool isSuccessed = answersEqual.All(a => a.Equals(true));
 
-                // Если исполнитель прошел тест, то проставит ему флаг IsSuccessedTest в true.
-                if (isSuccessed)
+                // Если исполнитель не прошел тест.
+                if (!isSuccessed)
                 {
-                    UserEntity user = await _user.GetUserByLogin(userName);
-                    user.IsSuccessedTest = true;
-                    await _postgre.SaveChangesAsync();
-
-                    return true;
+                    return false;
                 }
 
-                return false;
+                UserEntity user = await _user.GetUserByLogin(userName);
+                user.IsSuccessedTest = true;
+                await _postgre.SaveChangesAsync();
+
+                return true;
             }
 
             catch (Exception ex)

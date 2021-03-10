@@ -45,5 +45,11 @@ namespace Barbuuuda.Models.Entities.Executor
         /// Является ли ответ верным.
         /// </summary>
         public bool? IsRight { get; set; }
+
+        /// <summary>
+        /// Номер вопроса.
+        /// </summary>
+        [NotMapped]
+        public int QuestionNumber { get; set; }
     }
 }
