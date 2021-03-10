@@ -1,9 +1,11 @@
 ﻿using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Controllers
@@ -52,15 +54,41 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод получает список вопросов с вариантами ответа для теста исполнителя.
+        /// Метод получает вопрос для теста исполнителя в зависимости от номера вопроса, переданного с фронта.
         /// </summary>
-        /// <returns>Список вопросов с вариантами ответов.</returns>
-        [HttpPost, Route("get-tests")]
-        public async Task<IActionResult> GetExecutorTestAsync()
+        /// <param name="numberQuestion">Номер вопроса.</param>
+        /// <returns>Вопрос с вариантами ответов.</returns>
+        [HttpGet, Route("answer")]
+        public async Task<IActionResult> GetExecutorTestAsync([FromQuery] int numberQuestion)
         {
-            IEnumerable aTests = await _executor.GetExecutorTestAsync();
+            var oQuestion = await _executor.GetQuestionAsync(numberQuestion);
 
-            return Ok(aTests);
+            return Ok(oQuestion);
+        }
+
+        /// <summary>
+        /// Метод получает кол-во вопросов для теста исполнителя.
+        /// </summary>
+        /// <returns>Кол-во вопросов.</returns>
+        [HttpGet, Route("answers-count")]
+        public async Task<IActionResult> GetAnswersCountAsync()
+        {
+            int count = await _executor.GetCountAsync();
+
+            return Ok(count);
+        }
+
+        /// <summary>
+        /// Метод проверяет результаты ответов на тест исполнителем.
+        /// </summary>
+        /// <param name="answers">Массив с ответами на тест.</param>
+        /// <returns>Статус прохождения теста true/false.</returns>
+        [HttpPost, Route("check")]
+        public async Task<IActionResult> CheckAnswersTestAsync([FromBody] List<AnswerVariant> answers)
+        {
+            bool isCheck = await _executor.CheckAnswersTestAsync(answers, GetUserName());
+
+            return Ok(isCheck);
         }
     }
 }

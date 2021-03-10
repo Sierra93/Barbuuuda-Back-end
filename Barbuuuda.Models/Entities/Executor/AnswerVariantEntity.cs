@@ -7,7 +7,7 @@ namespace Barbuuuda.Models.Entities.Executor
     /// Класс модели вариантов ответов к вопросам теста для исполнителей.
     /// </summary>
     [Table("AnswerVariants", Schema = "dbo")]
-    public sealed class AnswerVariant
+    public sealed class AnswerVariantEntity
     {
         [Key, Column("AnswerVariantId")]
         public int AnswerVariantId { get; set; }
@@ -16,7 +16,7 @@ namespace Barbuuuda.Models.Entities.Executor
         /// Массив с вариантами ответов.
         /// </summary>
         [Column("AnswerVariantText", TypeName = "jsonb")]
-        public AnswerVariants[] AnswerVariantText { get; set; }
+        public AnswerVariant[] AnswerVariantText { get; set; }
 
         /// <summary>
         /// Внешний ключ к QuestionId вопроса таблицы Questions.
@@ -29,7 +29,7 @@ namespace Barbuuuda.Models.Entities.Executor
     /// Нужно для столбца вариантов ответов.
     /// </summary>
     [NotMapped]
-    public class AnswerVariants
+    public sealed class AnswerVariant
     {
         /// <summary>
         /// Вариант ответа.
@@ -44,6 +44,12 @@ namespace Barbuuuda.Models.Entities.Executor
         /// <summary>
         /// Является ли ответ верным.
         /// </summary>
-        public bool IsRight { get; set; }
+        public bool? IsRight { get; set; }
+
+        /// <summary>
+        /// Номер вопроса.
+        /// </summary>
+        [NotMapped]
+        public int QuestionNumber { get; set; }
     }
 }

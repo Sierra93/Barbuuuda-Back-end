@@ -1,11 +1,14 @@
 ﻿using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Data;
+using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
+using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,14 +22,16 @@ namespace Barbuuuda.Services
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
+        private readonly IUser _user;
 
-        public ExecutorService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden)
+        public ExecutorService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, IUser user)
         {
             _db = db;
             _postgre = postgre;
             _iden = iden;
+            _user = user;
         }
-       
+
         /// <summary>
         /// Метод выгружает список исполнителей сервиса.
         /// </summary>
@@ -107,23 +112,134 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод получает список вопросов с вариантами ответа для теста исполнителя.
+        /// Метод получает вопрос для теста исполнителя в зависимости от номера вопроса, переданного с фронта.
         /// </summary>
-        /// <returns>Список вопросов с вариантами ответов.</returns>
-        public async Task<IEnumerable> GetExecutorTestAsync()
+        /// <param name="numberQuestion">Номер вопроса.</param>
+        /// <returns>Вопрос с вариантами ответов.</returns>
+        public async Task<object> GetQuestionAsync(int numberQuestion)
         {
-            IEnumerable aTests = await _postgre.Questions
+            try
+            {
+                int count = await _postgre.Questions.CountAsync();
+
+                if (numberQuestion == 0)
+                {
+                    throw new UserMessageException(TextException.ERROR_EMPTY_NUMBER_QUESTION);
+                }
+
+                // Если номер вопроса некорректный.
+                if (numberQuestion > count)
+                {
+                    throw new ErrorRangeAnswerException(numberQuestion);
+                }
+
+                var question = await _postgre.Questions
                 .Join(_postgre.AnswerVariants,
                 t1 => t1.QuestionId,
                 t2 => t2.QuestionId,
-                (t1, t2) => new {
-                    t1.QuestionId,
+                (t1, t2) => new
+                {
                     t1.QuestionText,
+                    t1.NumberQuestion,
                     t2.AnswerVariantText
                 })
-                .ToListAsync();
+                .Where(q => q.NumberQuestion == numberQuestion)
+                .FirstOrDefaultAsync();
 
-            return aTests;
+                // Затирает верные ответы, чтобы фронт их не видел.
+                question.AnswerVariantText.ToList().ForEach(el => el.IsRight = null);
+
+                return question;
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод получает кол-во вопросов для теста исполнителя.
+        /// </summary>
+        /// <returns>Кол-во вопросов.</returns>
+        public async Task<int> GetCountAsync()
+        {
+            try
+            {
+                return await _postgre.Questions.CountAsync();
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод проверяет результаты ответов на тест исполнителем.
+        /// </summary>
+        /// <param name="answers">Массив с ответами на тест.</param>
+        ///  /// <param name="userName">Логин юзера.</param>
+        /// <returns>Статус прохождения теста true/false.</returns>
+        public async Task<bool> CheckAnswersTestAsync(List<AnswerVariant> answers, string userName)
+        {
+            try
+            {
+                if (answers.Count == 0)
+                {
+                    throw new UserMessageException(TextException.ERROR_EMPTY_INPUT_ARRAY_ANSWERS);
+                }
+                
+                List<bool> answersEqual = new List<bool>(); 
+
+                // Считает кол-во правильных ответов.
+                for (int i = 0; i < answers.Count; i++)
+                {
+                    // Уберет пробелы в начале и в конце.
+                    answers[i].AnswerVariantText = CommonMethodsService.ReplaceSpacesString(answers[i].AnswerVariantText);
+
+                    // Заменит флаг правильности с null на false.
+                    if (answers[i].IsRight == null)
+                    {
+                        answers[i].IsRight = false;
+                    }
+
+                    // Находит такой ответ в БД.
+                    AnswerVariantEntity answer = await _postgre.AnswerVariants
+                        .Where(a => a.QuestionId
+                        .Equals(answers[i].QuestionNumber))
+                        .SingleOrDefaultAsync();
+
+                    // Выбирает конкретный вариант для проверки правильности.
+                    string rightVariant = answer.AnswerVariantText
+                        .Where(a => a.IsRight.Equals(true))
+                        .Select(a => a.AnswerVariantText)
+                        .FirstOrDefault();
+
+                    answers[i].IsRight = answers[i].AnswerVariantText.Equals(rightVariant);
+                    answersEqual.Add((bool)answers[i].IsRight);
+                }
+
+                // Если не все ответы были верными, то тест не пройден.  
+                bool isSuccessed = answersEqual.All(a => a.Equals(true));
+
+                // Если исполнитель не прошел тест.
+                if (!isSuccessed)
+                {
+                    return false;
+                }
+
+                UserEntity user = await _user.GetUserByLogin(userName);
+                user.IsSuccessedTest = true;
+                await _postgre.SaveChangesAsync();
+
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
         }
     }
 }

@@ -37,6 +37,8 @@ namespace Barbuuuda
                 builder.WithOrigins(
                     "https://testdevi.site",
                     "https://testdevi.site/",
+                    "https://barbuuuda.ru",
+                    "https://barbuuuda.ru/",
                     "http://localhost:8080/",
                     "http://localhost:8080")
                 .AllowAnyMethod().AllowAnyHeader();
@@ -146,7 +148,7 @@ namespace Barbuuuda
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Documents API");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Barbuuuda API");
             });
         }
     }

@@ -42,11 +42,25 @@
             </summary>
             <param name="specializations">Массив специализаций.</param>             
         </member>
-        <member name="M:Barbuuuda.Controllers.ExecutorController.GetExecutorTestAsync">
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetExecutorTestAsync(System.Int32)">
             <summary>
-            Метод получает список вопросов с вариантами ответа для теста исполнителя.
+            Метод получает вопрос для теста исполнителя в зависимости от номера вопроса, переданного с фронта.
             </summary>
-            <returns>Список вопросов с вариантами ответов.</returns>
+            <param name="numberQuestion">Номер вопроса.</param>
+            <returns>Вопрос с вариантами ответов.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetAnswersCountAsync">
+            <summary>
+            Метод получает кол-во вопросов для теста исполнителя.
+            </summary>
+            <returns>Кол-во вопросов.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.CheckAnswersTestAsync(System.Collections.Generic.List{Barbuuuda.Models.Entities.Executor.AnswerVariant})">
+            <summary>
+            Метод проверяет результаты ответов на тест исполнителем.
+            </summary>
+            <param name="answers">Массив с ответами на тест.</param>
+            <returns>Статус прохождения теста true/false.</returns>
         </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>
@@ -280,7 +294,6 @@
             <summary>
             Метод обновляет токен юзеру.
             </summary>
-            <param name="userName">Имя юзера.</param>
             <returns>Строка токена.</returns>
         </member>
     </members>

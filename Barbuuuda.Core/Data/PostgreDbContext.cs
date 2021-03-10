@@ -24,7 +24,7 @@ namespace Barbuuuda.Core.Data
 
         public DbSet<QuestionEntity> Questions { get; set; }    // Таблица вопросов для теста исполнителей.
 
-        public DbSet<AnswerVariant> AnswerVariants { get; set; }    // Таблица ответов к тестам исполнителей.
+        public DbSet<AnswerVariantEntity> AnswerVariants { get; set; }    // Таблица ответов к тестам исполнителей.
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }
     }

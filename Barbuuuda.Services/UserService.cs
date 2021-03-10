@@ -122,17 +122,17 @@ namespace Barbuuuda.Services
         /// Метод запишет токен юзера в БД.
         /// </summary>
         /// <param name="token">Токен юзера.</param>
-        private async Task SetUserToken(string token, string username)
-        {
-            UserEntity oUser = await _iden.AspNetUsers
-                .Where(u => u.UserName
-                .Equals(username))
-                .FirstOrDefaultAsync();
+        //private async Task SetUserToken(string token, string username)
+        //{
+        //    UserEntity oUser = await _iden.AspNetUsers
+        //        .Where(u => u.UserName
+        //        .Equals(username))
+        //        .FirstOrDefaultAsync();
 
-            // Запишет токен.
-            oUser.UserToken = token;
-            await _iden.SaveChangesAsync();
-        }
+        //    // Запишет токен.
+        //    oUser.UserToken = token;
+        //    await _iden.SaveChangesAsync();
+        //}
 
         private ClaimsIdentity GetClaim(string username)
         {
@@ -173,9 +173,6 @@ namespace Barbuuuda.Services
                 {
                     userId = oUser.Id;
                 }
-
-                // Авторизован ли юзер.
-                bool bAuth = oUser.UserToken != null ? true : false;
 
                 return new { aHeaderFields };
             }
@@ -384,6 +381,22 @@ namespace Barbuuuda.Services
             {
                 throw new Exception(ex.Message.ToString());
             }
+        }
+
+        /// <summary>
+        /// Метод находит юзера по его логину.
+        /// </summary>
+        /// <param name="userName">Логин юзера.</param>
+        /// <returns>Объект с данными юзера.</returns>
+        public async Task<UserEntity> GetUserByLogin(string userName)
+        {
+            // Находит юзера, чтобы проставить ему успешное прохождение теста.
+            UserEntity user = await _postgre.Users
+                .Where(u => u.UserName
+                .Equals(userName))
+                .SingleOrDefaultAsync();
+
+            return user;
         }
     }
 }

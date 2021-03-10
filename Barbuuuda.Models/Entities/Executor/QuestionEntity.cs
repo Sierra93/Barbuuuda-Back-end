@@ -17,5 +17,11 @@ namespace Barbuuuda.Models.Entities.Executor
         /// </summary>
         [Column("QuestionText", TypeName = "nvarchar(max)")]
         public string QuestionText { get; set; }
+
+        /// <summary>
+        /// Номер вопроса, который нужно получить.
+        /// </summary>
+        [Column("NumberQuestion", TypeName = "integer")]
+        public int NumberQuestion { get; set; }
     }
 }

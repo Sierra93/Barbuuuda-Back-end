@@ -176,13 +176,11 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод обновляет токен юзеру.
         /// </summary>
-        /// <param name="userName">Имя юзера.</param>
         /// <returns>Строка токена.</returns>
-        [AllowAnonymous]
         [HttpGet, Route("token")]
         public async Task<IActionResult> RefreshToken([FromQuery] string userName)
         {
-            string sToken = await _user.GenerateToken(userName);
+            string sToken = await _user.GenerateToken(userName ?? GetUserName() ?? null);
 
             return Ok(sToken);
         }

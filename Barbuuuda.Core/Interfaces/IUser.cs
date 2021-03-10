@@ -48,5 +48,12 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="claimsIdentity">Объект полномочий.</param>
         /// <returns>Строку токена.</returns>
         Task<string> GenerateToken(string userName);
+
+        /// <summary>
+        /// Метод находит юзера по его логину.
+        /// </summary>
+        /// <param name="userName">Логин юзера.</param>
+        /// <returns>Объект с данными юзера.</returns>
+        Task<UserEntity> GetUserByLogin(string userName);
     }
 }
