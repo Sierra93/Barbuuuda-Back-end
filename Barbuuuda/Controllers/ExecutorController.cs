@@ -90,5 +90,17 @@ namespace Barbuuuda.Controllers
 
             return Ok(isCheck);
         }
+
+        /// <summary>
+        /// Метод выгружает задания, которые находятся в работе у исполнителя. Т.е у которых статус "В работе".
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        [HttpPost, Route("tasks-work")]
+        public async Task<IActionResult> GetTasksWork()
+        {
+            IEnumerable tasks = await _executor.GetTasksWork(GetUserName());
+
+            return Ok(tasks);
+        }
     }
 }

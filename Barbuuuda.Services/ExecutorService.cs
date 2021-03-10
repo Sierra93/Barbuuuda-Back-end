@@ -89,6 +89,8 @@ namespace Barbuuuda.Services
 
             catch (Exception ex)
             {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogError();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -154,6 +156,8 @@ namespace Barbuuuda.Services
 
             catch (Exception ex)
             {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogError();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -171,6 +175,8 @@ namespace Barbuuuda.Services
 
             catch (Exception ex)
             {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogError();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -238,6 +244,55 @@ namespace Barbuuuda.Services
 
             catch (Exception ex)
             {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogError();
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод выгружает задания, которые находятся в работе у исполнителя. Т.е у которых статус "В работе".
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        public async Task<IEnumerable> GetTasksWork(string userName)
+        {
+            try
+            {
+                UserEntity user = await _user.GetUserByLogin(userName);
+
+                return await (from tasks in _postgre.Tasks
+                              join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                              join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                              join users in _postgre.Users on tasks.OwnerId equals users.Id
+                              where statuses.StatusName.Equals(StatusTask.IN_WORK)
+                              where users.Id.Equals(user.Id)
+                              select new
+                              {
+                                  tasks.CategoryCode,
+                                  tasks.CountOffers,
+                                  tasks.CountViews,
+                                  tasks.OwnerId,
+                                  tasks.SpecCode,
+                                  categories.CategoryName,
+                                  tasks.StatusCode,
+                                  statuses.StatusName,
+                                  taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                  taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                  tasks.TaskTitle,
+                                  tasks.TaskDetail,
+                                  tasks.TaskId,
+                                  taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                  tasks.TypeCode,
+                                  userName
+                              })
+                          .OrderBy(o => o.TaskId)
+                          .ToListAsync();
+            }
+
+            catch (Exception ex)
+            {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogError();
                 throw new Exception(ex.Message.ToString());
             }
         }

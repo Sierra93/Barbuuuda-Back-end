@@ -17,7 +17,6 @@ namespace Barbuuuda.Core.Interfaces
         /// <returns>Список исполнителей.</returns>
         Task<IEnumerable> GetExecutorListAsync();
 
-
         /// <summary>
         /// Метод добавляет специализации исполнителя.
         /// </summary>
@@ -44,5 +43,11 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="userName">Логин юзера.</param>
         /// <returns>Статус прохождения теста true/false.</returns>
         Task<bool> CheckAnswersTestAsync(List<AnswerVariant> answers, string userName);
+
+        /// <summary>
+        /// Метод выгружает задания, которые находятся в работе у исполнителя. Т.е у которых статус "В работе".
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        Task<IEnumerable> GetTasksWork(string userName);
     }
 }
