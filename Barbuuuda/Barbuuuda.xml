@@ -62,6 +62,12 @@
             <param name="answers">Массив с ответами на тест.</param>
             <returns>Статус прохождения теста true/false.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetTasksWork">
+            <summary>
+            Метод выгружает задания, которые находятся в работе у исполнителя. Т.е у которых статус "В работе".
+            </summary>
+            <returns>Список заданий.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>
             Контроллер главной страницы.
