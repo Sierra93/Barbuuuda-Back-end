@@ -1,6 +1,7 @@
 ﻿using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Enums;
+using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Task;
@@ -22,12 +23,14 @@ namespace Barbuuuda.Services
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
+        private readonly IUser _user;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, IUser user)
         {
             _db = db;
             _postgre = postgre;
             _iden = iden;
+            _user = user;
         }
 
         /// <summary>
@@ -670,7 +673,6 @@ namespace Barbuuuda.Services
         {
             try
             {
-                int countTotal = await GetStatusName(StatusTask.TOTAL);
                 int countAuction = await GetStatusName(StatusTask.AUCTION);
                 int countWork = await GetStatusName(StatusTask.IN_WORK);
                 int countGarant = await GetStatusName(StatusTask.GARANT);
@@ -680,7 +682,6 @@ namespace Barbuuuda.Services
 
                 return new
                 {
-                    total = countTotal,
                     auction = countAuction,
                     work = countWork,
                     garant = countGarant,
@@ -780,19 +781,17 @@ namespace Barbuuuda.Services
         {
             try
             {
-                string userId = await GetUserLoginById(userName);
+                UserEntity user = await _user.GetUserByLogin(userName);
 
-                return !string.IsNullOrEmpty(userName) ?
-                    await _postgre.Tasks
-                    .Where(t => t.OwnerId.Equals(userId))
-                    .CountAsync() : throw new ArgumentNullException();
-            }
+                if (user.Id == null)
+                {
+                    throw new NotFoundUserException(userName);
+                }
 
-            catch (ArgumentNullException ex)
-            {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                await _logger.LogError();
-                throw new ArgumentNullException($"Id не передан {ex.Message}");
+                return await _postgre.Tasks
+                    .Where(t => t.OwnerId
+                    .Equals(user.Id))
+                    .CountAsync();
             }
 
             catch (Exception ex)

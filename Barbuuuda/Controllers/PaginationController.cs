@@ -2,7 +2,6 @@
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Outpoot;
 using Barbuuuda.Models.User;
-using Barbuuuda.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,15 +22,17 @@ namespace Barbuuuda.Controllers
         private readonly IdentityDbContext _iden;
         private readonly UserManager<UserEntity> _userManager;
         private readonly SignInManager<UserEntity> _signInManager;
+        private readonly ITask _task;
         public static string Module => "Barbuuuda.Pagination";
 
-        public PaginationController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager) : base(Module)
+        public PaginationController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager, ITask task) : base(Module)
         {
             _db = db;
             _postgre = postgre;
             _userManager = userManager;
             _signInManager = signInManager;
             _iden = iden;
+            _task = task;
         }
 
         /// <summary>
@@ -43,7 +44,6 @@ namespace Barbuuuda.Controllers
         public async Task<IActionResult> GetPaginationTasks(int pageIdx = 1)
         {            
             int countTasksPage = 5;   // Кол-во заданий на странице.
-            ITask _task = new TaskService(_db, _postgre, _iden);
             string userId = await _task.GetUserByName(GetUserName());
 
             var aTasks = (from tasks in _postgre.Tasks
