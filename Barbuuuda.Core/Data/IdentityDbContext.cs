@@ -1,14 +1,12 @@
 ﻿using Barbuuuda.Models.User;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Data;
 
 namespace Barbuuuda.Core.Data
 {
+    /// <summary>
+    /// Класс представляет контекст для работы с PostgreSQL именно с таблицами Identity.
+    /// </summary>
     public sealed class IdentityDbContext : IdentityDbContext<UserEntity>
     {
         public DbSet<UserEntity> AspNetUsers { get; set; }

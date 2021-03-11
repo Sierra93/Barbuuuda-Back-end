@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Barbuuuda.Models.User
 {
@@ -65,9 +62,21 @@ namespace Barbuuuda.Models.User
         public string Gender { get; set; }    // M - мужчина, F - женщина.
 
         [Column("RememberMe", TypeName = "boolean")]
-        public bool RememberMe { get; set; }
+        public bool RememberMe { get; set; }        
 
-        [Column("UserToken", TypeName = "text")]
-        public string UserToken { get; set; }   // Токен юзера.
+        [Column("ExecutorSpecializations", TypeName = "jsonb")]
+        public ExecutorSpecialization[] Specializations { get; set; }
+
+        [Column("IsSuccessedTest", TypeName = "bool")]
+        public bool IsSuccessedTest { get; set; }   // Пройден ли тест.
+    }
+
+    /// <summary>
+    /// Класс сопоставляется с json столбцом специализаций таблицы юзеров (Используется только для исполнителей).
+    /// </summary>
+    [NotMapped]
+    public sealed class ExecutorSpecialization
+    {
+        public string SpecName { get; set; }
     }
 }

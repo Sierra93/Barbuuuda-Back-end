@@ -1,10 +1,6 @@
 ﻿using Barbuuuda.Core.Data;
-using Barbuuuda.Models.Task;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Barbuuuda.Tests
 {
