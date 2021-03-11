@@ -1,9 +1,5 @@
-﻿using Barbuuuda.Core.Data;
-using Barbuuuda.Core.Interfaces;
+﻿using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Task;
-using Barbuuuda.Models.User;
-using Barbuuuda.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections;
