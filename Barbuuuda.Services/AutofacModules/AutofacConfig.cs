@@ -1,11 +1,10 @@
 ﻿using Autofac;
 using Barbuuuda.Core.Interfaces;
-using Barbuuuda.Services;
 
-namespace Barbuuuda.AutofacModules
+namespace Barbuuuda.Services.AutofacModules
 {
     /// <summary>
-    /// Конфигурация Autofac, в которой ругистрируются все сервисы.
+    /// Конфигурация Autofac, в которой регистрируются все сервисы.
     /// </summary>
     public class AutofacConfig : Module
     {
@@ -23,9 +22,8 @@ namespace Barbuuuda.AutofacModules
             // Сервис исполнителя.
             builder.RegisterType<ExecutorService>().As<IExecutor>();
 
-            // TODO: когда будет проведен рефакторинг контроллера, вернуться сюда.
             // Сервис пагинации.
-            //builder.RegisterType<ExecutorService>().As<IPagination>();
+            builder.RegisterType<PaginationService>().As<IPagination>();
         }
     }
 }
