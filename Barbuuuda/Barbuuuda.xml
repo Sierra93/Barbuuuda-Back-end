@@ -57,11 +57,17 @@
             <param name="answers">Массив с ответами на тест.</param>
             <returns>Статус прохождения теста true/false.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.ExecutorController.GetTasksWork">
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetTasksWorkAsync">
             <summary>
             Метод выгружает задания, которые находятся в работе у исполнителя. Т.е у которых статус "В работе".
             </summary>
             <returns>Список заданий.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.RespondAsync(Barbuuuda.Models.Executor.Input.TaskInput)">
+            <summary>
+            Метод оставляет ставку к заданию.
+            </summary>
+            <param name="taskInput">Входная модель.</param>
         </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>

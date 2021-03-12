@@ -1,5 +1,7 @@
 ﻿using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Entities.Executor;
+using Barbuuuda.Models.Executor.Input;
+using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -96,11 +98,23 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <returns>Список заданий.</returns>
         [HttpPost, Route("tasks-work")]
-        public async Task<IActionResult> GetTasksWork()
+        public async Task<IActionResult> GetTasksWorkAsync()
         {
-            IEnumerable tasks = await _executor.GetTasksWork(GetUserName());
+            IEnumerable tasks = await _executor.GetTasksWorkAsync(GetUserName());
 
             return Ok(tasks);
+        }
+
+        /// <summary>
+        /// Метод оставляет ставку к заданию.
+        /// </summary>
+        /// <param name="taskInput">Входная модель.</param>
+        [HttpPost, Route("respond")]
+        public async Task<IActionResult> RespondAsync([FromBody] TaskInput taskInput)
+        {
+            await _executor.RespondAsync(taskInput.TaskId, GetUserName());
+
+            return Ok();
         }
     }
 }
