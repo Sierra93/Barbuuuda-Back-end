@@ -3,6 +3,7 @@ using Barbuuuda.Models.Outpoot;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Controllers
@@ -35,6 +36,19 @@ namespace Barbuuuda.Controllers
         public async Task<IActionResult> GetPaginationTasks(int pageIdx = 1)
         {
             IndexOutpoot paginationData = await _pagination.GetPaginationTasks(pageIdx, GetUserName());
+
+            return Ok(paginationData);
+        }
+
+        /// <summary>
+        /// Метод пагинации аукциона.
+        /// </summary>
+        /// <param name="pageIdx"></param>
+        /// <returns>Данные пагинации.</returns>
+        [HttpPost, Route("auction")]
+        public async Task<IActionResult> GetPaginationAuction([FromQuery] int pageIdx)
+        {
+            var paginationData = await _pagination.GetPaginationAuction(pageIdx);
 
             return Ok(paginationData);
         }

@@ -15,5 +15,12 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="userName">Имя юзера.</param>
         /// <returns>Данные пагинации.</returns>
         Task<IndexOutpoot> GetPaginationTasks(int pageIdx, string userName);
+
+        /// <summary>
+        /// Метод пагинации аукциона.
+        /// </summary>
+        /// <param name="pageIdx"></param>
+        /// <returns>Данные пагинации.</returns>
+        Task<IndexOutpoot> GetPaginationAuction(int pageIdx);
     }
 }

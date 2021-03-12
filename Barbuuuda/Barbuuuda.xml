@@ -138,6 +138,13 @@
             <param name="pageIdx">Номер страницы. По дефолту 1.</param>
             <returns>Данные пагинации.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.PaginationController.GetPaginationAuction(System.Int32)">
+            <summary>
+            Метод пагинации аукциона.
+            </summary>
+            <param name="pageIdx"></param>
+            <returns>Данные пагинации.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.TaskController">
             <summary>
             Контроллер содержит логику работы с заданиями.
