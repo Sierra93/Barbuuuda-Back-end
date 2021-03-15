@@ -4,6 +4,7 @@ using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Entities.Executor;
+using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -254,7 +255,7 @@ namespace Barbuuuda.Services
         /// Метод выгружает задания, которые находятся в работе у исполнителя. Т.е у которых статус "В работе".
         /// </summary>
         /// <returns>Список заданий.</returns>
-        public async Task<IEnumerable> GetTasksWork(string userName)
+        public async Task<IEnumerable> GetTasksWorkAsync(string userName)
         {
             try
             {
@@ -293,6 +294,43 @@ namespace Barbuuuda.Services
             {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 _ = _logger.LogError();
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод оставляет ставку к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания, к которому оставляют ставку.</param>
+        /// <param name="userName">Имя юзера.</param>
+        public async Task RespondAsync(int taskId, string userName)
+        {
+            try
+            {
+                if (taskId == 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                // Находит Id юзера.
+                UserEntity user = await _user.GetUserByLogin(userName);
+
+                // Находит задание по его TaskId.
+                TaskEntity task = await _postgre.Tasks.Where(t => t.TaskId.Equals(taskId)).FirstOrDefaultAsync();
+
+                if (task == null)
+                {
+                    throw new NotFoundTaskIdException(taskId);
+                }
+
+                // Проставит ставку к заданию.
+                task.TaskMembers.Add(user.Id);
+                _postgre.Tasks.Update(task);
+                await _postgre.SaveChangesAsync();
+            }
+
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message.ToString());
             }
         }

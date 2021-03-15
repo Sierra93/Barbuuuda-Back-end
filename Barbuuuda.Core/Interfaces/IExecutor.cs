@@ -48,6 +48,13 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод выгружает задания, которые находятся в работе у исполнителя. Т.е у которых статус "В работе".
         /// </summary>
         /// <returns>Список заданий.</returns>
-        Task<IEnumerable> GetTasksWork(string userName);
+        Task<IEnumerable> GetTasksWorkAsync(string userName);
+
+        /// <summary>
+        /// Метод оставляет ставку к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания, к которому оставляют ставку.</param>
+        /// <param name="userName">Имя юзера.</param>
+        Task RespondAsync(int taskId, string userName);
     }
 }
