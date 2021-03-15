@@ -240,7 +240,7 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }               
 
-                if (!type.Equals(TaskParam.ALL) && !type.Equals(TaskParam.SINGLE))
+                if (!type.Equals(GetTaskTypeEnum.All) && !type.Equals(GetTaskTypeEnum.Single))
                 {
                     throw new NotParameterException(type);
                 }
