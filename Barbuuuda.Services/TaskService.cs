@@ -227,6 +227,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userName">Login заказчика.</param>
         /// <param name="type">Параметр получения заданий либо все либо одно.</param>
+        /// <param name="taskId">TaskId задания, которое нужно получить.</param>
         /// <returns>Коллекция заданий.</returns>
         public async Task<IList> GetTasksList(string userName, int? taskId, string type)
         {
@@ -237,6 +238,11 @@ namespace Barbuuuda.Services
                 if (string.IsNullOrEmpty(userName))
                 {
                     throw new ArgumentNullException();
+                }               
+
+                if (!type.Equals(TaskParam.ALL) && !type.Equals(TaskParam.SINGLE))
+                {
+                    throw new NotParameterException(type);
                 }
 
                 // Вернет либо все задания либо одно.
