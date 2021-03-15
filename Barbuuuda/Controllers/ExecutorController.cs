@@ -1,7 +1,6 @@
 ﻿using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.Executor.Input;
-using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

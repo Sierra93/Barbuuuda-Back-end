@@ -240,13 +240,13 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }               
 
-                if (!type.Equals(GetTaskTypeEnum.All) && !type.Equals(GetTaskTypeEnum.Single))
+                if (!type.Equals(TaskType.ALL) && !type.Equals(TaskType.SINGLE))
                 {
                     throw new NotParameterException(type);
                 }
 
                 // Вернет либо все задания либо одно.
-                return aResultTaskObj = type.Equals(GetTaskTypeEnum.All.ToString())
+                return aResultTaskObj = type.Equals(TaskType.ALL)
                     ? aResultTaskObj = await GetAllTasks(userName)
                     : aResultTaskObj = await GetSingleTask(userName, taskId);
             }
