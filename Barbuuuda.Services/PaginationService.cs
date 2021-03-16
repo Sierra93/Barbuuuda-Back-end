@@ -1,6 +1,6 @@
 ﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
-using Barbuuuda.Models.Outpoot;
+using Barbuuuda.Models.Pagination.Outpoot;
 using Barbuuuda.Models.User;
 using System.Threading.Tasks;
 using System.Linq;
