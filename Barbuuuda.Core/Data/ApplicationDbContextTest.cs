@@ -1,5 +1,4 @@
-﻿using Barbuuuda.Models.Entities.Knowlege;
-using Barbuuuda.Models.Logger;
+﻿using Barbuuuda.Models.Logger;
 using Barbuuuda.Models.MainPage;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
@@ -8,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Barbuuuda.Core.Data
 {
     /// <summary>
-    /// Класс контекста БД MSSQL.
+    /// Класс контекста тестовой БД.
     /// </summary>
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContextTest : DbContext
     {
         public DbSet<LoggerEntity> Logs { get; set; }   // Таблица логов.
 
@@ -34,11 +33,7 @@ namespace Barbuuuda.Core.Data
 
         public DbSet<HopeEntity> Hopes { get; set; }  // Таблица НАДЕЕМСЯ НА ДОЛГОЕ СОТРУДНИЧЕСТВО.
 
-        public DbSet<KnowlegeCategoryEntity> KnowlegeCategories { get; set; }   // Таблица категорий в БЗ.
-
-        public DbSet<KnowlegeArticleEntity> KnowlegeArticles { get; set; }  // Таблица статей БЗ.
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        public ApplicationDbContextTest(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }
     }

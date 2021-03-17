@@ -1,12 +1,12 @@
 ﻿using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Barbuuuda.Core.Data
 {
+    /// <summary>
+    /// Класс контекста БД PostgreSQL.
+    /// </summary>
     public class PostgreDbContext : DbContext
     {
         public DbSet<UserEntity> Users { get; set; }    // Таблица информации аккаунтов пользователей.
