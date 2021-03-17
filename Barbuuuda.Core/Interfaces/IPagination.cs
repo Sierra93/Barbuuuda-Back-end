@@ -1,4 +1,4 @@
-﻿using Barbuuuda.Models.Outpoot;
+﻿using Barbuuuda.Models.Pagination.Outpoot;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Core.Interfaces

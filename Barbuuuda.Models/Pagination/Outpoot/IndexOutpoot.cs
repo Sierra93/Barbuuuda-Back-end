@@ -1,10 +1,7 @@
-﻿using Barbuuuda.Models.Task;
-using System;
+﻿using Barbuuuda.Models.Pagination.Outpoot;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Barbuuuda.Models.Outpoot
+namespace Barbuuuda.Models.Pagination.Outpoot
 {
     /// <summary>
     /// Класс с информацией о пагинации.

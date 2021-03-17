@@ -1,7 +1,6 @@
 ﻿using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.Executor.Input;
-using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -110,7 +109,7 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <param name="taskInput">Входная модель.</param>
         [HttpPost, Route("respond")]
-        public async Task<IActionResult> RespondAsync([FromBody] TaskInput taskInput)
+        public async Task<IActionResult> RespondTaskAsync([FromBody] TaskInput taskInput)
         {
             await _executor.RespondAsync(taskInput.TaskId, GetUserName());
 
