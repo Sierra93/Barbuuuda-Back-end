@@ -48,15 +48,15 @@ namespace Barbuuuda
               options.UseSqlServer(
                   Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-             options.UseSqlServer(
-                 Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            // options.UseSqlServer(
+            //     Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
             services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
         opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-        opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+        //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
+        //opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
             services.AddDbContext<IdentityDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
