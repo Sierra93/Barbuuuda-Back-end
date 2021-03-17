@@ -1,9 +1,7 @@
-﻿using Barbuuuda.Models.User;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Barbuuuda.Models.Task
 {
@@ -16,43 +14,88 @@ namespace Barbuuuda.Models.Task
         [Key, Column("TaskId")]
         public int TaskId { get; set; }
 
+        /// <summary>
+        /// Id заказчика, который создал задание.
+        /// </summary>
         [Required, Column("OwnerId", TypeName = "varchar(150)")]
-        public string OwnerId { get; set; }    // Id заказчика, который создал задание.
+        public string OwnerId { get; set; }
 
+        /// <summary>
+        /// Id исполнителя, который выполняет задание.
+        /// </summary>
         [Column("ExecutorId", TypeName = "varchar(150)")]
-        public string ExecutorId { get; set; }  // Id исполнителя, который выполняет задание.
+        public string ExecutorId { get; set; }
 
+        /// <summary>
+        /// Дата создания задачи.
+        /// </summary>
         [Column("TaskBegda", TypeName = "timestamp")]
-        public DateTime TaskBegda { get; set; }    // Дата создания задачи.
+        public DateTime TaskBegda { get; set; }
 
+        /// <summary>
+        /// Дата завершения задачи.
+        /// </summary>
         [Column("TaskEndda", TypeName = "timestamp")]
-        public DateTime TaskEndda { get; set; }    // Дата завершения задачи.
+        public DateTime TaskEndda { get; set; }
 
+        /// <summary>
+        /// Кол-во ставок к заданию.
+        /// </summary>
         [Column("CountOffers", TypeName = "integer")]
-        public int CountOffers { get; set; }    // Кол-во ставок к заданию.
+        public int CountOffers { get; set; }
 
+        /// <summary>
+        /// Кол-во просмотров задания.
+        /// </summary>
         [Column("CountViews", TypeName = "integer")]
-        public int CountViews { get; set; }     // Кол-во просмотров задания.
+        public int CountViews { get; set; }
 
+        /// <summary>
+        /// Код типа заданий (для всех, для про).
+        /// </summary>
         [Column("TypeCode", TypeName = "varchar(100)")]
-        public string TypeCode { get; set; } // Код типа заданий (для всех, для про).
+        public string TypeCode { get; set; }
 
+        /// <summary>
+        /// Код статуса задания.
+        /// </summary>
         [Column("StatusCode", TypeName = "varchar(100)")]
-        public string StatusCode { get; set; }   // Код статуса задания.
+        public string StatusCode { get; set; }
 
+        /// <summary>
+        /// Код категории задания (программирование и тд).
+        /// </summary>
         [Column("CategoryCode", TypeName = "varchar(100)")]
-        public string CategoryCode { get; set; }     // Код категории задания (программирование и тд).
+        public string CategoryCode { get; set; }
 
+        /// <summary>
+        /// Бюджет задания в цифрах либо по дефолту "По договоренности".
+        /// </summary>
         [Column("TaskPrice", TypeName = "numeric(12,2)")]
-        public decimal? TaskPrice { get; set; }   // Бюджет задания в цифрах либо по дефолту "По договоренности".
+        public decimal? TaskPrice { get; set; }
 
+        /// <summary>
+        /// Заголовок задания.
+        /// </summary>
         [Column("TaskTitle", TypeName = "text")]
-        public string TaskTitle { get; set; }   // Заголовок задания.
+        public string TaskTitle { get; set; }
 
+        /// <summary>
+        /// Описание задания.
+        /// </summary>
         [Column("TaskDetail", TypeName = "text")]
-        public string TaskDetail { get; set; }  // Описание задания.
+        public string TaskDetail { get; set; }
 
+        /// <summary>
+        /// Код специализации.   
+        /// </summary>
         [Column("SpecCode", TypeName = "varchar(100)")]
-        public string SpecCode { get; set; }    // Код специализации.        
+        public string SpecCode { get; set; }     
+        
+        /// <summary>
+        /// Массив исполнителей, которые сделали ставку к заданию.
+        /// </summary>
+        [Column("TaskMembers", TypeName = "jsonb")]
+        public List<string> TaskMembers { get; set; }
     }
 }

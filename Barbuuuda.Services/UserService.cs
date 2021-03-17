@@ -1,8 +1,6 @@
 ﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
-using Barbuuuda.Core.ViewModels.User;
-using Barbuuuda.Emails;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,19 +17,17 @@ namespace Barbuuuda.Services
     /// <summary>
     /// Сервис реализует методы пользователя.
     /// </summary>
-    public class UserService : IUser
+    public sealed class UserService : IUser
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
-        private readonly UserManager<UserEntity> _userManager;
         private readonly SignInManager<UserEntity> _signInManager;
 
-        public UserService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
+        public UserService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, SignInManager<UserEntity> signInManager)
         {
             _db = db;
             _postgre = postgre;
-            _userManager = userManager;
             _signInManager = signInManager;
             _iden = iden;
         }
@@ -46,23 +42,23 @@ namespace Barbuuuda.Services
             try
             {
                 // Авторизует юзера.
-                var oAuth = await _signInManager.PasswordSignInAsync(user.UserName, user.UserPassword, user.RememberMe, false);
-
-                // Выбирает роли юзера.
-                IList<string> aRoles = await GetUserRole(user.UserName);
+                var oAuth = await _signInManager.PasswordSignInAsync(user.UserName, user.UserPassword, user.RememberMe, false);                
 
                 // Если авторизация успешна.
                 if (oAuth.Succeeded)
                 {
-                    string sToken = await GetToken(user); // Генерит токен юзеру.
+                    ClaimsIdentity oClaim = GetIdentityClaim(user);
+
+                    // Выбирает роли юзера.
+                    IEnumerable<string> aRoles = await GetUserRole(user.UserName);
+
+                    // Генерит токен юзеру.
+                    string sToken = GenerateToken(oClaim).Result;
 
                     return new
                     {
-                        oAuth.Succeeded,
-                        oAuth.IsLockedOut,
-                        user = user.UserName,
+                        user = oClaim.Name,
                         userToken = sToken,
-                        userId = user.Id,
                         role = aRoles
                     };
                 }
@@ -114,39 +110,29 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
         /// <returns>Токен юзера.</returns>
-        private async Task<string> GetToken(UserEntity user)
+        private ClaimsIdentity GetIdentityClaim(UserEntity user)
         {
-            ClaimsIdentity oClaim = GetClaim(user.UserName);
-            var now = DateTime.UtcNow;
-            var jwt = new JwtSecurityToken(
-                issuer: AuthOptions.ISSUER,
-                audience: AuthOptions.AUDIENCE,
-                notBefore: now,
-                claims: oClaim.Claims,
-                expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
-                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            ClaimsIdentity oClaim = GetClaim(user.UserName);           
+            //await SetUserToken(encodedJwt, user.UserName);   // Запишет токен юзера в БД.
 
-            await SetUserToken(encodedJwt, user.UserName);   // Запишет токен юзера в БД.
-
-            return encodedJwt;
+            return oClaim;
         }
 
         /// <summary>
         /// Метод запишет токен юзера в БД.
         /// </summary>
         /// <param name="token">Токен юзера.</param>
-        private async Task SetUserToken(string token, string username)
-        {
-            UserEntity oUser = await _iden.AspNetUsers
-                .Where(u => u.UserName
-                .Equals(username))
-                .FirstOrDefaultAsync();
+        //private async Task SetUserToken(string token, string username)
+        //{
+        //    UserEntity oUser = await _iden.AspNetUsers
+        //        .Where(u => u.UserName
+        //        .Equals(username))
+        //        .FirstOrDefaultAsync();
 
-            // Запишет токен.
-            oUser.UserToken = token;
-            await _iden.SaveChangesAsync();
-        }
+        //    // Запишет токен.
+        //    oUser.UserToken = token;
+        //    await _iden.SaveChangesAsync();
+        //}
 
         private ClaimsIdentity GetClaim(string username)
         {
@@ -188,15 +174,7 @@ namespace Barbuuuda.Services
                     userId = oUser.Id;
                 }
 
-                // Авторизован ли юзер.
-                bool bAuth = oUser.UserToken != null ? true : false;
-
-                return new
-                {
-                    aHeaderFields,
-                    bAuth,
-                    userId
-                };
+                return new { aHeaderFields };
             }
 
             catch (ArgumentNullException ex)
@@ -256,17 +234,17 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userId">Id юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        public async Task<object> GetProfileInfo(string userId)
+        public async Task<object> GetProfileInfo(string userName)
         {
             try
             {
-                if (string.IsNullOrEmpty(userId))
+                if (string.IsNullOrEmpty(userName))
                 {
                     throw new ArgumentNullException();
                 }
 
                 return await _postgre.Users
-                    .Where(u => u.Id.Equals(userId))
+                    .Where(u => u.UserName.Equals(userName))
                     .Select(up => new
                     {
                         up.UserName,
@@ -302,15 +280,15 @@ namespace Barbuuuda.Services
         /// Метод сохраняет личные данные юзера.
         /// </summary>
         /// <param name="needUserUpdate">Объект с данными юзера.</param>
-        public async Task SaveProfileData(UserEntity needUserUpdate)
+        public async Task SaveProfileData(UserEntity needUserUpdate, string userName)
         {
             try
             {
-                if (string.IsNullOrEmpty(needUserUpdate.Id))
+                if (string.IsNullOrEmpty(userName))
                     throw new ArgumentNullException();
 
                 // Изменяет объект юзера.
-                await ChangeProfileData(needUserUpdate);
+                await ChangeProfileData(needUserUpdate, userName);
                 await _postgre.SaveChangesAsync();
             }
 
@@ -331,10 +309,10 @@ namespace Barbuuuda.Services
         /// Метод изменяет объект юзера.
         /// </summary>
         /// <param name="needUserUpdate">Исходный объект юзера для изменения.</param>
-        private async Task ChangeProfileData(UserEntity needUserUpdate)
+        private async Task ChangeProfileData(UserEntity needUserUpdate, string userName)
         {
             UserEntity oldUser = await _postgre.Users
-                    .Where(u => u.Id.Equals(needUserUpdate.Id))
+                    .Where(u => u.UserName.Equals(userName))
                     .FirstOrDefaultAsync();
 
             // Изменяет некоторые поля.
@@ -344,6 +322,81 @@ namespace Barbuuuda.Services
             oldUser.Email = needUserUpdate.Email;
             oldUser.City = needUserUpdate.City;
             oldUser.Gender = needUserUpdate.Gender;
+        }
+
+        /// <summary>
+        /// Метод генерит токен юзеру.
+        /// </summary>
+        /// <param name="claimsIdentity">Объект полномочий.</param>
+        /// <returns>Строку токена.</returns>
+        public Task<string> GenerateToken(ClaimsIdentity claimsIdentity)
+        {
+            var now = DateTime.UtcNow;
+            var jwt = new JwtSecurityToken(
+                issuer: AuthOptions.ISSUER,
+                audience: AuthOptions.AUDIENCE,
+                notBefore: now,
+                claims: claimsIdentity.Claims,
+                expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+            return Task.FromResult(encodedJwt);
+        }
+
+
+        /// <summary>
+        /// Метод обновит токен юзеру.
+        /// </summary>
+        /// <param name="claimsIdentity">Объект полномочий.</param>
+        /// <returns>Строку токена.</returns>
+        public Task<string> GenerateToken(string userName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userName))
+                {
+                    throw new ArgumentNullException();
+                }
+
+                var now = DateTime.UtcNow;
+                var jwt = new JwtSecurityToken(
+                    issuer: AuthOptions.ISSUER,
+                    audience: AuthOptions.AUDIENCE,
+                    notBefore: now,
+                    claims: new ClaimsIdentity().Claims,
+                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+                return Task.FromResult(encodedJwt);
+            }
+
+            catch (ArgumentNullException ex)
+            {
+                throw new ArgumentNullException($"Не передано имя пользователя {ex.Message}");
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод находит юзера по его логину.
+        /// </summary>
+        /// <param name="userName">Логин юзера.</param>
+        /// <returns>Объект с данными юзера.</returns>
+        public async Task<UserEntity> GetUserByLogin(string userName)
+        {
+            // Находит юзера, чтобы проставить ему успешное прохождение теста.
+            UserEntity user = await _postgre.Users
+                .Where(u => u.UserName
+                .Equals(userName))
+                .SingleOrDefaultAsync();
+
+            return user;
         }
     }
 }

@@ -7,12 +7,12 @@ namespace Barbuuuda.Models.Outpoot
     /// <summary>
     /// Класс пагинации.
     /// </summary>
-    public class ModelPaginationOutpoot
+    public class PaginationOutpoot
     {
         public int PageNumber { get; private set; }
         public int TotalPages { get; private set; }
 
-        public ModelPaginationOutpoot(int count, int pageNumber, int pageSize)
+        public PaginationOutpoot(int count, int pageNumber, int pageSize)
         {
             PageNumber = pageNumber;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);

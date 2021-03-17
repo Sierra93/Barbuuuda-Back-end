@@ -9,10 +9,10 @@ namespace Barbuuuda.Models.Outpoot
     /// <summary>
     /// Класс с информацией о пагинации.
     /// </summary>
-    public class ModelIndexOutpoot
+    public class IndexOutpoot
     {
         public IEnumerable Tasks { get; set; }
 
-        public ModelPaginationOutpoot PageData { get; set; }
+        public PaginationOutpoot PageData { get; set; }
     }
 }

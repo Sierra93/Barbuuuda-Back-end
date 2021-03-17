@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Barbuuuda.Models.Task
 {
@@ -32,10 +29,16 @@ namespace Barbuuuda.Models.Task
     /// Класс сопоставляется с json столбцом специализаций.
     /// </summary>
     [NotMapped]
-    public class Specialization
+    public sealed class Specialization
     {
+        /// <summary>
+        /// Наименование специализации.
+        /// </summary>
         public string SpecName { get; set; }
 
+        /// <summary>
+        /// Код специализации.
+        /// </summary>
         public string SpecCode { get; set; }
     }
 }

@@ -1,16 +1,9 @@
-﻿using Barbuuuda.Core.Data;
-using Barbuuuda.Core.Interfaces;
+﻿using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Outpoot;
-using Barbuuuda.Models.Task;
-using Barbuuuda.Models.User;
-using Barbuuuda.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Controllers
@@ -19,72 +12,45 @@ namespace Barbuuuda.Controllers
     /// Контроллер работы с пагинацией.
     /// </summary>
     [ApiController, Route("pagination")]
-    public class PaginationController : ControllerBase
-    {
-        private readonly ApplicationDbContext _db;
-        private readonly PostgreDbContext _postgre;
-        private readonly IdentityDbContext _iden;
-        private readonly UserManager<UserEntity> _userManager;
-        private readonly SignInManager<UserEntity> _signInManager;
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public class PaginationController : BaseController
+    {        
+        public static string Module => "Barbuuuda.Pagination";
 
-        public PaginationController(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager)
+        /// <summary>
+        /// Абстракция сервиса пагинации.
+        /// </summary>
+        private readonly IPagination _pagination;
+
+        public PaginationController(IPagination pagination) : base(Module)
         {
-            _db = db;
-            _postgre = postgre;
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _iden = iden;
+            _pagination = pagination;
         }
 
         /// <summary>
         /// Метод пагинации.
         /// </summary>
-        /// <param name="pageIdx"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <param name="pageIdx">Номер страницы. По дефолту 1.</param>
+        /// <returns>Данные пагинации.</returns>
         [HttpGet, Route("page")]
-        public async Task<IActionResult> Index([FromQuery] string userId, int pageIdx = 1)
-        {            
-            int countTasksPage = 5;   // Кол-во заданий на странице.
-            ITask _task = new TaskService(_db, _postgre, _iden, _userManager, _signInManager);
-            string userName = await _task.GetUserLoginById(userId);
+        public async Task<IActionResult> GetPaginationTasks(int pageIdx = 1)
+        {
+            IndexOutpoot paginationData = await _pagination.GetPaginationTasks(pageIdx, GetUserName());
 
-            var aTasks = (from tasks in _postgre.Tasks
-                                                  join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                                                  join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                                                  where tasks.OwnerId.Equals(userId)
-                                                  select new
-                                                  {
-                                                      tasks.CategoryCode,
-                                                      tasks.CountOffers,
-                                                      tasks.CountViews,
-                                                      tasks.OwnerId,
-                                                      tasks.SpecCode,
-                                                      categories.CategoryName,
-                                                      tasks.StatusCode,
-                                                      statuses.StatusName,
-                                                      taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                                      taskEndda = string.Format("{0:f}", tasks.TaskEndda),
-                                                      tasks.TaskTitle,
-                                                      tasks.TaskDetail,
-                                                      tasks.TaskId,
-                                                      taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                                                      tasks.TypeCode,
-                                                      userName
-                                                  })
-                          .OrderBy(o => o.TaskId)
-                          .AsQueryable();
-            var count = await aTasks.CountAsync();
-            var items = await aTasks.Skip((pageIdx - 1) * countTasksPage).Take(countTasksPage).ToListAsync();
+            return Ok(paginationData);
+        }
 
-            ModelPaginationOutpoot pageData = new ModelPaginationOutpoot(count, pageIdx, countTasksPage);
-            ModelIndexOutpoot data = new ModelIndexOutpoot
-            {
-                PageData = pageData,
-                Tasks = items
-            };
+        /// <summary>
+        /// Метод пагинации аукциона.
+        /// </summary>
+        /// <param name="pageIdx"></param>
+        /// <returns>Данные пагинации.</returns>
+        [HttpPost, Route("auction")]
+        public async Task<IActionResult> GetPaginationAuction([FromQuery] int pageIdx)
+        {
+            var paginationData = await _pagination.GetPaginationAuction(pageIdx);
 
-            return Ok(data);
+            return Ok(paginationData);
         }
     }
 }

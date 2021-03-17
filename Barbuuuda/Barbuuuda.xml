@@ -4,9 +4,25 @@
         <name>Barbuuuda</name>
     </assembly>
     <members>
+        <member name="T:Barbuuuda.Controllers.BaseController">
+            <summary>
+            Базовый контроллер для всех контроллеров.
+            </summary>
+        </member>
+        <member name="M:Barbuuuda.Controllers.BaseController.GetUserName">
+            <summary>
+            Метод получает имя текущего юзера.
+            </summary>
+            <returns>Имя юзера.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.ExecutorController">
             <summary>
             Контроллер содержит методы по работе с исполнителями сервиса.
+            </summary>
+        </member>
+        <member name="F:Barbuuuda.Controllers.ExecutorController._executor">
+            <summary>
+            Сервис исполнителя.
             </summary>
         </member>
         <member name="M:Barbuuuda.Controllers.ExecutorController.GetExecutorListAsync">
@@ -15,9 +31,52 @@
             </summary>
             <returns>Список исполнителей.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.AddExecutorSpecializations(Barbuuuda.Models.User.ExecutorSpecialization[])">
+            <summary>
+            Метод добавляет специализации исполнителя.
+            </summary>
+            <param name="specializations">Массив специализаций.</param>             
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetExecutorTestAsync(System.Int32)">
+            <summary>
+            Метод получает вопрос для теста исполнителя в зависимости от номера вопроса, переданного с фронта.
+            </summary>
+            <param name="numberQuestion">Номер вопроса.</param>
+            <returns>Вопрос с вариантами ответов.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetAnswersCountAsync">
+            <summary>
+            Метод получает кол-во вопросов для теста исполнителя.
+            </summary>
+            <returns>Кол-во вопросов.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.CheckAnswersTestAsync(System.Collections.Generic.List{Barbuuuda.Models.Entities.Executor.AnswerVariant})">
+            <summary>
+            Метод проверяет результаты ответов на тест исполнителем.
+            </summary>
+            <param name="answers">Массив с ответами на тест.</param>
+            <returns>Статус прохождения теста true/false.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetTasksWorkAsync">
+            <summary>
+            Метод выгружает задания, которые находятся в работе у исполнителя. Т.е у которых статус "В работе".
+            </summary>
+            <returns>Список заданий.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.RespondAsync(Barbuuuda.Models.Executor.Input.TaskInput)">
+            <summary>
+            Метод оставляет ставку к заданию.
+            </summary>
+            <param name="taskInput">Входная модель.</param>
+        </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>
             Контроллер главной страницы.
+            </summary>
+        </member>
+        <member name="F:Barbuuuda.Controllers.MainPageController._mainPage">
+            <summary>
+            Сервис стартовой страницы.
             </summary>
         </member>
         <member name="M:Barbuuuda.Controllers.MainPageController.GetFonContent">
@@ -73,17 +132,33 @@
             Контроллер работы с пагинацией.
             </summary>
         </member>
-        <member name="M:Barbuuuda.Controllers.PaginationController.Index(System.String,System.Int32)">
+        <member name="F:Barbuuuda.Controllers.PaginationController._pagination">
+            <summary>
+            Абстракция сервиса пагинации.
+            </summary>
+        </member>
+        <member name="M:Barbuuuda.Controllers.PaginationController.GetPaginationTasks(System.Int32)">
             <summary>
             Метод пагинации.
             </summary>
+            <param name="pageIdx">Номер страницы. По дефолту 1.</param>
+            <returns>Данные пагинации.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.PaginationController.GetPaginationAuction(System.Int32)">
+            <summary>
+            Метод пагинации аукциона.
+            </summary>
             <param name="pageIdx"></param>
-            <param name="userId"></param>
-            <returns></returns>
+            <returns>Данные пагинации.</returns>
         </member>
         <member name="T:Barbuuuda.Controllers.TaskController">
             <summary>
             Контроллер содержит логику работы с заданиями.
+            </summary>
+        </member>
+        <member name="F:Barbuuuda.Controllers.TaskController._task">
+            <summary>
+            Сервис заданий.
             </summary>
         </member>
         <member name="M:Barbuuuda.Controllers.TaskController.CreateTask(Barbuuuda.Models.Task.TaskEntity)">
@@ -108,15 +183,15 @@
         </member>
         <member name="M:Barbuuuda.Controllers.TaskController.GetSpecializations">
             <summary>
+            TODO убрать.
             Метод выгружает список специализаций заданий.
             </summary>
             <returns>Коллекцию специализаций.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.TaskController.GetTasksList(System.String,System.Nullable{System.Int32},System.String)">
+        <member name="M:Barbuuuda.Controllers.TaskController.GetTasksList(System.Nullable{System.Int32},System.String)">
             <summary>
             Метод получает список заданий заказчика или конкретное задание.
             </summary>
-            <param name="userId">Id заказчика.</param>
             <param name="taskId">Id задания.</param>
             <param name="type">Параметр получения заданий либо все либо одно.</param>
             <returns>Коллекция заданий.</returns>
@@ -148,7 +223,7 @@
             <param name="date">Параметр даты.</param>
             <returns>Найденные задания.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.TaskController.LoadActiveTasks(System.String)">
+        <member name="M:Barbuuuda.Controllers.TaskController.LoadActiveTasks">
             <summary>
             Метод выгружает активные задания заказчика.
             </summary>
@@ -160,20 +235,18 @@
             </summary>
             <returns>Число кол-ва задач.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.TaskController.GetStatusTasks(System.String,System.String)">
+        <member name="M:Barbuuuda.Controllers.TaskController.GetStatusTasks(System.String)">
             <summary>
             Метод получает задания определенного статуса.
             </summary>
             <param name="status">Название статуса.</param>
-            <param name="userId">Id пользователя.</param>
             <returns>Список заданий с определенным статусом.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.TaskController.GetTotalCountTasks(System.String)">
+        <member name="M:Barbuuuda.Controllers.TaskController.GetTotalCountTasks">
             <summary>
             Метод получает кол-во заданий всего.
             </summary>
-            <param name="userId">Id пользователя.</param>
-            <returns></returns>
+            <returns>Кол-во заданий.</returns>
         </member>
         <member name="M:Barbuuuda.Controllers.TaskController.LoadAuctionTasks">
             <summary>
@@ -184,6 +257,11 @@
         <member name="T:Barbuuuda.Controllers.UserController">
             <summary>
             Контроллер содержит логику работы с пользователями.
+            </summary>        
+        </member>
+        <member name="F:Barbuuuda.Controllers.UserController._user">
+            <summary>
+            Сервис работы с юзерами.
             </summary>
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.CreateUserAsync(Barbuuuda.Models.User.UserEntity)">
@@ -210,20 +288,19 @@
             <summary>
             Метод авторизует пользователя.
             <paramref name="user">Объект с данными юзера.</paramref>
-            </summary>
+            </summary>        
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize(Barbuuuda.Models.User.UserEntity)">
+        <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize(System.String)">
             <summary>
+            TODO: нужно убрать этот метод, так как авторизация переделана на основе токенов и доступ и так будет отваливаться когда токен протухнет.
             Метод проверяет, авторизован ли юзер.
             </summary>
-            <param name="user">Объект с данными юзера.</param>
-            <returns>Объект с данными авторизованного юзера.</returns>
+            <returns>Объект с данными авторизованного юзера.</returns>       
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.GetProfileInfoAsync(System.String)">
+        <member name="M:Barbuuuda.Controllers.UserController.GetProfileInfoAsync">
             <summary>
             Метод получает информацию о пользователе для профиля.
             </summary>
-            <param name="userId">Id юзера.</param>
             <returns>Объект с данными о профиле пользователя.</returns>
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.SaveProfileDataAsync(Barbuuuda.Models.User.UserEntity)">
@@ -231,6 +308,12 @@
             Метод сохраняет личные данные юзера.
             </summary>
             <param name="user">Объект с данными юзера.</param>
+        </member>
+        <member name="M:Barbuuuda.Controllers.UserController.RefreshToken(System.String)">
+            <summary>
+            Метод обновляет токен юзеру.
+            </summary>
+            <returns>Строка токена.</returns>
         </member>
     </members>
 </doc>

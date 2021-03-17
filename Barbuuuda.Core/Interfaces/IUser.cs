@@ -1,7 +1,5 @@
 ﻿using Barbuuuda.Models.User;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Core.Interfaces
@@ -35,6 +33,27 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод сохраняет личные данные юзера.
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
-        Task SaveProfileData(UserEntity user);
+        Task SaveProfileData(UserEntity user, string userName);
+
+        /// <summary>
+        /// Метод выдаст токен юзеру.
+        /// </summary>
+        /// <param name="claimsIdentity">Объект полномочий.</param>
+        /// <returns>Строку токена.</returns>
+        Task<string> GenerateToken(ClaimsIdentity claimsIdentity);
+
+        /// <summary>
+        /// Метод обновит токен юзеру.
+        /// </summary>
+        /// <param name="claimsIdentity">Объект полномочий.</param>
+        /// <returns>Строку токена.</returns>
+        Task<string> GenerateToken(string userName);
+
+        /// <summary>
+        /// Метод находит юзера по его логину.
+        /// </summary>
+        /// <param name="userName">Логин юзера.</param>
+        /// <returns>Объект с данными юзера.</returns>
+        Task<UserEntity> GetUserByLogin(string userName);
     }
 }
