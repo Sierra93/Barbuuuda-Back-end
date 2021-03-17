@@ -325,11 +325,11 @@ namespace Barbuuuda.Services
                 }
             }
 
+            // TODO: отрефачить этот метод, чтоб не обращаться два раза к БД за получением задания.
             string userId = await GetUserByName(userName);
             var oTask = await (from tasks in _postgre.Tasks
                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                               where tasks.OwnerId.Equals(userId)
                                where tasks.TaskId.Equals(taskId)
                                select new
                                {

@@ -152,7 +152,6 @@ namespace Barbuuuda.Controllers
         /// Метод получает информацию о пользователе для профиля.
         /// </summary>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        //[CustomAuthorization]
         [HttpGet, Route("profile")]
         public async Task<IActionResult> GetProfileInfoAsync()
         {
