@@ -227,6 +227,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userName">Login заказчика.</param>
         /// <param name="type">Параметр получения заданий либо все либо одно.</param>
+        /// <param name="taskId">TaskId задания, которое нужно получить.</param>
         /// <returns>Коллекция заданий.</returns>
         public async Task<IList> GetTasksList(string userName, int? taskId, string type)
         {
@@ -237,10 +238,15 @@ namespace Barbuuuda.Services
                 if (string.IsNullOrEmpty(userName))
                 {
                     throw new ArgumentNullException();
+                }               
+
+                if (!type.Equals(TaskType.ALL) && !type.Equals(TaskType.SINGLE))
+                {
+                    throw new NotParameterException(type);
                 }
 
                 // Вернет либо все задания либо одно.
-                return aResultTaskObj = type.Equals(GetTaskTypeEnum.All.ToString())
+                return aResultTaskObj = type.Equals(TaskType.ALL)
                     ? aResultTaskObj = await GetAllTasks(userName)
                     : aResultTaskObj = await GetSingleTask(userName, taskId);
             }
@@ -319,11 +325,11 @@ namespace Barbuuuda.Services
                 }
             }
 
+            // TODO: отрефачить этот метод, чтоб не обращаться два раза к БД за получением задания.
             string userId = await GetUserByName(userName);
             var oTask = await (from tasks in _postgre.Tasks
                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                               where tasks.OwnerId.Equals(userId)
                                where tasks.TaskId.Equals(taskId)
                                select new
                                {

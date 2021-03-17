@@ -1,9 +1,8 @@
 ﻿using Barbuuuda.Core.Interfaces;
-using Barbuuuda.Models.Outpoot;
+using Barbuuuda.Models.Pagination.Outpoot;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Controllers
