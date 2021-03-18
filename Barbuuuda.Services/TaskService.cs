@@ -783,10 +783,15 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userName">Login пользователя.</param>
         /// <returns></returns>
-        public async Task<int> GetTotalCountTasks(string userName)
+        public async Task<int?> GetTotalCountTasks(string userName)
         {
             try
             {
+                if (string.IsNullOrEmpty(userName))
+                {
+                    return null;
+                }
+
                 UserEntity user = await _user.GetUserByLogin(userName);
 
                 if (user.Id == null)

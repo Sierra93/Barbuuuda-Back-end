@@ -191,7 +191,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("total")]
         public async Task<IActionResult> GetTotalCountTasks()
         {
-            int countTasks = await _task.GetTotalCountTasks(GetUserName());
+            int? countTasks = await _task.GetTotalCountTasks(GetUserName());
 
             return Ok(countTasks);
         }

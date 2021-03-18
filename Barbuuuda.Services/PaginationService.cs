@@ -31,51 +31,56 @@ namespace Barbuuuda.Services
         {
             try
             {
-                int countTasksPage = 10;   // Кол-во заданий на странице.
-                UserEntity user = await _user.GetUserByLogin(userName);
-
-                var aTasks = (from tasks in _postgre.Tasks
-                              join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                              join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                              where tasks.OwnerId.Equals(user.Id)
-                              select new
-                              {
-                                  tasks.CategoryCode,
-                                  tasks.CountOffers,
-                                  tasks.CountViews,
-                                  tasks.OwnerId,
-                                  tasks.SpecCode,
-                                  categories.CategoryName,
-                                  tasks.StatusCode,
-                                  statuses.StatusName,
-                                  taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                  taskEndda = string.Format("{0:f}", tasks.TaskEndda),
-                                  tasks.TaskTitle,
-                                  tasks.TaskDetail,
-                                  tasks.TaskId,
-                                  taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                                  tasks.TypeCode,
-                                  userName
-                              })
-                              .OrderBy(o => o.TaskId)
-                              .AsQueryable();
-                int count = await aTasks.CountAsync();
-                var items = await aTasks.Skip((pageIdx - 1) * countTasksPage).Take(countTasksPage).ToListAsync();
-
-                PaginationOutpoot pageData = new PaginationOutpoot(count, pageIdx, countTasksPage);
-                IndexOutpoot paginationData = new IndexOutpoot
+                if (!string.IsNullOrEmpty(userName))
                 {
-                    PageData = pageData,
-                    Tasks = items
-                };
+                    int countTasksPage = 10;   // Кол-во заданий на странице.
+                    UserEntity user = await _user.GetUserByLogin(userName);
 
-                return paginationData;
+                    var aTasks = (from tasks in _postgre.Tasks
+                                  join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                                  join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                                  where tasks.OwnerId.Equals(user.Id)
+                                  select new
+                                  {
+                                      tasks.CategoryCode,
+                                      tasks.CountOffers,
+                                      tasks.CountViews,
+                                      tasks.OwnerId,
+                                      tasks.SpecCode,
+                                      categories.CategoryName,
+                                      tasks.StatusCode,
+                                      statuses.StatusName,
+                                      taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                      taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                      tasks.TaskTitle,
+                                      tasks.TaskDetail,
+                                      tasks.TaskId,
+                                      taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                      tasks.TypeCode,
+                                      userName
+                                  })
+                                  .OrderBy(o => o.TaskId)
+                                  .AsQueryable();
+                    int count = await aTasks.CountAsync();
+                    var items = await aTasks.Skip((pageIdx - 1) * countTasksPage).Take(countTasksPage).ToListAsync();
+
+                    PaginationOutpoot pageData = new PaginationOutpoot(count, pageIdx, countTasksPage);
+                    IndexOutpoot paginationData = new IndexOutpoot
+                    {
+                        PageData = pageData,
+                        Tasks = items
+                    };
+
+                    return paginationData;
+                }                
             }
 
             catch (Exception ex)
             {
                 throw new Exception(ex.Message.ToString());
             }
+
+            return null;
         }
 
         /// <summary>

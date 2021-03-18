@@ -92,7 +92,7 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="userName">Login пользователя.</param>
         /// <returns>Кол-во заданий.</returns>
-        Task<int> GetTotalCountTasks(string userName);
+        Task<int?> GetTotalCountTasks(string userName);
 
         /// <summary>
         /// Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".

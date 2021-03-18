@@ -176,6 +176,7 @@ namespace Barbuuuda.Controllers
         /// Метод обновляет токен юзеру.
         /// </summary>
         /// <returns>Строка токена.</returns>
+        [AllowAnonymous]
         [HttpGet, Route("token")]
         public async Task<IActionResult> RefreshToken([FromQuery] string userName)
         {
