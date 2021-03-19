@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -90,12 +89,6 @@ namespace Barbuuuda.Models.Task
         /// Код специализации.   
         /// </summary>
         [Column("SpecCode", TypeName = "varchar(100)")]
-        public string SpecCode { get; set; }     
-        
-        /// <summary>
-        /// Массив исполнителей, которые сделали ставку к заданию.
-        /// </summary>
-        [Column("TaskMembers", TypeName = "jsonb")]
-        public List<string> TaskMembers { get; set; }
+        public string SpecCode { get; set; }           
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Barbuuuda.Models.Entities.Executor;
+using Barbuuuda.Models.Entities.Respond;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,16 @@ namespace Barbuuuda.Core.Data
         public DbSet<QuestionEntity> Questions { get; set; }    // Таблица вопросов для теста исполнителей.
 
         public DbSet<AnswerVariantEntity> AnswerVariants { get; set; }    // Таблица ответов к тестам исполнителей.
+
+        /// <summary>
+        /// Таблица шаблонов к ставкам заданий.
+        /// </summary>
+        public DbSet<RespondTemplateEntity> RespondTemplates { get; set; }
+
+        /// <summary>
+        /// Таблица ставок к заданиям.
+        /// </summary>
+        public DbSet<RespondEntity> Responds { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }
     }
