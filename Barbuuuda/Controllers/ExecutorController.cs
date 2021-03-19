@@ -109,9 +109,9 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <param name="taskInput">Входная модель.</param>
         [HttpPost, Route("respond")]
-        public async Task<IActionResult> RespondTaskAsync([FromBody] TaskInput taskInput)
+        public async Task<IActionResult> RespondTaskAsync([FromBody] RespondInput taskInput)
         {
-            await _executor.RespondAsync(taskInput.TaskId, GetUserName());
+            await _executor.RespondAsync(taskInput.TaskId, taskInput.Price, taskInput.IsTemplate, taskInput, taskInput.Comment, GetUserName());
 
             return Ok();
         }
