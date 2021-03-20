@@ -1,4 +1,5 @@
 ﻿using Barbuuuda.Models.Entities.Executor;
+using Barbuuuda.Models.Entities.Knowlege;
 using Barbuuuda.Models.Entities.Respond;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
@@ -11,26 +12,57 @@ namespace Barbuuuda.Core.Data
     /// </summary>
     public class PostgreDbContext : DbContext
     {
-        public DbSet<UserEntity> Users { get; set; }    // Таблица информации аккаунтов пользователей.
+        /// <summary>
+        /// Таблица информации аккаунтов пользователей.
+        /// </summary>
+        public DbSet<UserEntity> Users { get; set; }
 
-        public DbSet<TaskEntity> Tasks { get; set; }    // Таблица предложений поставщикам.
+        /// <summary>
+        /// Таблица предложений поставщикам.
+        /// </summary>
+        public DbSet<TaskEntity> Tasks { get; set; }
 
-        public DbSet<TaskStatusEntity> TaskStatuses { get; set; }   // Таблица статусов заданий.
+        /// <summary>
+        /// Таблица статусов заданий.
+        /// </summary>
+        public DbSet<TaskStatusEntity> TaskStatuses { get; set; }
 
-        public DbSet<TaskCategoryEntity> TaskCategories { get; set; }   // Таблица категорий заданий.
+        /// <summary>
+        /// Таблица категорий заданий
+        /// </summary>
+        public DbSet<TaskCategoryEntity> TaskCategories { get; set; }
 
-        public DbSet<TaskTypeEntity> TaskTypes { get; set; }   // Таблица типов заданий.
+        /// <summary>
+        ///  Таблица типов заданий.
+        /// </summary>
+        public DbSet<TaskTypeEntity> TaskTypes { get; set; }  
 
         public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options) { }
 
-        public DbSet<QuestionEntity> Questions { get; set; }    // Таблица вопросов для теста исполнителей.
+        /// <summary>
+        /// Таблица вопросов для теста исполнителей.
+        /// </summary>
+        public DbSet<QuestionEntity> Questions { get; set; }
 
-        public DbSet<AnswerVariantEntity> AnswerVariants { get; set; }    // Таблица ответов к тестам исполнителей.
+        /// <summary>
+        /// Таблица ответов к тестам исполнителей.
+        /// </summary>
+        public DbSet<AnswerVariantEntity> AnswerVariants { get; set; }    
 
         /// <summary>
         /// Таблица шаблонов к ставкам заданий.
         /// </summary>
         public DbSet<RespondTemplateEntity> RespondTemplates { get; set; }
+
+        /// <summary>
+        /// Таблица категорий в БЗ.
+        /// </summary>
+        public DbSet<KnowlegeCategoryEntity> KnowlegeCategories { get; set; }
+
+        /// <summary>
+        /// Таблица статей БЗ.
+        /// </summary>
+        public DbSet<KnowlegeArticleEntity> KnowlegeArticles { get; set; }  
 
         /// <summary>
         /// Таблица ставок к заданиям.

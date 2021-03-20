@@ -6,7 +6,7 @@ namespace Barbuuuda.Models.Entities.Knowlege
     /// <summary>
     /// Класс сопоставляется с таблицей категорий БЗ.
     /// </summary>
-    [Table("KnowlegeCategories")]
+    [Table("KnowlegeCategories", Schema = "dbo")]
     public sealed class KnowlegeCategoryEntity
     {
         /// <summary>
@@ -18,7 +18,7 @@ namespace Barbuuuda.Models.Entities.Knowlege
         /// <summary>
         /// Заголовок категории.
         /// </summary>
-        [Column("CategoryTitle", TypeName = "varchar(100)")]
+        [Column("CategoryTitle", TypeName = "varchar(200)")]
         public string CategoryTitle { get; set; }
 
         /// <summary>

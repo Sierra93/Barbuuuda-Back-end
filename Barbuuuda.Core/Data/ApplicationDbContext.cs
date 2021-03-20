@@ -32,11 +32,7 @@ namespace Barbuuuda.Core.Data
 
         public DbSet<HeaderTypeEntity> Headers { get; set; }   // Таблица полей хидера.
 
-        public DbSet<HopeEntity> Hopes { get; set; }  // Таблица НАДЕЕМСЯ НА ДОЛГОЕ СОТРУДНИЧЕСТВО.
-
-        public DbSet<KnowlegeCategoryEntity> KnowlegeCategories { get; set; }   // Таблица категорий в БЗ.
-
-        public DbSet<KnowlegeArticleEntity> KnowlegeArticles { get; set; }  // Таблица статей БЗ.
+        public DbSet<HopeEntity> Hopes { get; set; }  // Таблица НАДЕЕМСЯ НА ДОЛГОЕ СОТРУДНИЧЕСТВО.       
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
