@@ -4,6 +4,7 @@ using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Entities.Executor;
+using Barbuuuda.Models.Executor.Input;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
@@ -302,8 +303,12 @@ namespace Barbuuuda.Services
         /// Метод оставляет ставку к заданию.
         /// </summary>
         /// <param name="taskId">Id задания, к которому оставляют ставку.</param>
+        /// <param name="price">Цена ставки (без комиссии 22%).</param>
+        /// <param name="comment">Комментарий к ставке.</param>
+        /// <param name="isTemplate">Флаг сохранения как шаблон.</param>
+        /// <param name="template">Данные шаблона.</param>
         /// <param name="userName">Имя юзера.</param>
-        public async Task RespondAsync(int taskId, string userName)
+        public async Task RespondAsync(int taskId, decimal price, bool isTemplate, RespondInput template, string comment, string userName)
         {
             try
             {
@@ -311,9 +316,6 @@ namespace Barbuuuda.Services
                 {
                     throw new NullTaskIdException();
                 }
-
-                // Находит Id юзера.
-                UserEntity user = await _user.GetUserByLogin(userName);
 
                 // Находит задание по его TaskId.
                 TaskEntity task = await _postgre.Tasks.Where(t => t.TaskId.Equals(taskId)).FirstOrDefaultAsync();
@@ -323,8 +325,15 @@ namespace Barbuuuda.Services
                     throw new NotFoundTaskIdException(taskId);
                 }
 
-                // Проставит ставку к заданию.
-                task.TaskMembers.Add(user.Id);
+                // Находит Id юзера.
+                UserEntity user = await _user.GetUserByLogin(userName);
+
+                // Если нужно сохранить шаблон (шаблоны).
+                if (isTemplate)
+                {
+                    
+                }                
+
                 _postgre.Tasks.Update(task);
                 await _postgre.SaveChangesAsync();
             }

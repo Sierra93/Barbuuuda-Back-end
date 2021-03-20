@@ -1,4 +1,5 @@
 ﻿using Barbuuuda.Models.Entities.Executor;
+using Barbuuuda.Models.Executor.Input;
 using Barbuuuda.Models.User;
 using System.Collections;
 using System.Collections.Generic;
@@ -54,7 +55,11 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод оставляет ставку к заданию.
         /// </summary>
         /// <param name="taskId">Id задания, к которому оставляют ставку.</param>
+        /// <param name="price">Цена ставки (без комиссии 22%).</param>
+        /// <param name="comment">Комментарий к ставке.</param>
+        /// <param name="isTemplate">Флаг сохранения как шаблон.</param>
+        /// <param name="template">Данные шаблона.</param>
         /// <param name="userName">Имя юзера.</param>
-        Task RespondAsync(int taskId, string userName);
+        Task RespondAsync(int taskId, decimal price, bool isTemplate, RespondInput respondInput, string comment, string userName);
     }
 }

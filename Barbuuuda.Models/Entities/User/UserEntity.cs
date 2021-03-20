@@ -78,5 +78,5 @@ namespace Barbuuuda.Models.User
     public sealed class ExecutorSpecialization
     {
         public string SpecName { get; set; }
-    }
+    }    
 }
