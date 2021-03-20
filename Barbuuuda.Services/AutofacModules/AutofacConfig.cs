@@ -24,6 +24,9 @@ namespace Barbuuuda.Services.AutofacModules
 
             // Сервис пагинации.
             builder.RegisterType<PaginationService>().As<IPagination>();
+
+            // Сервис БЗ.
+            builder.RegisterType<KnowlegeService>().As<IKnowlege>();
         }
     }
 }
