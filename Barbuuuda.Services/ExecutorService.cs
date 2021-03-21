@@ -324,7 +324,6 @@ namespace Barbuuuda.Services
                 }
 
                 // Проставит ставку к заданию.
-                task.TaskMembers.Add(user.Id);
                 _postgre.Tasks.Update(task);
                 await _postgre.SaveChangesAsync();
             }

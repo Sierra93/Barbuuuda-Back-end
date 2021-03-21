@@ -43,22 +43,29 @@ namespace Barbuuuda
                 .AllowAnyMethod().AllowAnyHeader();
             }));
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-              options.UseSqlServer(
-                  Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
-
+            #region Продакшен БД.
             //services.AddDbContext<ApplicationDbContext>(options =>
-            // options.UseSqlServer(
-            //     Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //  options.UseSqlServer(
+            //      Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+
+            //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
+            //opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+
+            //services.AddDbContext<IdentityDbContext>(options =>
+            //    options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            #endregion
+
+            #region Тестовые БД.
+            services.AddDbContext<ApplicationDbContext>(options =>
+             options.UseSqlServer(
+                 Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
             services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-        opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
-
-        //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-        //opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+        opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
             services.AddDbContext<IdentityDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+                options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            #endregion
 
             services.AddIdentity<UserEntity, IdentityRole>(opts =>
             {
