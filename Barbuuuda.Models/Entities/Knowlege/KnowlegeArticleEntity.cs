@@ -54,7 +54,7 @@ namespace Barbuuuda.Models.Entities.Knowlege
         /// <summary>
         /// Url скрина.
         /// </summary>
-        [Column("ArticleDetails", TypeName = "nvarchar(max)")]
+        [Column("ImageUrl", TypeName = "nvarchar(max)")]
         public string ImageUrl { get; set; }
     }
 }
