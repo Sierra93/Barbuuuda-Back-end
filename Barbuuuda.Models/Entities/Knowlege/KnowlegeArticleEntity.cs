@@ -48,7 +48,7 @@ namespace Barbuuuda.Models.Entities.Knowlege
         /// <summary>
         /// Имеет ли статья скриншоты.
         /// </summary>
-        [Column("HasImage", TypeName = "bit")]
+        [Column("HasImage", TypeName = "bool")]
         public bool HasImage { get; set; }
 
         /// <summary>
