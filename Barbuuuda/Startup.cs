@@ -43,7 +43,7 @@ namespace Barbuuuda
                 .AllowAnyMethod().AllowAnyHeader();
             }));
 
-            #region ��������� ��.
+            #region ПРОД.
             //services.AddDbContext<ApplicationDbContext>(options =>
             //  options.UseSqlServer(
             //      Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
@@ -55,7 +55,7 @@ namespace Barbuuuda
             //    options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
             #endregion
 
-            #region �������� ��.
+            #region ТЕСТ.
             services.AddDbContext<ApplicationDbContext>(options =>
              options.UseSqlServer(
                  Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
@@ -69,11 +69,11 @@ namespace Barbuuuda
 
             services.AddIdentity<UserEntity, IdentityRole>(opts =>
             {
-                opts.Password.RequiredLength = 5;   // ����������� �����
-                opts.Password.RequireNonAlphanumeric = false;   // ��������� �� �� ���������-�������� �������
-                opts.Password.RequireLowercase = false; // ��������� �� ������� � ������ ��������
-                opts.Password.RequireUppercase = false; // ��������� �� ������� � ������� ��������
-                opts.Password.RequireDigit = false; // ��������� �� �����
+                opts.Password.RequiredLength = 5;   
+                opts.Password.RequireNonAlphanumeric = false;   
+                opts.Password.RequireLowercase = false; 
+                opts.Password.RequireUppercase = false; 
+                opts.Password.RequireDigit = false; 
             })
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
@@ -113,21 +113,12 @@ namespace Barbuuuda
                         options.RequireHttpsMetadata = false;
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
-                            // ��������, ����� �� �������������� �������� ��� ��������� ������
                             ValidateIssuer = true,
-                            // ������, �������������� ��������
-                            ValidIssuer = AuthOptions.ISSUER,
-
-                            // ����� �� �������������� ����������� ������
+                            ValidIssuer = AuthOptions.ISSUER,                          
                             ValidateAudience = true,
-                            // ��������� ����������� ������
                             ValidAudience = AuthOptions.AUDIENCE,
-                            // ����� �� �������������� ����� �������������
                             ValidateLifetime = true,
-
-                            // ��������� ����� ������������
                             IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                            // ��������� ����� ������������
                             ValidateIssuerSigningKey = true,
                         };
                     });
