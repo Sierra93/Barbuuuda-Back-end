@@ -89,6 +89,6 @@ namespace Barbuuuda.Models.Task
         /// Код специализации.   
         /// </summary>
         [Column("SpecCode", TypeName = "varchar(100)")]
-        public string SpecCode { get; set; }           
+        public string SpecCode { get; set; }            
     }
 }

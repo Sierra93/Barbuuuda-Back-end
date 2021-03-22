@@ -18,25 +18,25 @@ namespace Barbuuuda.Models.Entities.Knowlege
         /// <summary>
         /// Заголовок статьи.
         /// </summary>
-        [Column("ArticleTitle", TypeName = "varchar(100)")]
+        [Column("ArticleTitle", TypeName = "varchar(200)")]
         public string ArticleTitle { get; set; }
 
         /// <summary>
         /// Детальное описание статьи.
         /// </summary>
-        [Column("ArticleDetails", TypeName = "nvarchar(max)")]
+        [Column("ArticleDetails", TypeName = "text")]
         public string ArticleDetails { get; set; }
 
         /// <summary>
         /// Кол-во людей, которые сочли эту статью полезной.
         /// </summary>
-        [Column("HelpfulCount", TypeName = "int")]
+        [Column("HelpfulCount", TypeName = "integer")]
         public int HelpfulCount { get; set; }
 
         /// <summary>
         /// Кол-во людей, которые не сочли эту статью полезной.
         /// </summary>
-        [Column("NotHelpfulCount", TypeName = "int")]
+        [Column("NotHelpfulCount", TypeName = "integer")]
         public int NotHelpfulCount { get; set; }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Barbuuuda.Models.Entities.Knowlege
         /// <summary>
         /// Url скрина.
         /// </summary>
-        [Column("ArticleDetails", TypeName = "nvarchar(max)")]
+        [Column("ImageUrl", TypeName = "text")]
         public string ImageUrl { get; set; }
     }
 }
