@@ -152,7 +152,6 @@ namespace Barbuuuda.Controllers
         /// Метод получает информацию о пользователе для профиля.
         /// </summary>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        //[CustomAuthorization]
         [HttpGet, Route("profile")]
         public async Task<IActionResult> GetProfileInfoAsync()
         {
@@ -177,6 +176,7 @@ namespace Barbuuuda.Controllers
         /// Метод обновляет токен юзеру.
         /// </summary>
         /// <returns>Строка токена.</returns>
+        [AllowAnonymous]
         [HttpGet, Route("token")]
         public async Task<IActionResult> RefreshToken([FromQuery] string userName)
         {

@@ -1,4 +1,4 @@
-using Barbuuuda.Core.Data;
+п»їusing Barbuuuda.Core.Data;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
@@ -25,7 +24,7 @@ namespace Barbuuuda
         {
             Configuration = configuration;
             containerBuilder = new ContainerBuilder();
-        }       
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -33,7 +32,7 @@ namespace Barbuuuda
             services.AddControllers();
 
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
-            {     
+            {
                 builder.WithOrigins(
                     "https://testdevi.site",
                     "https://testdevi.site/",
@@ -44,30 +43,44 @@ namespace Barbuuuda
                 .AllowAnyMethod().AllowAnyHeader();
             }));
 
+            #region РџР РћР”.
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //  options.UseSqlServer(
+            //      Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+
+            //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
+            //opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+
+            //services.AddDbContext<IdentityDbContext>(options =>
+            //    options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            #endregion
+
+            #region РўР•РЎРў.
             services.AddDbContext<ApplicationDbContext>(options =>
-              options.UseSqlServer(
-                  Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+             options.UseSqlServer(
+                 Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
             services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-        opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+        opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
             services.AddDbContext<IdentityDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+                options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            #endregion
 
             services.AddIdentity<UserEntity, IdentityRole>(opts =>
             {
-                opts.Password.RequiredLength = 5;   // Минимальная длина
-                opts.Password.RequireNonAlphanumeric = false;   // Требуются ли не алфавитно-цифровые символы
-                opts.Password.RequireLowercase = false; // Требуются ли символы в нижнем регистре
-                opts.Password.RequireUppercase = false; // Требуются ли символы в верхнем регистре
-                opts.Password.RequireDigit = false; // Требуются ли цифры
+                opts.Password.RequiredLength = 5;   
+                opts.Password.RequireNonAlphanumeric = false;   
+                opts.Password.RequireLowercase = false; 
+                opts.Password.RequireUppercase = false; 
+                opts.Password.RequireDigit = false; 
             })
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
 
             //services.AddDbContext<ApplicationDbContext>(options =>
             //  options.UseSqlServer(
-            //      Configuration.GetConnectionString("TestConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //      Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
             services.AddSwaggerGen(options =>
             {
@@ -89,7 +102,8 @@ namespace Barbuuuda
 
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                var xmlPath = Path.Combine(Directory.GetCurrentDirectory(), xmlFile);
                 options.IncludeXmlComments(xmlPath);
             });
 
@@ -99,24 +113,15 @@ namespace Barbuuuda
                         options.RequireHttpsMetadata = false;
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
-                            // укзывает, будет ли валидироваться издатель при валидации токена
                             ValidateIssuer = true,
-                            // строка, представляющая издателя
-                            ValidIssuer = AuthOptions.ISSUER,
-
-                            // будет ли валидироваться потребитель токена
+                            ValidIssuer = AuthOptions.ISSUER,                          
                             ValidateAudience = true,
-                            // установка потребителя токена
                             ValidAudience = AuthOptions.AUDIENCE,
-                            // будет ли валидироваться время существования
                             ValidateLifetime = true,
-
-                            // установка ключа безопасности
                             IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                            // валидация ключа безопасности
                             ValidateIssuerSigningKey = true,
                         };
-                    });   
+                    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

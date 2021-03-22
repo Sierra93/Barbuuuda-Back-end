@@ -1,6 +1,7 @@
 ﻿using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Enums;
+using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Task;
@@ -22,12 +23,14 @@ namespace Barbuuuda.Services
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IdentityDbContext _iden;
+        private readonly IUser _user;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, IUser user)
         {
             _db = db;
             _postgre = postgre;
             _iden = iden;
+            _user = user;
         }
 
         /// <summary>
@@ -224,6 +227,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userName">Login заказчика.</param>
         /// <param name="type">Параметр получения заданий либо все либо одно.</param>
+        /// <param name="taskId">TaskId задания, которое нужно получить.</param>
         /// <returns>Коллекция заданий.</returns>
         public async Task<IList> GetTasksList(string userName, int? taskId, string type)
         {
@@ -234,10 +238,15 @@ namespace Barbuuuda.Services
                 if (string.IsNullOrEmpty(userName))
                 {
                     throw new ArgumentNullException();
+                }               
+
+                if (!type.Equals(TaskType.ALL) && !type.Equals(TaskType.SINGLE))
+                {
+                    throw new NotParameterException(type);
                 }
 
                 // Вернет либо все задания либо одно.
-                return aResultTaskObj = type.Equals(GetTaskTypeEnum.All.ToString())
+                return aResultTaskObj = type.Equals(TaskType.ALL)
                     ? aResultTaskObj = await GetAllTasks(userName)
                     : aResultTaskObj = await GetSingleTask(userName, taskId);
             }
@@ -316,11 +325,11 @@ namespace Barbuuuda.Services
                 }
             }
 
+            // TODO: отрефачить этот метод, чтоб не обращаться два раза к БД за получением задания.
             string userId = await GetUserByName(userName);
             var oTask = await (from tasks in _postgre.Tasks
                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                               where tasks.OwnerId.Equals(userId)
                                where tasks.TaskId.Equals(taskId)
                                select new
                                {
@@ -670,7 +679,6 @@ namespace Barbuuuda.Services
         {
             try
             {
-                int countTotal = await GetStatusName(StatusTask.TOTAL);
                 int countAuction = await GetStatusName(StatusTask.AUCTION);
                 int countWork = await GetStatusName(StatusTask.IN_WORK);
                 int countGarant = await GetStatusName(StatusTask.GARANT);
@@ -680,7 +688,6 @@ namespace Barbuuuda.Services
 
                 return new
                 {
-                    total = countTotal,
                     auction = countAuction,
                     work = countWork,
                     garant = countGarant,
@@ -776,23 +783,26 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userName">Login пользователя.</param>
         /// <returns></returns>
-        public async Task<int> GetTotalCountTasks(string userName)
+        public async Task<int?> GetTotalCountTasks(string userName)
         {
             try
             {
-                string userId = await GetUserLoginById(userName);
+                if (string.IsNullOrEmpty(userName))
+                {
+                    return null;
+                }
 
-                return !string.IsNullOrEmpty(userName) ?
-                    await _postgre.Tasks
-                    .Where(t => t.OwnerId.Equals(userId))
-                    .CountAsync() : throw new ArgumentNullException();
-            }
+                UserEntity user = await _user.GetUserByLogin(userName);
 
-            catch (ArgumentNullException ex)
-            {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                await _logger.LogError();
-                throw new ArgumentNullException($"Id не передан {ex.Message}");
+                if (user.Id == null)
+                {
+                    throw new NotFoundUserException(userName);
+                }
+
+                return await _postgre.Tasks
+                    .Where(t => t.OwnerId
+                    .Equals(user.Id))
+                    .CountAsync();
             }
 
             catch (Exception ex)

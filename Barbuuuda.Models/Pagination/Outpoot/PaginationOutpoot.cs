@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Barbuuuda.Models.Outpoot
+namespace Barbuuuda.Models.Pagination.Outpoot
 {
     /// <summary>
     /// Класс пагинации.

@@ -4,11 +4,6 @@
         <name>Barbuuuda</name>
     </assembly>
     <members>
-        <member name="T:Barbuuuda.AutofacModules.AutofacConfig">
-            <summary>
-            Конфигурация Autofac, в которой ругистрируются все сервисы.
-            </summary>
-        </member>
         <member name="T:Barbuuuda.Controllers.BaseController">
             <summary>
             Базовый контроллер для всех контроллеров.
@@ -62,11 +57,17 @@
             <param name="answers">Массив с ответами на тест.</param>
             <returns>Статус прохождения теста true/false.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.ExecutorController.GetTasksWork">
+        <member name="M:Barbuuuda.Controllers.ExecutorController.GetTasksWorkAsync">
             <summary>
             Метод выгружает задания, которые находятся в работе у исполнителя. Т.е у которых статус "В работе".
             </summary>
             <returns>Список заданий.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.RespondAsync(Barbuuuda.Models.Executor.Input.TaskInput)">
+            <summary>
+            Метод оставляет ставку к заданию.
+            </summary>
+            <param name="taskInput">Входная модель.</param>
         </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>
@@ -131,12 +132,24 @@
             Контроллер работы с пагинацией.
             </summary>
         </member>
+        <member name="F:Barbuuuda.Controllers.PaginationController._pagination">
+            <summary>
+            Абстракция сервиса пагинации.
+            </summary>
+        </member>
         <member name="M:Barbuuuda.Controllers.PaginationController.GetPaginationTasks(System.Int32)">
             <summary>
             Метод пагинации.
             </summary>
-            <param name="pageIdx">Страница по умолчанию.</param>
-            <returns>Список заданий.</returns>
+            <param name="pageIdx">Номер страницы. По дефолту 1.</param>
+            <returns>Данные пагинации.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.PaginationController.GetPaginationAuction(System.Int32)">
+            <summary>
+            Метод пагинации аукциона.
+            </summary>
+            <param name="pageIdx"></param>
+            <returns>Данные пагинации.</returns>
         </member>
         <member name="T:Barbuuuda.Controllers.TaskController">
             <summary>

@@ -1,9 +1,5 @@
-﻿using Barbuuuda.Core.Data;
-using Barbuuuda.Core.Interfaces;
+﻿using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Task;
-using Barbuuuda.Models.User;
-using Barbuuuda.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections;
@@ -195,7 +191,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("total")]
         public async Task<IActionResult> GetTotalCountTasks()
         {
-            int countTasks = await _task.GetTotalCountTasks(GetUserName());
+            int? countTasks = await _task.GetTotalCountTasks(GetUserName());
 
             return Ok(countTasks);
         }

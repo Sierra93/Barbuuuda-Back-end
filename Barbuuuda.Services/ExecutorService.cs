@@ -4,6 +4,9 @@ using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Entities.Executor;
+using Barbuuuda.Models.Entities.Respond;
+using Barbuuuda.Models.Executor.Input;
+using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -254,7 +257,7 @@ namespace Barbuuuda.Services
         /// Метод выгружает задания, которые находятся в работе у исполнителя. Т.е у которых статус "В работе".
         /// </summary>
         /// <returns>Список заданий.</returns>
-        public async Task<IEnumerable> GetTasksWork(string userName)
+        public async Task<IEnumerable> GetTasksWorkAsync(string userName)
         {
             try
             {
@@ -293,6 +296,57 @@ namespace Barbuuuda.Services
             {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 _ = _logger.LogError();
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод оставляет ставку к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания, к которому оставляют ставку.</param>
+        /// <param name="price">Цена ставки (без комиссии 22%).</param>
+        /// <param name="comment">Комментарий к ставке.</param>
+        /// <param name="isTemplate">Флаг сохранения как шаблон.</param>
+        /// <param name="template">Данные шаблона.</param>
+        /// <param name="userName">Имя юзера.</param>
+        public async Task RespondAsync(int? taskId, decimal price, bool isTemplate, RespondInput template, string comment, string userName)
+        {
+            try
+            {
+                if (taskId == 0 || taskId == null)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                // Находит задание по его TaskId.
+                TaskEntity task = await _postgre.Tasks.Where(t => t.TaskId.Equals(taskId)).FirstOrDefaultAsync();
+
+                if (task == null)
+                {
+                    throw new NotFoundTaskIdException(taskId);
+                }
+
+                // Находит Id исполнителя, который делает ставку к заданию.
+                UserEntity user = await _user.GetUserByLogin(userName);
+
+                // Если нужно сохранить шаблон.
+                //if (isTemplate)
+                //{
+
+                //}                
+
+                // Добавит новую ставку.
+                await _postgre.Responds.AddAsync(new RespondEntity() { 
+                    TaskId = taskId,
+                    Price = price,
+                    Comment = comment,
+                    ExecutorId = user.Id
+                });
+                await _postgre.SaveChangesAsync();
+            }
+
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message.ToString());
             }
         }

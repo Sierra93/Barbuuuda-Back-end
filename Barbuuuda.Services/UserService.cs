@@ -394,7 +394,7 @@ namespace Barbuuuda.Services
             UserEntity user = await _postgre.Users
                 .Where(u => u.UserName
                 .Equals(userName))
-                .SingleOrDefaultAsync();
+                .FirstOrDefaultAsync();
 
             return user;
         }
