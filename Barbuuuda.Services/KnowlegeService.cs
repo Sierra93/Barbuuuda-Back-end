@@ -4,6 +4,7 @@ using Barbuuuda.Models.Entities.Knowlege;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Barbuuuda.Services
 {
@@ -22,12 +23,12 @@ namespace Barbuuuda.Services
         /// <summary>
         /// Метод выгружает список категорий для БЗ.
         /// </summary>
-        /// <returns>Список категорий.</returns>
+        /// <returns>Список категорий.</returns>       
         public async Task<IEnumerable<KnowlegeCategoryEntity>> GetCategoryListAsync()
         {
             try
             {
-                throw new NotImplementedException();
+                return await _postgre.KnowlegeCategories.ToListAsync();
             }
 
             catch (Exception ex)

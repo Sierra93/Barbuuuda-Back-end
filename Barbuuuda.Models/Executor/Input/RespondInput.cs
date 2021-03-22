@@ -1,5 +1,4 @@
 ﻿using Barbuuuda.Models.Entities.Respond;
-using Barbuuuda.Models.User;
 
 namespace Barbuuuda.Models.Executor.Input
 {
@@ -11,13 +10,7 @@ namespace Barbuuuda.Models.Executor.Input
         /// <summary>
         /// Id задания.
         /// </summary>
-        public int TaskId { get; set; }
-
-        /// <summary>
-        /// Внешний ключ к таблице пользователей.
-        /// </summary>
-        public int Id { get; set; }
-        public UserEntity User { get; set; }
+        public int? TaskId { get; set; }
 
         /// <summary>
         /// Цена, за которую исполнитель готов выполнить задание.
