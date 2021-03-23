@@ -30,5 +30,15 @@ namespace Barbuuuda.Controllers
 
             return Ok(categoryList);
         }
+
+        /// <summary>
+        /// Метод связывает внешним ключом статьи с определенной категорией в таблице dbo.KnowlegeCategories.
+        /// </summary>
+        /// <returns>Список статей.</returns>
+        [HttpPost, Route("articles-list")]
+        public async Task<IActionResult> GetCategoryArticles()
+        {
+
+        }
     }
 }
