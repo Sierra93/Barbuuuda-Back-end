@@ -6,7 +6,7 @@ namespace Barbuuuda.Models.Entities.Knowlege
     /// <summary>
     /// Класс сопоставляется с таблицей статей в БЗ.
     /// </summary>
-    [Table("KnowlegeArticles")]
+    [Table("KnowlegeArticles", Schema = "dbo")]
     public sealed class KnowlegeArticleEntity
     {
         /// <summary>
@@ -43,7 +43,8 @@ namespace Barbuuuda.Models.Entities.Knowlege
         /// Вторичный ключ на PK CategoryId таблицы KnowlegeCategories.
         /// </summary>
         public int CategoryId { get; set; }
-        public KnowlegeCategoryEntity Id { get; set; }
+        [ForeignKey("CategoryId")]
+        public KnowlegeCategoryEntity Category { get; set; }
 
         /// <summary>
         /// Имеет ли статья скриншоты.

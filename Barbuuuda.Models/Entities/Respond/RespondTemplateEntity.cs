@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Barbuuuda.Models.Entities.Respond
@@ -13,6 +14,7 @@ namespace Barbuuuda.Models.Entities.Respond
         /// <summary>
         /// Первичный ключ.
         /// </summary>
+        [Key]
         public int TemplateId { get; set; }
 
         /// <summary>
