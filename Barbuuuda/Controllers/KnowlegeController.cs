@@ -2,8 +2,10 @@
 using Barbuuuda.Models.Entities.Knowlege;
 using Barbuuuda.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 
 namespace Barbuuuda.Controllers
 {
@@ -32,13 +34,15 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод связывает внешним ключом статьи с определенной категорией в таблице dbo.KnowlegeCategories.
+        /// Метод выгружает список статей категорий.
         /// </summary>
         /// <returns>Список статей.</returns>
         [HttpPost, Route("articles-list")]
         public async Task<IActionResult> GetCategoryArticles()
         {
+            IEnumerable articleList = await _knowlege.GetCategoryArticles();
 
+            return Ok(articleList);
         }
     }
-}
+} 

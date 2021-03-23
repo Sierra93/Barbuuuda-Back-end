@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Collections;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Barbuuuda.Services
 {
@@ -31,7 +32,8 @@ namespace Barbuuuda.Services
             {
                 //throw new NotImplementedException();
                 return await _postgre
-                    .KnowlegeCategories                    
+                    .KnowlegeCategories
+                    .OrderBy(t => t.CategoryId)
                     .ToListAsync();
             }
 
@@ -47,7 +49,18 @@ namespace Barbuuuda.Services
         /// <returns>Список статей.</returns>
         public async Task<IEnumerable> GetCategoryArticles()
         {
+            try
+            {               
+                return await _postgre
+                    .KnowlegeArticles                    
+                    .ToListAsync();
+            }
 
-        }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+        }       
     }
+   
 }
