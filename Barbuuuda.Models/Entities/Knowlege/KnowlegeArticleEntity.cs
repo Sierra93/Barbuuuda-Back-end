@@ -6,7 +6,7 @@ namespace Barbuuuda.Models.Entities.Knowlege
     /// <summary>
     /// Класс сопоставляется с таблицей статей в БЗ.
     /// </summary>
-    [Table("KnowlegeArticles")]
+    [Table("KnowlegeArticles", Schema = "dbo")]
     public sealed class KnowlegeArticleEntity
     {
         /// <summary>
@@ -18,32 +18,33 @@ namespace Barbuuuda.Models.Entities.Knowlege
         /// <summary>
         /// Заголовок статьи.
         /// </summary>
-        [Column("ArticleTitle", TypeName = "varchar(100)")]
+        [Column("ArticleTitle", TypeName = "varchar(200)")]
         public string ArticleTitle { get; set; }
 
         /// <summary>
         /// Детальное описание статьи.
         /// </summary>
-        [Column("ArticleDetails", TypeName = "nvarchar(max)")]
+        [Column("ArticleDetails", TypeName = "text")]
         public string ArticleDetails { get; set; }
 
         /// <summary>
         /// Кол-во людей, которые сочли эту статью полезной.
         /// </summary>
-        [Column("HelpfulCount", TypeName = "int")]
+        [Column("HelpfulCount", TypeName = "integer")]
         public int HelpfulCount { get; set; }
 
         /// <summary>
         /// Кол-во людей, которые не сочли эту статью полезной.
         /// </summary>
-        [Column("NotHelpfulCount", TypeName = "int")]
+        [Column("NotHelpfulCount", TypeName = "integer")]
         public int NotHelpfulCount { get; set; }
 
         /// <summary>
         /// Вторичный ключ на PK CategoryId таблицы KnowlegeCategories.
         /// </summary>
         public int CategoryId { get; set; }
-        public KnowlegeCategoryEntity Id { get; set; }
+        [ForeignKey("CategoryId")]
+        public KnowlegeCategoryEntity Category { get; set; }
 
         /// <summary>
         /// Имеет ли статья скриншоты.
@@ -54,7 +55,7 @@ namespace Barbuuuda.Models.Entities.Knowlege
         /// <summary>
         /// Url скрина.
         /// </summary>
-        [Column("ImageUrl", TypeName = "nvarchar(max)")]
+        [Column("ArticleDetails", TypeName = "nvarchar(max)")]
         public string ImageUrl { get; set; }
     }
 }

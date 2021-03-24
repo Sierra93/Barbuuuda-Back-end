@@ -4,6 +4,7 @@ using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Entities.Executor;
+using Barbuuuda.Models.Entities.Respond;
 using Barbuuuda.Models.Executor.Input;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
@@ -308,11 +309,11 @@ namespace Barbuuuda.Services
         /// <param name="isTemplate">Флаг сохранения как шаблон.</param>
         /// <param name="template">Данные шаблона.</param>
         /// <param name="userName">Имя юзера.</param>
-        public async Task RespondAsync(int taskId, decimal price, bool isTemplate, RespondInput template, string comment, string userName)
+        public async Task RespondAsync(int? taskId, decimal price, bool isTemplate, RespondInput template, string comment, string userName)
         {
             try
             {
-                if (taskId == 0)
+                if (taskId == 0 || taskId == null)
                 {
                     throw new NullTaskIdException();
                 }
@@ -325,16 +326,22 @@ namespace Barbuuuda.Services
                     throw new NotFoundTaskIdException(taskId);
                 }
 
-                // Находит Id юзера.
+                // Находит Id исполнителя, который делает ставку к заданию.
                 UserEntity user = await _user.GetUserByLogin(userName);
 
-                // Если нужно сохранить шаблон (шаблоны).
-                if (isTemplate)
-                {
-                    
-                }                
+                // Если нужно сохранить шаблон.
+                //if (isTemplate)
+                //{
 
-                _postgre.Tasks.Update(task);
+                //}                
+
+                // Добавит новую ставку.
+                await _postgre.Responds.AddAsync(new RespondEntity() { 
+                    TaskId = taskId,
+                    Price = price,
+                    Comment = comment,
+                    ExecutorId = user.Id
+                });
                 await _postgre.SaveChangesAsync();
             }
 

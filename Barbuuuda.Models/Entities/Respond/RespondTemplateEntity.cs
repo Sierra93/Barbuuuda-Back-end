@@ -1,6 +1,6 @@
-﻿using Barbuuuda.Models.User;
-using System;
+﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Barbuuuda.Models.Entities.Respond
@@ -14,6 +14,7 @@ namespace Barbuuuda.Models.Entities.Respond
         /// <summary>
         /// Первичный ключ.
         /// </summary>
+        [Key]
         public int TemplateId { get; set; }
 
         /// <summary>
@@ -22,10 +23,9 @@ namespace Barbuuuda.Models.Entities.Respond
         public Guid TemplateCode { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// Id пользователя, который сохранил шаблон. Внешний ключ к таблице пользователей.
+        /// Id пользователя, который сохранил шаблон.
         /// </summary>
-        public int Id { get; set; }
-        public UserEntity User { get; set; }
+        public string ExecutorId { get; set; }
 
         /// <summary>
         /// Название шаблона.

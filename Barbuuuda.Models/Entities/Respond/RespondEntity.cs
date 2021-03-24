@@ -1,4 +1,4 @@
-﻿using Barbuuuda.Models.User;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Barbuuuda.Models.Entities.Respond
@@ -12,6 +12,7 @@ namespace Barbuuuda.Models.Entities.Respond
         /// <summary>
         /// Первичный ключ.
         /// </summary>
+        [Key]
         public int RespondId { get; set; }
 
         /// <summary>
@@ -20,14 +21,18 @@ namespace Barbuuuda.Models.Entities.Respond
         public decimal Price { get; set; }
 
         /// <summary>
+        /// Id задания.
+        /// </summary>
+        public int? TaskId { get; set; }
+
+        /// <summary>
         /// Комментарий.
         /// </summary>
         public string Comment { get; set; }
 
         /// <summary>
-        /// Внешний ключ к таблице пользователей.
+        /// Id исполнителя, который сделал ставку к заданию.
         /// </summary>
-        public int Id { get; set; }
-        public UserEntity User { get; set; }
+        public string ExecutorId { get; set; }
     }
 }
