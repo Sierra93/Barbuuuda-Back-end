@@ -14,5 +14,11 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <returns>Список категорий.</returns>
         Task<IEnumerable<KnowlegeCategoryEntity>> GetCategoryListAsync();
-    }
+
+        // <summary>
+        /// Метод выгружает список популярных статей.
+        /// </summary>
+        /// <returns>Список статей.</returns>
+        Task<IEnumerable<PopularArticleEntity>> GetPopularArticles();
+    }    
 }

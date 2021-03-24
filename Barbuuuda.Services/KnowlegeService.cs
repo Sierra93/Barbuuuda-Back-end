@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 
 namespace Barbuuuda.Services
 {
@@ -36,5 +37,25 @@ namespace Barbuuuda.Services
                 throw new Exception(ex.Message.ToString());
             }
         }
+
+        /// <summary>
+        /// Метод выгружает список популярных статей.
+        /// </summary>
+        /// <returns>Список статей.</returns>
+        public async Task<IEnumerable<PopularArticleEntity>> GetPopularArticles()
+        {
+            try
+            {
+                return await _postgre
+                    .PopularArticles
+                    .ToListAsync();
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
     }
 }

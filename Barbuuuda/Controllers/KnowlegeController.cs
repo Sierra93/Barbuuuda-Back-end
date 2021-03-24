@@ -3,6 +3,7 @@ using Barbuuuda.Models.Entities.Knowlege;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace Barbuuuda.Controllers
 {
@@ -28,6 +29,18 @@ namespace Barbuuuda.Controllers
             IEnumerable<KnowlegeCategoryEntity> categoryList = await _knowlege.GetCategoryListAsync();
 
             return Ok(categoryList);
+        }
+
+        /// <summary>
+        /// Метод выгружает список популярных статей.
+        /// </summary>
+        /// <returns>Список статей.</returns>
+        [HttpPost, Route("popular")]
+        public async Task<IActionResult> GetPopularArticles()
+        {
+            IEnumerable<PopularArticleEntity> populArticlesList = await _knowlege.GetPopularArticles();
+
+            return Ok(populArticlesList);
         }
     }
 }
