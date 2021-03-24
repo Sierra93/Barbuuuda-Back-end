@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System.Collections;
 
 namespace Barbuuuda.Services
 {
@@ -42,7 +41,7 @@ namespace Barbuuuda.Services
         /// Метод выгружает список популярных статей.
         /// </summary>
         /// <returns>Список статей.</returns>
-        public async Task<IEnumerable<PopularArticleEntity>> GetPopularArticles()
+        public async Task<IEnumerable<PopularArticleEntity>> GetPopularArticlesAsync()
         {
             try
             {

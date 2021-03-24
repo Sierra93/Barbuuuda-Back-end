@@ -19,6 +19,6 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод выгружает список популярных статей.
         /// </summary>
         /// <returns>Список статей.</returns>
-        Task<IEnumerable<PopularArticleEntity>> GetPopularArticles();
+        Task<IEnumerable<PopularArticleEntity>> GetPopularArticlesAsync();
     }    
 }
