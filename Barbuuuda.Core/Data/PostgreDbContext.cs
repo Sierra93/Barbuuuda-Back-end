@@ -70,5 +70,10 @@ namespace Barbuuuda.Core.Data
         public DbSet<RespondEntity> Responds { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }
+
+        /// <summary>
+        /// Таблица популярных статей.
+        /// </summary>
+        public DbSet<PopularArticleEntity> PopularArticles { get; set; }
     }
 }

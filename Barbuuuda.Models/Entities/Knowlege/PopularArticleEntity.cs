@@ -7,7 +7,7 @@ namespace Barbuuuda.Models.Entities.Knowlege
     /// <summary>
     /// Класс сопоставляется с таблицей популярных статей.
     /// </summary>
-    [Table("PopularArticles")]
+    [Table("PopularArticles", Schema = "dbo")]
     public sealed class PopularArticleEntity
     {
         [Key]
