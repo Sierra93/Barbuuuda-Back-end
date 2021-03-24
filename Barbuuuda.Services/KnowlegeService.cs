@@ -38,6 +38,23 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
+        /// Метод возвращает список статей.
+        /// </summary>
+        /// <returns>Список статей.</returns>
+        public async Task<IEnumerable<KnowlegeArticleEntity>> GetCategoryArticles()
+        {
+            try
+            {
+                return await _postgre.KnowlegeArticles.ToListAsync();
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
         /// Метод выгружает список популярных статей.
         /// </summary>
         /// <returns>Список статей.</returns>
@@ -45,9 +62,7 @@ namespace Barbuuuda.Services
         {
             try
             {
-                return await _postgre
-                    .PopularArticles
-                    .ToListAsync();
+                return await _postgre.PopularArticles.ToListAsync();
             }
 
             catch (Exception ex)
@@ -57,4 +72,5 @@ namespace Barbuuuda.Services
         }
 
     }
+
 }

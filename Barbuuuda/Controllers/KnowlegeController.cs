@@ -41,5 +41,17 @@ namespace Barbuuuda.Controllers
 
             return Ok(populArticlesList);
         }
+
+        /// <summary>
+        /// Метод выгружает список статей категорий.
+        /// </summary>
+        /// <returns>Список статей.</returns>
+        [HttpPost, Route("articles-list")]
+        public async Task<IActionResult> GetCategoryArticles()
+        {
+            IEnumerable<KnowlegeArticleEntity> articleList = await _knowlege.GetCategoryArticles();
+
+            return Ok(articleList);
+        }
     }
-}
+} 

@@ -55,7 +55,7 @@ namespace Barbuuuda.Models.Entities.Knowlege
         /// <summary>
         /// Url скрина.
         /// </summary>
-        [Column("ImageUrl", TypeName = "text")]
+        [Column("ArticleDetails", TypeName = "text")]
         public string ImageUrl { get; set; }
     }
 }
