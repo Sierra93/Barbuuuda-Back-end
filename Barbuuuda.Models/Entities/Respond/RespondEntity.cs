@@ -18,7 +18,7 @@ namespace Barbuuuda.Models.Entities.Respond
         /// <summary>
         /// Цена ставки (без комиссии).
         /// </summary>
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
 
         /// <summary>
         /// Id задания.
