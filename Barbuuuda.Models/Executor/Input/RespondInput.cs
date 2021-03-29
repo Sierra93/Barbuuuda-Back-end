@@ -15,7 +15,7 @@ namespace Barbuuuda.Models.Executor.Input
         /// <summary>
         /// Цена, за которую исполнитель готов выполнить задание.
         /// </summary>
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
 
         /// <summary>
         /// Запомнить сообщение как шаблон.
