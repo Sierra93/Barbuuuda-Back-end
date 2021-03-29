@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Barbuuuda.Models.Task
 {
@@ -15,10 +12,16 @@ namespace Barbuuuda.Models.Task
         [Key, Column("type_id")]
         public int TypeId { get; set; }
 
+        /// <summary>
+        /// Код типа.
+        /// </summary>
         [Column("type_code", TypeName = "varchar(100)")]
-        public string TypeCode { get; set; }  // Код типа.
+        public string TypeCode { get; set; }
 
+        /// <summary>
+        /// Название типа задания.
+        /// </summary>
         [Column("type_name", TypeName = "varchar(100)")]
-        public string TypeName { get; set; }    // Название типа задания.
+        public string TypeName { get; set; }    
     }
 }

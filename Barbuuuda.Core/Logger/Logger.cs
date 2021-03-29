@@ -2,8 +2,6 @@
 using Barbuuuda.Core.Data;
 using Barbuuuda.Models.Logger;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Core.Logger

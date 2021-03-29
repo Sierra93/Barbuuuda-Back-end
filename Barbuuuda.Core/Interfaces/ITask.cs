@@ -114,5 +114,12 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="userId">Id юзера.</param>
         /// <returns>Id юзера.</returns>
         Task<string> GetUserByName(string userName);
+
+        /// <summary>
+        /// Метод получает список ставок к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
+        /// <returns>Список ставок.</returns>
+        Task<IEnumerable> GetRespondsAsync(int taskId);
     }
 }

@@ -6,6 +6,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using System.ComponentModel.DataAnnotations;
 
 namespace Barbuuuda.Controllers
 {
@@ -206,6 +207,19 @@ namespace Barbuuuda.Controllers
             object aAuctionTasks = await _task.LoadAuctionTasks();
 
             return Ok(aAuctionTasks);
+        }
+
+        /// <summary>
+        /// Метод получает список ставок к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
+        /// <returns>Список ставок.</returns>
+        [HttpPost, Route("get-responds")]
+        public async Task<IActionResult> GetRespondsAsync([FromBody][Required(ErrorMessage = "taskId задания не может быть пустым")] int taskId)
+        {
+            IEnumerable respondsList = await _task.GetRespondsAsync(taskId);
+
+            return Ok(respondsList);
         }
     }
 }

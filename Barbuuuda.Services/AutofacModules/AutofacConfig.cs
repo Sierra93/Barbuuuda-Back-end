@@ -27,6 +27,6 @@ namespace Barbuuuda.Services.AutofacModules
 
             // Сервис БЗ.
             builder.RegisterType<KnowlegeService>().As<IKnowlege>();
-        }
+        }       
     }
 }

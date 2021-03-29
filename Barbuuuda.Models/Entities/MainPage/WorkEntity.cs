@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Barbuuuda.Models.MainPage
 {
@@ -15,16 +12,28 @@ namespace Barbuuuda.Models.MainPage
         [Key, Column("work_id")]
         public int WorkId { get; set; }
 
+        /// <summary>
+        /// Основной заголовок блока.
+        /// </summary>
         [Column("main_title", TypeName = "nvarchar(150)")]
-        public string MainTitle { get; set; }   // Основной заголовок блока.
+        public string MainTitle { get; set; }
 
+        /// <summary>
+        /// Дополнительный заголовок.
+        /// </summary>
         [Column("second_title", TypeName = "nvarchar(150)")]
-        public string SecondTitle { get; set; }     // Дополнительный заголовок.
+        public string SecondTitle { get; set; }
 
+        /// <summary>
+        /// Заголовок блока.
+        /// </summary>
         [Column("block_title", TypeName = "nvarchar(150)")]
-        public string BlockTitle { get; set; }  // Заголовок блока.
+        public string BlockTitle { get; set; }
 
+        /// <summary>
+        /// Описание блока.
+        /// </summary>
         [Column("block_text", TypeName = ("nvarchar(500)"))]
-        public string BlockText { get; set; }   // Описание блока.
+        public string BlockText { get; set; }   
     }
 }
