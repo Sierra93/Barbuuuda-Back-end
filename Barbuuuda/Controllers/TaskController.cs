@@ -6,6 +6,8 @@ using System.Collections;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using System.ComponentModel.DataAnnotations;
+using Barbuuuda.Models.Task.Input;
 
 namespace Barbuuuda.Controllers
 {
@@ -206,6 +208,19 @@ namespace Barbuuuda.Controllers
             object aAuctionTasks = await _task.LoadAuctionTasks();
 
             return Ok(aAuctionTasks);
+        }
+
+        /// <summary>
+        /// Метод получает список ставок к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
+        /// <returns>Список ставок.</returns>
+        [HttpPost, Route("get-responds")]
+        public async Task<IActionResult> GetRespondsAsync([FromBody] GetRespondInput getRespondInput)
+        {
+            IEnumerable respondsList = await _task.GetRespondsAsync(getRespondInput.TaskId);
+
+            return Ok(respondsList);
         }
     }
 }

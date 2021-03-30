@@ -10,12 +10,12 @@ namespace Barbuuuda.Models.Executor.Input
         /// <summary>
         /// Id задания.
         /// </summary>
-        public int? TaskId { get; set; }
+        public int TaskId { get; set; }
 
         /// <summary>
         /// Цена, за которую исполнитель готов выполнить задание.
         /// </summary>
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
 
         /// <summary>
         /// Запомнить сообщение как шаблон.

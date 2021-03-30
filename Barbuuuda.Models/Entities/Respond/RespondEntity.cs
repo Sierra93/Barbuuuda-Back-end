@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Barbuuuda.Models.Entities.Respond
 {
@@ -11,26 +12,31 @@ namespace Barbuuuda.Models.Entities.Respond
         /// <summary>
         /// Первичный ключ.
         /// </summary>
+        [Key, Column("RespondId")]
         public int RespondId { get; set; }
 
         /// <summary>
         /// Цена ставки (без комиссии).
         /// </summary>
-        public decimal Price { get; set; }
+        [Column("Price")]
+        public decimal? Price { get; set; }
 
         /// <summary>
         /// Id задания.
         /// </summary>
-        public int? TaskId { get; set; }
+        [Column("TaskId")]
+        public int TaskId { get; set; }
 
         /// <summary>
         /// Комментарий.
         /// </summary>
+        [Column("Comment")]
         public string Comment { get; set; }
 
         /// <summary>
         /// Id исполнителя, который сделал ставку к заданию.
         /// </summary>
+        [Column("ExecutorId")]
         public string ExecutorId { get; set; }
     }
 }

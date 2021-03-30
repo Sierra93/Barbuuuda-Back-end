@@ -859,5 +859,39 @@ namespace Barbuuuda.Services
                 .Select(u => u.Id)
                 .FirstOrDefaultAsync();
         }
+
+        /// <summary>
+        /// Метод получает список ставок к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
+        /// <returns>Список ставок.</returns>
+        public async Task<IEnumerable> GetRespondsAsync(int taskId)
+        {
+            try
+            {
+                if (taskId == 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                IEnumerable respondsList = await _postgre.Responds.Where(t => t.TaskId == taskId)
+                    .Join(_postgre.Users, re => re.ExecutorId, u => u.Id,
+                    (re, u) => new { 
+                        re.Price,
+                        re.Comment,
+                        u.UserName
+                    })
+                    .ToListAsync();
+
+                return respondsList;
+            }
+
+            catch (Exception ex)
+            {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
+                throw new Exception(ex.Message.ToString());
+            }
+        }
     }
 }

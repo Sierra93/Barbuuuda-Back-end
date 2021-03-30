@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Barbuuuda.Models.Task
 {
@@ -15,9 +12,15 @@ namespace Barbuuuda.Models.Task
         [Key, Column("status_id")]
         public int StatusId { get; set; }
 
+        /// <summary>
+        /// Код статуса.
+        /// </summary>
         [Column("status_code", TypeName = "varchar(100)")]
-        public string StatusCode { get; set; }  // Код статуса.
+        public string StatusCode { get; set; }
 
+        /// <summary>
+        /// Название статуса.
+        /// </summary>
         [Column("status_name", TypeName = "varchar(100)")]
         public string StatusName { get; set; }
     }

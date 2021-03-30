@@ -13,7 +13,7 @@ namespace Barbuuuda.Core.Data
     public class PostgreDbContext : DbContext
     {
         /// <summary>
-        /// Таблица информации аккаунтов пользователей.
+        /// Таблица пользователей.
         /// </summary>
         public DbSet<UserEntity> Users { get; set; }
 
@@ -70,5 +70,10 @@ namespace Barbuuuda.Core.Data
         public DbSet<RespondEntity> Responds { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }
+
+        /// <summary>
+        /// Таблица популярных статей.
+        /// </summary>
+        public DbSet<PopularArticleEntity> PopularArticles { get; set; }
     }
 }
