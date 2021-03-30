@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using System.ComponentModel.DataAnnotations;
+using Barbuuuda.Models.Task.Input;
 
 namespace Barbuuuda.Controllers
 {
@@ -215,9 +216,9 @@ namespace Barbuuuda.Controllers
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
         /// <returns>Список ставок.</returns>
         [HttpPost, Route("get-responds")]
-        public async Task<IActionResult> GetRespondsAsync([FromBody][Required(ErrorMessage = "taskId задания не может быть пустым")] int taskId)
+        public async Task<IActionResult> GetRespondsAsync([FromBody] GetRespondInput getRespondInput)
         {
-            IEnumerable respondsList = await _task.GetRespondsAsync(taskId);
+            IEnumerable respondsList = await _task.GetRespondsAsync(getRespondInput.TaskId);
 
             return Ok(respondsList);
         }

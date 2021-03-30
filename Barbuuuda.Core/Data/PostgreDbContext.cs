@@ -13,7 +13,7 @@ namespace Barbuuuda.Core.Data
     public class PostgreDbContext : DbContext
     {
         /// <summary>
-        /// Таблица информации аккаунтов пользователей.
+        /// Таблица пользователей.
         /// </summary>
         public DbSet<UserEntity> Users { get; set; }
 
