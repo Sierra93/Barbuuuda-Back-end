@@ -3,6 +3,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>2d0a43a2-1e5c-4a59-bb69-f117bb51285e</UserSecretsId>
     <Version>1.0.1</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile></DocumentationFile>
