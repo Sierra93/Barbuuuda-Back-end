@@ -12,17 +12,26 @@ namespace Barbuuuda.Models.Task
         [Key, Column("category_id")]
         public int CategoryId { get; set; }
 
+        /// <summary>
+        /// Код категории.
+        /// </summary>
         [Column("category_code", TypeName = "varchar(100)")]
-        public string CategoryCode { get; set; }  // Код категории.
+        public string CategoryCode { get; set; }
 
+        /// <summary>
+        /// Название категории.
+        /// </summary>
         [Column("category_name", TypeName = "varchar(100)")]
-        public string CategoryName { get; set; }    // Название категории.
+        public string CategoryName { get; set; }    
 
         [Column("specializations", TypeName = "jsonb")]
         public Specialization[] Specializations { get; set; }
 
+        /// <summary>
+        /// Url иконки категории.
+        /// </summary>
         [Column("url", TypeName = "text")]
-        public string Url { get; set; }     // Url иконки категории.
+        public string Url { get; set; }     
     }
 
     /// <summary>

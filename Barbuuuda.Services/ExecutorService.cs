@@ -309,11 +309,11 @@ namespace Barbuuuda.Services
         /// <param name="isTemplate">Флаг сохранения как шаблон.</param>
         /// <param name="template">Данные шаблона.</param>
         /// <param name="userName">Имя юзера.</param>
-        public async Task RespondAsync(int? taskId, decimal? price, bool isTemplate, RespondInput template, string comment, string userName)
+        public async Task RespondAsync(int taskId, decimal? price, bool isTemplate, RespondInput template, string comment, string userName)
         {
             try
             {
-                if (taskId == 0 || taskId == null)
+                if (taskId == 0)
                 {
                     throw new NullTaskIdException();
                 }

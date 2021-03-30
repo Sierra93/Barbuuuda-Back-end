@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Barbuuuda.Models.User
 {
@@ -15,19 +12,34 @@ namespace Barbuuuda.Models.User
         [Key, Column("id")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Иконка поля хидера (если есть).
+        /// </summary>
         [Column("header_icon", TypeName = "nvarchar(max)")]
-        public string HeaderIcon { get; set; }  // Иконка поля хидера (если есть).
+        public string HeaderIcon { get; set; }
 
+        /// <summary>
+        /// Название поля хидера.
+        /// </summary>
         [Column("header_field", TypeName = "nvarchar(200)")]
-        public string HeaderField { get; set; }     // Название поля хидера.
+        public string HeaderField { get; set; }
 
+        /// <summary>
+        /// Тип хидера.
+        /// </summary>
         [Column("header_type", TypeName = "nvarchar(50)")]
-        public string HeaderType { get; set; }  // Тип хидера.
+        public string HeaderType { get; set; }
 
+        /// <summary>
+        /// Поле меню профиля.
+        /// </summary>
         [Column("profile_field", TypeName = "nvarchar(100)")]
-        public string ProfileField { get; set; }    // Поле меню профиля.
+        public string ProfileField { get; set; }
 
+        /// <summary>
+        /// Пункт профиля или нет.
+        /// </summary>
         [Column("is_profile", TypeName = "bit")]
-        public bool IsProfile { get; set; }     // Пункт профиля или нет.
+        public bool IsProfile { get; set; }     
     }
 }

@@ -13,44 +13,83 @@ namespace Barbuuuda.Models.User
         [Column("UserPassword", TypeName = "varchar(100)")]
         public string UserPassword { get; set; }
 
+        /// <summary>
+        /// Роль пользователя: Заказчик или Исполнитель.
+        /// </summary>
         [Column("UserRole", TypeName = "varchar(1)")]
-        public string UserRole { get; set; }    // Роль пользователя: Заказчик или Исполнитель.
+        public string UserRole { get; set; }
 
+        /// <summary>
+        /// Фамилия.
+        /// </summary>
         [Column("LastName", TypeName = "varchar(100)")]
-        public string LastName { get; set; }    // Фамилия.
+        public string LastName { get; set; }
 
+        /// <summary>
+        /// Имя.
+        /// </summary>
         [Column("FirstName", TypeName = "varchar(100)")]
-        public string FirstName { get; set; }   // Имя.
+        public string FirstName { get; set; }
 
+        /// <summary>
+        /// Отчество.
+        /// </summary>
         [Column("Patronymic", TypeName = "varchar(100)")]
-        public string Patronymic { get; set; }  // Отчество.
+        public string Patronymic { get; set; }
 
+        /// <summary>
+        /// Путь к иконке пользователя.
+        /// </summary>
         [Column("UserIcon", TypeName = "text")]
-        public string UserIcon { get; set; }    // Путь к иконке пользователя.
+        public string UserIcon { get; set; }
 
+        /// <summary>
+        /// Кол-во положительных отзывов исполнителя.
+        /// </summary>
         [Column("CountPositive", TypeName = "integer")]
-        public int CountPositive { get; set; }  // Кол-во положительных отзывов исполнителя.
+        public int CountPositive { get; set; }
 
+        /// <summary>
+        /// Кол-во отрицательных отзывов исполнителя.
+        /// </summary>
         [Column("CountNegative", TypeName = "integer")]
-        public int CountNegative { get; set; }  // Кол-во отрицательных отзывов исполнителя.
+        public int CountNegative { get; set; }
 
+        /// <summary>
+        /// Рейтинг исполнителя.
+        /// </summary>
         [Column("Rating", TypeName = ("numeric(12,2)"))]
-        public double Rating { get; set; }  // Рейтинг исполнителя.
+        public double Rating { get; set; }  
 
+        /// <summary>
+        /// Флаг онлайн.
+        /// </summary>
         [Column("IsOnline", TypeName = "boolean")]
         public bool IsOnline { get; set; }
 
+        /// <summary>
+        /// Дата регистрации пользователя.
+        /// </summary>
         [Column("DateRegister", TypeName = "timestamp")]
-        public DateTime DateRegister { get; set; }  // Дата регистрации пользователя.
+        public DateTime DateRegister { get; set; }
 
+        /// <summary>
+        /// Информация "Обо мне".
+        /// </summary>
         [Column("AboutInfo", TypeName = "text")]
-        public string AboutInfo { get; set; }   // Информация "Обо мне".
+        public string AboutInfo { get; set; }
 
+        /// <summary>
+        /// Счет пользователя.
+        /// </summary>
         [Column("Score", TypeName = "numeric(12,2)")]
-        public decimal? Score { get; set; }     // Счет пользователя.
+        public decimal? Score { get; set; }
 
+        /// <summary>
+        /// План: PRO или базовый.
+        /// </summary>
         [Column("Plan", TypeName = "varchar(10)")]
-        public string Plan { get; set; }    // План: PRO или базовый.
+        public string Plan { get; set; }    
 
         [Column("City", TypeName = "varchar(200)")]
         public string City { get; set; }
@@ -58,8 +97,11 @@ namespace Barbuuuda.Models.User
         [Column("Age", TypeName = "integer")]
         public int Age { get; set; }
 
+        /// <summary>
+        /// M - мужчина, F - женщина.
+        /// </summary>
         [Column("Gender", TypeName = "varchar(1)")]
-        public string Gender { get; set; }    // M - мужчина, F - женщина.
+        public string Gender { get; set; }    
 
         [Column("RememberMe", TypeName = "boolean")]
         public bool RememberMe { get; set; }        
@@ -67,8 +109,11 @@ namespace Barbuuuda.Models.User
         [Column("ExecutorSpecializations", TypeName = "jsonb")]
         public ExecutorSpecialization[] Specializations { get; set; }
 
+        /// <summary>
+        /// Пройден ли тест.
+        /// </summary>
         [Column("IsSuccessedTest", TypeName = "bool")]
-        public bool IsSuccessedTest { get; set; }   // Пройден ли тест.
+        public bool IsSuccessedTest { get; set; }   
     }
 
     /// <summary>
