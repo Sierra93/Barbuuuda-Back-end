@@ -44,30 +44,6 @@ namespace Barbuuuda.Models.User
         public string UserIcon { get; set; }
 
         /// <summary>
-        /// Кол-во положительных отзывов исполнителя.
-        /// </summary>
-        [Column("CountPositive", TypeName = "integer")]
-        public int CountPositive { get; set; }
-
-        /// <summary>
-        /// Кол-во отрицательных отзывов исполнителя.
-        /// </summary>
-        [Column("CountNegative", TypeName = "integer")]
-        public int CountNegative { get; set; }
-
-        /// <summary>
-        /// Рейтинг исполнителя.
-        /// </summary>
-        [Column("Rating", TypeName = ("numeric(12,2)"))]
-        public double Rating { get; set; }  
-
-        /// <summary>
-        /// Флаг онлайн.
-        /// </summary>
-        [Column("IsOnline", TypeName = "boolean")]
-        public bool IsOnline { get; set; }
-
-        /// <summary>
         /// Дата регистрации пользователя.
         /// </summary>
         [Column("DateRegister", TypeName = "timestamp")]

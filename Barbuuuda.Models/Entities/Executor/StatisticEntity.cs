@@ -7,7 +7,7 @@ namespace Barbuuuda.Models.Entities.Executor
     /// <summary>
     /// Класс сопоставляется с таблицей статистики исполнителей.
     /// </summary>
-    [Table("ExecutorStatistic")]
+    [Table("ExecutorStatistic", Schema = "dbo")]
     public sealed class StatisticEntity
     {
         [Key]
@@ -16,28 +16,28 @@ namespace Barbuuuda.Models.Entities.Executor
         /// <summary>
         /// Id пользователя.
         /// </summary>
-        public string Id { get; set; }
+        public string ExecutorId { get; set; }
 
         [ForeignKey("Id")]
-        public UserEntity UserId { get; set; }
+        public UserEntity Executor { get; set; }
 
         /// <summary>
         /// Общее кол-во выполненных заданий.
         /// </summary>
         [Column("CountTotalCompletedTask", TypeName = "bigint")]
-        public long? CountTotalCompletedTask { get; set; }
+        public long CountTotalCompletedTask { get; set; }
 
         /// <summary>
         /// Кол-во положительных отзывов.
         /// </summary>
         [Column("CountPositive", TypeName = "bigint")]
-        public long? CountPositive { get; set; }
+        public long CountPositive { get; set; }
 
         /// <summary>
         /// Кол-во отрицательных отзывов.
         /// </summary>
         [Column("CountNegative", TypeName = "bigint")]
-        public long? CountNegative { get; set; }
+        public long CountNegative { get; set; }
 
         /// <summary>
         /// Рейтинг.
@@ -61,6 +61,6 @@ namespace Barbuuuda.Models.Entities.Executor
         /// Кол-во выполненных заданий категории.
         /// </summary>
         [Column("CountTaskCategory", TypeName = "bigint")]
-        public long? CountTaskCategory { get; set; }
+        public long CountTaskCategory { get; set; }
     }
 }

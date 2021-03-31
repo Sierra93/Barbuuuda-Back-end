@@ -254,7 +254,6 @@ namespace Barbuuuda.Services
                         up.FirstName,
                         up.Patronymic,
                         up.UserIcon,
-                        up.Rating,
                         dateRegister = string.Format("{0:f}", up.DateRegister),
                         scoreMoney = string.Format("{0:0,0}", up.Score),
                         up.AboutInfo,

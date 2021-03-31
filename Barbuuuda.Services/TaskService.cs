@@ -874,14 +874,20 @@ namespace Barbuuuda.Services
                     throw new NullTaskIdException();
                 }
 
-                IEnumerable respondsList = await _postgre.Responds.Where(t => t.TaskId == taskId)
-                    .Join(_postgre.Users, re => re.ExecutorId, u => u.Id,
-                    (re, u) => new { 
-                        re.Price,
-                        re.Comment,
-                        u.UserName
+                IEnumerable respondsList = await (_postgre.Responds.Where(t => t.TaskId == taskId)
+                    .Join(_postgre.Users, re => re.ExecutorId, u => u.Id, (re, u) => new { re, u })
+                    .Join(_postgre.Statistics, user => user.u.Id, st => st.ExecutorId, (user, st) => new { user, st })
+                    .Select(res => new {
+                        res.user.u.UserName,
+                        res.user.re.Comment,
+                        price = string.Format("{0:0,0}", res.user.re.Price),
+                        res.st.CountPositive,
+                        res.st.CountNegative,
+                        res.st.CountTotalCompletedTask,
+                        res.st.Rating,
+                        userIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO
                     })
-                    .ToListAsync();
+                    .ToListAsync());
 
                 return respondsList;
             }

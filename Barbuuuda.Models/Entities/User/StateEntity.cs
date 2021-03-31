@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Barbuuuda.Models.Entities.User
 {
     /// <summary>
-    /// Класс сопоставляется с таблицей статистики пользователей.
+    /// Класс сопоставляется с таблицей состояния пользователей.
     /// </summary>
-    [Table("State")]
+    [Table("State", Schema = "dbo")]
     public sealed class StateEntity
     {
         [Key]
@@ -16,10 +16,10 @@ namespace Barbuuuda.Models.Entities.User
         /// <summary>
         /// Id пользователя.
         /// </summary>
-        public string Id { get; set; }
+        public string UserId { get; set; }
 
         [ForeignKey("Id")]
-        public UserEntity UserId { get; set; }
+        public UserEntity User { get; set; }
 
         /// <summary>
         /// Флаг нахождения на сервисе в данный момент.
