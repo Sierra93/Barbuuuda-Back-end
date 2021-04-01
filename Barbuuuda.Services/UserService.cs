@@ -21,15 +21,13 @@ namespace Barbuuuda.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IdentityDbContext _iden;
         private readonly SignInManager<UserEntity> _signInManager;
 
-        public UserService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, SignInManager<UserEntity> signInManager)
+        public UserService(ApplicationDbContext db, PostgreDbContext postgre, SignInManager<UserEntity> signInManager)
         {
             _db = db;
             _postgre = postgre;
             _signInManager = signInManager;
-            _iden = iden;
         }
 
         /// <summary>
@@ -98,7 +96,7 @@ namespace Barbuuuda.Services
         /// <returns></returns>
         private async Task<IList<string>> GetUserRole(string username)
         {
-            return await _iden.AspNetUsers
+            return await _postgre.Users
                 .Where(u => u.UserName
                 .Equals(username))
                 .Select(r => r.UserRole)
@@ -124,14 +122,14 @@ namespace Barbuuuda.Services
         /// <param name="token">Токен юзера.</param>
         //private async Task SetUserToken(string token, string username)
         //{
-        //    UserEntity oUser = await _iden.AspNetUsers
+        //    UserEntity oUser = await _postgre.Users
         //        .Where(u => u.UserName
         //        .Equals(username))
         //        .FirstOrDefaultAsync();
 
         //    // Запишет токен.
         //    oUser.UserToken = token;
-        //    await _iden.SaveChangesAsync();
+        //    await _postgre.SaveChangesAsync();
         //}
 
         private ClaimsIdentity GetClaim(string username)
@@ -161,7 +159,7 @@ namespace Barbuuuda.Services
                 string userId = string.Empty;
 
                 // Выбирает юзера по логину.
-                UserEntity oUser = await _iden.AspNetUsers
+                UserEntity oUser = await _postgre.Users
                     .Where(u => u.UserName
                     .Equals(username))
                     .FirstOrDefaultAsync();

@@ -19,17 +19,17 @@ namespace Barbuuuda.Tests.Unit_tests
         public void AddSpecializationsTest()
         {
             var dbOptions = new DbContextOptionsBuilder<ApplicationDbContext>().UseInMemoryDatabase(databaseName: "GetTasksTest").Options;
-            var postgreOptions = new DbContextOptionsBuilder<IdentityDbContext>().UseInMemoryDatabase(databaseName: "GetTasksTest").Options;
-            var idenContext = new IdentityDbContext(postgreOptions);
+            var postgreOptions = new DbContextOptionsBuilder<PostgreDbContext>().UseInMemoryDatabase(databaseName: "GetTasksTest").Options;
+            var postgreContext = new PostgreDbContext(postgreOptions);
 
-            AddSpecializations(idenContext);
+            AddSpecializations(postgreContext);
         }
 
         /// <summary>
         /// Метод добавляет тестовые специализации исполнителя.
         /// </summary>
         /// <param name="pdbc">Контекст.</param>
-        private void AddSpecializations(IdentityDbContext pdbc)
+        private void AddSpecializations(PostgreDbContext pdbc)
         {
             string executorName = AddExecutor(pdbc);
             int count = AddSpec(pdbc, executorName);
@@ -41,7 +41,7 @@ namespace Barbuuuda.Tests.Unit_tests
         /// Метод добавляет тестового исполнителя.
         /// </summary>
         /// <param name="pdbc">Контекст.</param>
-        private string AddExecutor(IdentityDbContext pdbc)
+        private string AddExecutor(PostgreDbContext pdbc)
         {
             UserEntity oExecutor = new UserEntity
             {
@@ -53,7 +53,7 @@ namespace Barbuuuda.Tests.Unit_tests
                 Age = 23
             };
 
-            pdbc.AspNetUsers.Add(oExecutor);
+            pdbc.Users.Add(oExecutor);
             pdbc.SaveChanges();
 
             return oExecutor.UserName;
@@ -64,13 +64,13 @@ namespace Barbuuuda.Tests.Unit_tests
         /// </summary>
         /// <param name="pdbc">Контекст.</param>
         /// <param name="name">Логин исполнителя.</param>
-        private int AddSpec(IdentityDbContext pdbc, string name)
+        private int AddSpec(PostgreDbContext pdbc, string name)
         {
             ExecutorSpecialization[] aSpecies = new ExecutorSpecialization[] {
                 new ExecutorSpecialization() { SpecName = "Специализация1" },
                 new ExecutorSpecialization() { SpecName = "Специализация2" }
             };        
-            UserEntity oExecutor = pdbc.AspNetUsers
+            UserEntity oExecutor = pdbc.Users
                 .Where(e => e.UserName
                 .Equals(name))
                 .FirstOrDefault();
@@ -82,7 +82,7 @@ namespace Barbuuuda.Tests.Unit_tests
 
             pdbc.SaveChanges();
 
-            UserEntity getExecutor = pdbc.AspNetUsers
+            UserEntity getExecutor = pdbc.Users
                 .Where(e => e.UserName
                 .Equals(name))
                 .FirstOrDefault();

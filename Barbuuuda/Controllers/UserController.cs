@@ -22,7 +22,7 @@ namespace Barbuuuda.Controllers
     [ApiController, Route("user")]
     public class UserController : BaseController
     {
-        private readonly IdentityDbContext _iden;
+        private readonly PostgreDbContext _postgre;
         private readonly UserManager<UserEntity> _userManager;
         public static string Module => "Barbuuuda.User";
 
@@ -31,11 +31,11 @@ namespace Barbuuuda.Controllers
         /// </summary>
         private readonly IUser _user;
 
-        public UserController(IdentityDbContext iden, UserManager<UserEntity> userManager, IUser user) : base(Module)
+        public UserController(PostgreDbContext postgre, UserManager<UserEntity> userManager, IUser user) : base(Module)
         {
             _userManager = userManager;
-            _iden = iden;
             _user = user;
+            _postgre = postgre;
         }
 
 
@@ -43,11 +43,19 @@ namespace Barbuuuda.Controllers
         /// Метод создает нового пользователя.
         /// <paramref name="user">Объект с данными юзера.</paramref>
         /// </summary>
+        [AllowAnonymous]
         [HttpPost, Route("create")]
         public async Task<IActionResult> CreateUserAsync([FromBody] UserEntity user)
         {
             try
-            {                
+            {
+                IdentityResult errors = null;
+
+                if (user.Score == null)
+                {
+                    user.Score = 0;
+                }
+
                 // Ищет такой email в БД.
                 bool bErrorEmail = await IdentityUserEmail(user.Email);
 
@@ -72,19 +80,17 @@ namespace Barbuuuda.Controllers
                             $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
 
                         return Ok(oAddedUser);
-                    }
-
-                    else
-                    {
-                        // Что-то пошло не так, собирает ошибки запуская цепочку проверок валидации.
-                        CustomValidatorVm custom = new CustomValidatorVm(_iden);
-                        var aErrors = await custom.ValidateAsync(_userManager, user);
-
-                        return Ok(aErrors);
-                    }
+                    }                    
                 }
 
-                throw new Exception();
+                else
+                {
+                    // Что-то пошло не так, собирает ошибки запуская цепочку проверок валидации.
+                    CustomValidatorVm custom = new CustomValidatorVm(_postgre);
+                    errors = await custom.ValidateAsync(_userManager, user);
+                }
+
+                return BadRequest(errors);
             }
 
             catch (Exception ex)
@@ -100,7 +106,7 @@ namespace Barbuuuda.Controllers
         /// <returns>true - если существует, иначе false.</returns>
         private async Task<bool> IdentityUserEmail(string email)
         {
-            UserEntity oUser = await _iden.AspNetUsers
+            UserEntity oUser = await _postgre.Users
                     .Where(u => u.Email
                     .Equals(email))
                     .FirstOrDefaultAsync();

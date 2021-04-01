@@ -14,8 +14,8 @@ namespace Barbuuuda.Controllers
     /// <summary>
     /// Контроллер содержит методы по работе с исполнителями сервиса.
     /// </summary>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController, Route("executor")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ExecutorController : BaseController
     {
         public static string Module => "Barbuuuda.Executor";
@@ -111,9 +111,22 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("respond")]
         public async Task<IActionResult> RespondTaskAsync([FromBody] RespondInput taskInput)
         {
-            await _executor.RespondAsync(taskInput.TaskId, taskInput.Price, taskInput.IsTemplate, taskInput, taskInput.Comment, GetUserName());
+            bool isRespond = await _executor.RespondAsync(taskInput.TaskId, taskInput.Price, taskInput.IsTemplate, taskInput, taskInput.Comment, GetUserName());
 
-            return Ok();
+            return Ok(isRespond);
+        }
+
+        /// <summary>
+        /// Метод проверит, была ли сделана ставка к заданию текущим исполнителем.
+        /// </summary>
+        /// <param name="checkRespondInput">Входная модель.</param>
+        /// <returns>Статус проверки true/false.</returns>
+        [HttpPost, Route("check-respond")]
+        public async Task<IActionResult> CheckRespondAsync([FromBody] CheckRespondInput checkRespondInput)
+        {
+            bool isCheck = await _executor.CheckRespondAsync(checkRespondInput.TaskId, GetUserName());
+
+            return Ok(isCheck);
         }
     }
 }

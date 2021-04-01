@@ -25,7 +25,7 @@ namespace Barbuuuda.Models.Entities.Respond
         /// Id задания.
         /// </summary>
         [Column("TaskId")]
-        public int TaskId { get; set; }
+        public long? TaskId { get; set; }
 
         /// <summary>
         /// Комментарий.

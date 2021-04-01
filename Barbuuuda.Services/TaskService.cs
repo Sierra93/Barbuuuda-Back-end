@@ -22,14 +22,12 @@ namespace Barbuuuda.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IdentityDbContext _iden;
         private readonly IUser _user;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, IUser user)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUser user)
         {
             _db = db;
             _postgre = postgre;
-            _iden = iden;
             _user = user;
         }
 
@@ -165,7 +163,9 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                UserEntity oUser = await _iden.AspNetUsers.Where(u => u.UserName.Equals(userName)).FirstOrDefaultAsync();
+                UserEntity oUser = await _postgre.Users
+                    .Where(u => u.UserName.Equals(userName))
+                    .FirstOrDefaultAsync();
 
                 return oUser != null ? true : throw new ArgumentNullException();
             }
@@ -839,7 +839,7 @@ namespace Barbuuuda.Services
         /// <returns>Login юзера.</returns>
         public async Task<string> GetUserLoginById(string userId)
         {
-            return await _iden.AspNetUsers
+            return await _postgre.Users
                 .Where(u => u.Id
                 .Equals(userId))
                 .Select(u => u.UserName)
@@ -853,7 +853,7 @@ namespace Barbuuuda.Services
         /// <returns>Login юзера.</returns>
         public async Task<string> GetUserByName(string userName)
         {
-            return await _iden.AspNetUsers
+            return await _postgre.Users
                 .Where(u => u.UserName
                 .Equals(userName))
                 .Select(u => u.Id)

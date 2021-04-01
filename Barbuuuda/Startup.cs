@@ -63,9 +63,6 @@ namespace Barbuuuda
             services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
         opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-        //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-        //opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
-
             services.AddDbContext<IdentityDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
             #endregion
@@ -81,28 +78,8 @@ namespace Barbuuuda
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
 
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //  options.UseSqlServer(
-            //      Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
-
             services.AddSwaggerGen(options =>
-            {
-                //c.SwaggerDoc("v1", new OpenApiInfo {
-                //    Version = "v1",
-                //    Title = "ToDo API",
-                //    Description = "A simple example ASP.NET Core Web API",
-                //    TermsOfService = new Uri("https://example.com/terms"),
-                //    Contact = new OpenApiContact {
-                //        Name = "Shayne Boyer",
-                //        Email = string.Empty,
-                //        Url = new Uri("https://twitter.com/spboyer"),
-                //    },
-                //    License = new OpenApiLicense {
-                //        Name = "Use under LICX",
-                //        Url = new Uri("https://example.com/license"),
-                //    }
-                //});               
-
+            {             
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

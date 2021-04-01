@@ -6,7 +6,6 @@ using System.Collections;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using System.ComponentModel.DataAnnotations;
 using Barbuuuda.Models.Task.Input;
 
 namespace Barbuuuda.Controllers
@@ -14,8 +13,8 @@ namespace Barbuuuda.Controllers
     /// <summary>
     /// Контроллер содержит логику работы с заданиями.
     /// </summary>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController, Route("task")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TaskController : BaseController
     {
         public static string Module => "Barbuuuda.Task";
@@ -45,7 +44,7 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод создает новое задание.
+        /// Метод изменяет новое задание.
         /// </summary>
         /// <param name="oTask">Объект с данными задания.</param>
         /// <returns>Вернет данные измененного задания.</returns>
