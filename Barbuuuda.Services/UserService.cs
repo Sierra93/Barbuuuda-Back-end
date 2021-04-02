@@ -1,7 +1,9 @@
 ﻿using Barbuuuda.Core.Data;
+using Barbuuuda.Core.Extensions.User;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.User;
+using Barbuuuda.Models.User.Input;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,12 +24,14 @@ namespace Barbuuuda.Services
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly SignInManager<UserEntity> _signInManager;
+        private readonly UserManager<UserEntity> _userManager;
 
-        public UserService(ApplicationDbContext db, PostgreDbContext postgre, SignInManager<UserEntity> signInManager)
+        public UserService(ApplicationDbContext db, PostgreDbContext postgre, SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager)
         {
             _db = db;
             _postgre = postgre;
             _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -35,27 +39,53 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>
         /// <returns>Статус true/false</returns>
-        public async Task<object> LoginAsync(UserEntity user)
+        public async Task<object> LoginAsync(UserInput user)
         {
             try
             {
-                // Авторизует юзера.
-                var oAuth = await _signInManager.PasswordSignInAsync(user.UserName, user.UserPassword, user.RememberMe, false);                
+                SignInResult auth = null;
+                bool isContinue = false;
+
+                // Проверит, логин передан или email.
+                CustomValidatorExtension validatorExtension = new CustomValidatorExtension(_postgre);
+                bool isEmail = validatorExtension.CheckIsEmail(user.UserName);
+
+                // Если нужно проверять по логину.
+                if (!isEmail)
+                {
+                    // Авторизует юзера.
+                    auth = await _signInManager.PasswordSignInAsync(user.UserName, user.UserPassword, user.RememberMe, false);
+                }
+
+                // Значит в UserName лежит email.
+                else
+                {
+                    // Найдет пользователя по почте.
+                    UserEntity findUser = await _userManager.FindByEmailAsync(user.UserName);
+
+                    if (findUser != null && findUser.UserPassword.Equals(user.UserPassword))
+                    {
+                        isContinue = true;
+
+                        // Перезапишет UserName на логин выбранный из БД для фронта.
+                        user.UserName = findUser.UserName;
+                    }                    
+                }
 
                 // Если авторизация успешна.
-                if (oAuth.Succeeded)
+                if ((auth != null && auth.Succeeded) || isContinue)
                 {
-                    ClaimsIdentity oClaim = GetIdentityClaim(user);
+                    ClaimsIdentity claim = GetIdentityClaim(user);
 
                     // Выбирает роли юзера.
                     IEnumerable<string> aRoles = await GetUserRole(user.UserName);
 
                     // Генерит токен юзеру.
-                    string sToken = GenerateToken(oClaim).Result;
+                    string sToken = GenerateToken(claim).Result;
 
                     return new
                     {
-                        user = oClaim.Name,
+                        user = claim.Name,
                         userToken = sToken,
                         role = aRoles
                     };
@@ -78,7 +108,7 @@ namespace Barbuuuda.Services
             {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogError();
-                throw new ArgumentException("Логин или пароль введены не верно", ex.Message.ToString());
+                throw new ArgumentException("Логин и (или) пароль введены не верно", ex.Message.ToString());
             }
 
             catch (Exception ex)
@@ -111,7 +141,6 @@ namespace Barbuuuda.Services
         private ClaimsIdentity GetIdentityClaim(UserEntity user)
         {
             ClaimsIdentity oClaim = GetClaim(user.UserName);           
-            //await SetUserToken(encodedJwt, user.UserName);   // Запишет токен юзера в БД.
 
             return oClaim;
         }

@@ -8,7 +8,7 @@ namespace Barbuuuda.Models.User
     /// Класс сопоставляется с таблицей пользователей.
     /// </summary>
     [Table("AspNetUsers")]
-    public sealed class UserEntity : IdentityUser
+    public class UserEntity : IdentityUser
     {
         [Column("UserPassword", TypeName = "varchar(100)")]
         public string UserPassword { get; set; }

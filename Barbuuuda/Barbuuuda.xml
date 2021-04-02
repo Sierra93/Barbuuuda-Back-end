@@ -296,10 +296,10 @@
             Сервис работы с юзерами.
             </summary>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.CreateUserAsync(Barbuuuda.Models.User.UserEntity)">
+        <member name="M:Barbuuuda.Controllers.UserController.CreateUserAsync(Barbuuuda.Models.User.Input.UserInput)">
             <summary>
             Метод создает нового пользователя.
-            <paramref name="user">Объект с данными юзера.</paramref>
+            <paramref name="user">Входная модель пользователя.</paramref>
             </summary>
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.IdentityUserEmail(System.String)">
@@ -316,10 +316,10 @@
             <param name="userId">Id юзера.</param>
             <param name="code">Временный код токена.</param>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.LoginUserAsync(Barbuuuda.Models.User.UserEntity)">
+        <member name="M:Barbuuuda.Controllers.UserController.LoginUserAsync(Barbuuuda.Models.User.Input.UserInput)">
             <summary>
             Метод авторизует пользователя.
-            <paramref name="user">Объект с данными юзера.</paramref>
+            <paramref name="user">Входная модель пользователя.</paramref>
             </summary>        
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize(System.String)">
@@ -335,7 +335,7 @@
             </summary>
             <returns>Объект с данными о профиле пользователя.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.SaveProfileDataAsync(Barbuuuda.Models.User.UserEntity)">
+        <member name="M:Barbuuuda.Controllers.UserController.SaveProfileDataAsync(Barbuuuda.Models.User.Input.UserInput)">
             <summary>
             Метод сохраняет личные данные юзера.
             </summary>
@@ -346,6 +346,13 @@
             Метод обновляет токен юзеру.
             </summary>
             <returns>Строка токена.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.UserController.CreateUser(Barbuuuda.Models.User.Input.UserInput)">
+            <summary>
+            Метод создает пользователя.
+            </summary>
+            <param name="user">Входная модель пользователя.</param>
+            <returns></returns>
         </member>
     </members>
 </doc>
