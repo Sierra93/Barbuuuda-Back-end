@@ -317,7 +317,7 @@ namespace Barbuuuda.Services
                 }
 
                 // Находит задание по его TaskId.
-                TaskEntity task = await _postgre.Tasks.Where(t => t.TaskId.Equals(taskId)).FirstOrDefaultAsync();
+                TaskEntity task = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
 
                 if (task == null)
                 {
@@ -350,7 +350,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="taskId">Id задания</param>
         /// <param name="account">Логин пользователя.</param>
-        /// <returns>Статус проверки true/false.</returns>
+        /// <returns>Статус проверки: false - если ставка уже была сделана, true - если можно делать ставку.</returns>
         public async Task<bool> CheckRespondAsync(long? taskId, string account)
         {
             // Выберет все ставки с таким TaskId задания.

@@ -212,7 +212,7 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод получает список ставок к заданию.
         /// </summary>
-        /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
+        /// <param name="getRespondInput">Id задания, для которого нужно получить список ставок.</param>
         /// <returns>Список ставок.</returns>
         [HttpPost, Route("get-responds")]
         public async Task<IActionResult> GetRespondsAsync([FromBody] GetRespondInput getRespondInput)
