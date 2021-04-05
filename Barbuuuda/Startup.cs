@@ -12,6 +12,8 @@ using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Autofac;
+using System;
+using Barbuuuda.Core.Extensions;
 
 namespace Barbuuuda
 {
@@ -82,7 +84,6 @@ namespace Barbuuuda
             {             
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 var xmlPath = Path.Combine(Directory.GetCurrentDirectory(), xmlFile);
                 options.IncludeXmlComments(xmlPath);
             });
@@ -105,7 +106,7 @@ namespace Barbuuuda
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
         {
             app.UseCors("ApiCorsPolicy");
 
@@ -129,12 +130,15 @@ namespace Barbuuuda
                 endpoints.MapControllers();
             });
 
+            // Запишет путь для xml-файла документации API.
+            applicationLifetime.ApplicationStarted.Register(DocumentationFileExtension.OnApplicationStarted);
+
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Barbuuuda API");
             });
-        }
+        }        
     }
 }
