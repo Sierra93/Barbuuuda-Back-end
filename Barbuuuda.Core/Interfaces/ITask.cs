@@ -1,4 +1,5 @@
-﻿using Barbuuuda.Models.Task;
+﻿using Barbuuuda.Models.Respond.Outpoot;
+using Barbuuuda.Models.Task;
 using System.Collections;
 using System.Threading.Tasks;
 
@@ -120,6 +121,6 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
         /// <returns>Список ставок.</returns>
-        Task<IEnumerable> GetRespondsAsync(int taskId);
+        Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId);
     }
 }

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Barbuuuda.Models.Task.Input;
+using Barbuuuda.Models.Respond.Outpoot;
+using Microsoft.AspNetCore.Http;
 
 namespace Barbuuuda.Controllers
 {
@@ -214,10 +216,11 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <param name="getRespondInput">Id задания, для которого нужно получить список ставок.</param>
         /// <returns>Список ставок.</returns>
-        [HttpPost, Route("get-responds")]
+        [HttpPost("get-responds")]
+        [ProducesResponseType(200, Type = typeof(GetRespondResultOutpoot))]
         public async Task<IActionResult> GetRespondsAsync([FromBody] GetRespondInput getRespondInput)
         {
-            IEnumerable respondsList = await _task.GetRespondsAsync(getRespondInput.TaskId);
+            GetRespondResultOutpoot respondsList = await _task.GetRespondsAsync(getRespondInput.TaskId);
 
             return Ok(respondsList);
         }

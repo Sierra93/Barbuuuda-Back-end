@@ -1,9 +1,11 @@
-﻿using Barbuuuda.Core.Consts;
+﻿using AutoMapper;
+using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Enums;
 using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
+using Barbuuuda.Models.Respond.Outpoot;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Services
@@ -23,12 +26,14 @@ namespace Barbuuuda.Services
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IUser _user;
+        private readonly IMapper _mapper;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUser user)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUser user, IMapper mapper)
         {
             _db = db;
             _postgre = postgre;
             _user = user;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -865,7 +870,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
         /// <returns>Список ставок.</returns>
-        public async Task<IEnumerable> GetRespondsAsync(int taskId)
+        public async Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId)
         {
             try
             {
@@ -880,16 +885,27 @@ namespace Barbuuuda.Services
                     .Select(res => new {
                         res.user.u.UserName,
                         res.user.re.Comment,
-                        price = string.Format("{0:0,0}", res.user.re.Price),
+                        Price = string.Format("{0:0,0}", res.user.re.Price),
                         res.st.CountPositive,
                         res.st.CountNegative,
                         res.st.CountTotalCompletedTask,
                         res.st.Rating,
-                        userIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO
+                        UserIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO
                     })
                     .ToListAsync());
 
-                return respondsList;
+                GetRespondResultOutpoot result = new GetRespondResultOutpoot();
+
+                // Приведет к типу коллекции GetRespondResultOutpoot.
+                foreach (object respond in respondsList)
+                {
+                    string jsonString = JsonSerializer.Serialize(respond);
+                    RespondOutpoot resultObject = JsonSerializer.Deserialize<RespondOutpoot>(jsonString);
+                    result.Responds.Add(resultObject);
+                }
+                result.Count = result.Responds.Count;
+
+                return result;
             }
 
             catch (Exception ex)
