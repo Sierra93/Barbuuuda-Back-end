@@ -1,8 +1,9 @@
 ﻿using Barbuuuda.Core.Data;
+using Barbuuuda.Core.Extensions.User;
 using Barbuuuda.Core.Interfaces;
-using Barbuuuda.Core.ViewModels.User;
 using Barbuuuda.Emails;
 using Barbuuuda.Models.User;
+using Barbuuuda.Models.User.Input;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +23,7 @@ namespace Barbuuuda.Controllers
     [ApiController, Route("user")]
     public class UserController : BaseController
     {
-        private readonly IdentityDbContext _iden;
+        private readonly PostgreDbContext _postgre;
         private readonly UserManager<UserEntity> _userManager;
         public static string Module => "Barbuuuda.User";
 
@@ -31,60 +32,27 @@ namespace Barbuuuda.Controllers
         /// </summary>
         private readonly IUser _user;
 
-        public UserController(IdentityDbContext iden, UserManager<UserEntity> userManager, IUser user) : base(Module)
+        public UserController(PostgreDbContext postgre, UserManager<UserEntity> userManager, IUser user) : base(Module)
         {
             _userManager = userManager;
-            _iden = iden;
             _user = user;
+            _postgre = postgre;
         }
 
 
         /// <summary>
         /// Метод создает нового пользователя.
-        /// <paramref name="user">Объект с данными юзера.</paramref>
+        /// <paramref name="user">Входная модель пользователя.</paramref>
         /// </summary>
+        [AllowAnonymous]
         [HttpPost, Route("create")]
-        public async Task<IActionResult> CreateUserAsync([FromBody] UserEntity user)
+        public async Task<IActionResult> CreateUserAsync([FromBody] UserInput user)
         {
             try
-            {                
-                // Ищет такой email в БД.
-                bool bErrorEmail = await IdentityUserEmail(user.Email);
+            {
+                IActionResult result = await CreateUser(user);
 
-                if (!bErrorEmail)
-                {
-                    // Добавляет юзера.
-                    user.DateRegister = DateTime.UtcNow;
-                    var oAddedUser = await _userManager.CreateAsync(user, user.UserPassword);
-
-                    if (oAddedUser.Succeeded)
-                    {
-                        // Генерит временный токен для юзера.
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        var callbackUrl = Url.Action(
-                            "ConfirmAsync",
-                            "User",
-                            new { userId = user.Id, code = code },
-                            protocol: HttpContext.Request.Scheme);
-
-                        // Отправит уведомление на email.
-                        await EmailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
-                            $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
-
-                        return Ok(oAddedUser);
-                    }
-
-                    else
-                    {
-                        // Что-то пошло не так, собирает ошибки запуская цепочку проверок валидации.
-                        CustomValidatorVm custom = new CustomValidatorVm(_iden);
-                        var aErrors = await custom.ValidateAsync(_userManager, user);
-
-                        return Ok(aErrors);
-                    }
-                }
-
-                throw new Exception();
+                return result;
             }
 
             catch (Exception ex)
@@ -100,7 +68,7 @@ namespace Barbuuuda.Controllers
         /// <returns>true - если существует, иначе false.</returns>
         private async Task<bool> IdentityUserEmail(string email)
         {
-            UserEntity oUser = await _iden.AspNetUsers
+            UserEntity oUser = await _postgre.Users
                     .Where(u => u.Email
                     .Equals(email))
                     .FirstOrDefaultAsync();
@@ -116,21 +84,21 @@ namespace Barbuuuda.Controllers
         [HttpGet, AllowAnonymous]
         public async Task<IActionResult> ConfirmAsync(string userId, string code)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            UserEntity user = await _userManager.FindByIdAsync(userId);
             await _userManager.ConfirmEmailAsync(user, code);
 
-            return new RedirectResult("https://testdevi.site");
+            return new RedirectResult("https://barbuuuda.ru");
         }
 
         /// <summary>
         /// Метод авторизует пользователя.
-        /// <paramref name="user">Объект с данными юзера.</paramref>
+        /// <paramref name="user">Входная модель пользователя.</paramref>
         /// </summary>        
         [AllowAnonymous]
         [HttpPost, Route("login")]
-        public async Task<IActionResult> LoginUserAsync([FromBody] UserEntity user)
+        public async Task<IActionResult> LoginUserAsync([FromBody] UserInput user)
         {
-            var oAuth = await _user.LoginAsync(user);
+            object oAuth = await _user.LoginAsync(user);
 
             return Ok(oAuth);
         }
@@ -165,7 +133,7 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <param name="user">Объект с данными юзера.</param>
         [HttpPost, Route("save-data")]
-        public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserEntity user)
+        public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserInput user)
         {
             await _user.SaveProfileData(user, GetUserName());
 
@@ -183,6 +151,54 @@ namespace Barbuuuda.Controllers
             string sToken = await _user.GenerateToken(userName ?? GetUserName() ?? null);
 
             return Ok(sToken);
+        }
+
+        /// <summary>
+        /// Метод создает пользователя.
+        /// </summary>
+        /// <param name="user">Входная модель пользователя.</param>
+        /// <returns></returns>
+        private async Task<IActionResult> CreateUser(UserInput user)
+        {
+            IdentityResult errors = null;
+
+            if (user.Score == null)
+            {
+                user.Score = 0;
+            }
+
+            // Ищет такой email в БД.
+            bool bErrorEmail = await IdentityUserEmail(user.Email);
+
+            if (!bErrorEmail)
+            {
+                // Добавляет юзера.
+                user.DateRegister = DateTime.UtcNow;
+                IdentityResult oAddedUser = await _userManager.CreateAsync(user, user.UserPassword);
+
+                if (oAddedUser.Succeeded)
+                {
+                    // Генерит временный токен для юзера.
+                    string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    string callbackUrl = Url.Action("ConfirmAsync", "User", new { userId = user.Id, code = code },
+                        protocol: HttpContext.Request.Scheme);
+
+                    // Отправит уведомление на email.
+                    await EmailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
+                        $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
+
+                    return Ok(oAddedUser);
+                }
+            }
+
+            else
+            {
+                // Что-то пошло не так, собирает ошибки запуская цепочку проверок валидации.
+                CustomValidatorExtension custom = new CustomValidatorExtension(_postgre);
+                errors = await custom.ValidateAsync(_userManager, user);
+            }
+
+            return BadRequest(errors);
         }
     }
 }

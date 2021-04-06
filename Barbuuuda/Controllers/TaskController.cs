@@ -6,16 +6,17 @@ using System.Collections;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using System.ComponentModel.DataAnnotations;
 using Barbuuuda.Models.Task.Input;
+using Barbuuuda.Models.Respond.Outpoot;
+using Microsoft.AspNetCore.Http;
 
 namespace Barbuuuda.Controllers
 {
     /// <summary>
     /// Контроллер содержит логику работы с заданиями.
     /// </summary>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController, Route("task")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TaskController : BaseController
     {
         public static string Module => "Barbuuuda.Task";
@@ -45,7 +46,7 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод создает новое задание.
+        /// Метод изменяет новое задание.
         /// </summary>
         /// <param name="oTask">Объект с данными задания.</param>
         /// <returns>Вернет данные измененного задания.</returns>
@@ -213,12 +214,13 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод получает список ставок к заданию.
         /// </summary>
-        /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
+        /// <param name="getRespondInput">Id задания, для которого нужно получить список ставок.</param>
         /// <returns>Список ставок.</returns>
-        [HttpPost, Route("get-responds")]
+        [HttpPost("get-responds")]
+        [ProducesResponseType(200, Type = typeof(GetRespondResultOutpoot))]
         public async Task<IActionResult> GetRespondsAsync([FromBody] GetRespondInput getRespondInput)
         {
-            IEnumerable respondsList = await _task.GetRespondsAsync(getRespondInput.TaskId);
+            GetRespondResultOutpoot respondsList = await _task.GetRespondsAsync(getRespondInput.TaskId);
 
             return Ok(respondsList);
         }

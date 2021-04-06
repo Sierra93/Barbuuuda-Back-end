@@ -1,4 +1,5 @@
 ﻿using Barbuuuda.Models.User;
+using Barbuuuda.Models.User.Input;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>
         /// <returns>Статус true/false</returns>
-        Task<object> LoginAsync(UserEntity user);
+        Task<object> LoginAsync(UserInput user);
 
         /// <summary>
         /// Метод проверяет, авторизован ли юзер.

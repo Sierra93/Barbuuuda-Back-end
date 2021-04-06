@@ -1,9 +1,11 @@
-﻿using Barbuuuda.Core.Consts;
+﻿using AutoMapper;
+using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Enums;
 using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
+using Barbuuuda.Models.Respond.Outpoot;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Services
@@ -22,15 +25,15 @@ namespace Barbuuuda.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IdentityDbContext _iden;
         private readonly IUser _user;
+        private readonly IMapper _mapper;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, IUser user)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUser user, IMapper mapper)
         {
             _db = db;
             _postgre = postgre;
-            _iden = iden;
             _user = user;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -165,7 +168,9 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                UserEntity oUser = await _iden.AspNetUsers.Where(u => u.UserName.Equals(userName)).FirstOrDefaultAsync();
+                UserEntity oUser = await _postgre.Users
+                    .Where(u => u.UserName.Equals(userName))
+                    .FirstOrDefaultAsync();
 
                 return oUser != null ? true : throw new ArgumentNullException();
             }
@@ -839,7 +844,7 @@ namespace Barbuuuda.Services
         /// <returns>Login юзера.</returns>
         public async Task<string> GetUserLoginById(string userId)
         {
-            return await _iden.AspNetUsers
+            return await _postgre.Users
                 .Where(u => u.Id
                 .Equals(userId))
                 .Select(u => u.UserName)
@@ -853,7 +858,7 @@ namespace Barbuuuda.Services
         /// <returns>Login юзера.</returns>
         public async Task<string> GetUserByName(string userName)
         {
-            return await _iden.AspNetUsers
+            return await _postgre.Users
                 .Where(u => u.UserName
                 .Equals(userName))
                 .Select(u => u.Id)
@@ -865,7 +870,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
         /// <returns>Список ставок.</returns>
-        public async Task<IEnumerable> GetRespondsAsync(int taskId)
+        public async Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId)
         {
             try
             {
@@ -874,16 +879,33 @@ namespace Barbuuuda.Services
                     throw new NullTaskIdException();
                 }
 
-                IEnumerable respondsList = await _postgre.Responds.Where(t => t.TaskId == taskId)
-                    .Join(_postgre.Users, re => re.ExecutorId, u => u.Id,
-                    (re, u) => new { 
-                        re.Price,
-                        re.Comment,
-                        u.UserName
+                IEnumerable respondsList = await (_postgre.Responds.Where(t => t.TaskId == taskId)
+                    .Join(_postgre.Users, re => re.ExecutorId, u => u.Id, (re, u) => new { re, u })
+                    .Join(_postgre.Statistics, user => user.u.Id, st => st.ExecutorId, (user, st) => new { user, st })
+                    .Select(res => new {
+                        res.user.u.UserName,
+                        res.user.re.Comment,
+                        Price = string.Format("{0:0,0}", res.user.re.Price),
+                        res.st.CountPositive,
+                        res.st.CountNegative,
+                        res.st.CountTotalCompletedTask,
+                        res.st.Rating,
+                        UserIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO
                     })
-                    .ToListAsync();
+                    .ToListAsync());
 
-                return respondsList;
+                GetRespondResultOutpoot result = new GetRespondResultOutpoot();
+
+                // Приведет к типу коллекции GetRespondResultOutpoot.
+                foreach (object respond in respondsList)
+                {
+                    string jsonString = JsonSerializer.Serialize(respond);
+                    RespondOutpoot resultObject = JsonSerializer.Deserialize<RespondOutpoot>(jsonString);
+                    result.Responds.Add(resultObject);
+                }
+                result.Count = result.Responds.Count;
+
+                return result;
             }
 
             catch (Exception ex)

@@ -60,6 +60,14 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="isTemplate">Флаг сохранения как шаблон.</param>
         /// <param name="template">Данные шаблона.</param>
         /// <param name="userName">Имя юзера.</param>
-        Task RespondAsync(int taskId, decimal? price, bool isTemplate, RespondInput respondInput, string comment, string userName);
+        Task<bool> RespondAsync(long? taskId, decimal? price, bool isTemplate, RespondInput respondInput, string comment, string userName);
+
+        /// <summary>
+        /// Метод проверит, была ли сделана ставка к заданию текущим исполнителем.
+        /// </summary>
+        /// <param name="taskId">Id задания</param>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Статус проверки true/false.</returns>
+        Task<bool> CheckRespondAsync(long? taskId, string account);
     }
 }

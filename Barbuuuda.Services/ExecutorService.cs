@@ -24,14 +24,12 @@ namespace Barbuuuda.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IdentityDbContext _iden;
         private readonly IUser _user;
 
-        public ExecutorService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, IUser user)
+        public ExecutorService(ApplicationDbContext db, PostgreDbContext postgre, IUser user)
         {
             _db = db;
             _postgre = postgre;
-            _iden = iden;
             _user = user;
         }
 
@@ -76,13 +74,13 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                UserEntity oExecutor = await _iden.AspNetUsers
+                UserEntity oExecutor = await _postgre.Users
                     .Where(e => e.UserName
                     .Equals(executorName))
                     .FirstOrDefaultAsync();
 
                 oExecutor.Specializations = CheckEmptySpec(oExecutor, specializations);
-                await _iden.SaveChangesAsync();
+                await _postgre.SaveChangesAsync();
             }
 
             catch (ArgumentNullException ex)
@@ -309,17 +307,17 @@ namespace Barbuuuda.Services
         /// <param name="isTemplate">Флаг сохранения как шаблон.</param>
         /// <param name="template">Данные шаблона.</param>
         /// <param name="userName">Имя юзера.</param>
-        public async Task RespondAsync(int taskId, decimal? price, bool isTemplate, RespondInput template, string comment, string userName)
+        public async Task<bool> RespondAsync(long? taskId, decimal? price, bool isTemplate, RespondInput template, string comment, string userName)
         {
             try
             {
-                if (taskId == 0)
+                if (taskId == null)
                 {
                     throw new NullTaskIdException();
                 }
 
                 // Находит задание по его TaskId.
-                TaskEntity task = await _postgre.Tasks.Where(t => t.TaskId.Equals(taskId)).FirstOrDefaultAsync();
+                TaskEntity task = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
 
                 if (task == null)
                 {
@@ -327,13 +325,7 @@ namespace Barbuuuda.Services
                 }
 
                 // Находит Id исполнителя, который делает ставку к заданию.
-                UserEntity user = await _user.GetUserByLogin(userName);
-
-                // Если нужно сохранить шаблон.
-                //if (isTemplate)
-                //{
-
-                //}                
+                UserEntity user = await _user.GetUserByLogin(userName);                      
 
                 // Добавит новую ставку.
                 await _postgre.Responds.AddAsync(new RespondEntity() { 
@@ -343,12 +335,47 @@ namespace Barbuuuda.Services
                     ExecutorId = user.Id
                 });
                 await _postgre.SaveChangesAsync();
+
+                return true;
             }
 
             catch (Exception ex)
             {
                 throw new Exception(ex.Message.ToString());
             }
+        }
+
+        /// <summary>
+        /// Метод проверит, была ли сделана ставка к заданию текущим исполнителем.
+        /// </summary>
+        /// <param name="taskId">Id задания</param>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Статус проверки: false - если ставка уже была сделана, true - если можно делать ставку.</returns>
+        public async Task<bool> CheckRespondAsync(long? taskId, string account)
+        {
+            // Выберет все ставки с таким TaskId задания.
+            IEnumerable<RespondEntity> responds = await _postgre.Responds
+                .Where(t => t.TaskId == taskId)
+                .ToListAsync();
+
+            if (responds != null)
+            {
+                // Находит пользователя по логину.
+                UserEntity user = await _user.GetUserByLogin(account);
+
+                if (user != null)
+                {
+                    foreach (RespondEntity respond in responds.Where(r => r.ExecutorId.Equals(user.Id)))
+                    {
+                        if (respond != null)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
     }
 }

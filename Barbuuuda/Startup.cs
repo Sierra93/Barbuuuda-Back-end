@@ -12,6 +12,7 @@ using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Autofac;
+using Barbuuuda.Core.Extensions;
 
 namespace Barbuuuda
 {
@@ -44,30 +45,27 @@ namespace Barbuuuda
             }));
 
             #region ПРОД.
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //  options.UseSqlServer(
-            //      Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            services.AddDbContext<ApplicationDbContext>(options =>
+              options.UseSqlServer(
+                  Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-            //opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
+        opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            //services.AddDbContext<IdentityDbContext>(options =>
-            //    options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            services.AddDbContext<IdentityDbContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
             #endregion
 
             #region ТЕСТ.
-            services.AddDbContext<ApplicationDbContext>(options =>
-             options.UseSqlServer(
-                 Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //    services.AddDbContext<ApplicationDbContext>(options =>
+            //     options.UseSqlServer(
+            //         Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-        opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
+            //opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-        //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-        //opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
-
-            services.AddDbContext<IdentityDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //    services.AddDbContext<IdentityDbContext>(options =>
+            //        options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
             #endregion
 
             services.AddIdentity<UserEntity, IdentityRole>(opts =>
@@ -81,31 +79,10 @@ namespace Barbuuuda
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
 
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //  options.UseSqlServer(
-            //      Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
-
             services.AddSwaggerGen(options =>
-            {
-                //c.SwaggerDoc("v1", new OpenApiInfo {
-                //    Version = "v1",
-                //    Title = "ToDo API",
-                //    Description = "A simple example ASP.NET Core Web API",
-                //    TermsOfService = new Uri("https://example.com/terms"),
-                //    Contact = new OpenApiContact {
-                //        Name = "Shayne Boyer",
-                //        Email = string.Empty,
-                //        Url = new Uri("https://twitter.com/spboyer"),
-                //    },
-                //    License = new OpenApiLicense {
-                //        Name = "Use under LICX",
-                //        Url = new Uri("https://example.com/license"),
-                //    }
-                //});               
-
+            {             
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 var xmlPath = Path.Combine(Directory.GetCurrentDirectory(), xmlFile);
                 options.IncludeXmlComments(xmlPath);
             });
@@ -128,7 +105,7 @@ namespace Barbuuuda
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
         {
             app.UseCors("ApiCorsPolicy");
 
@@ -152,12 +129,15 @@ namespace Barbuuuda
                 endpoints.MapControllers();
             });
 
+            // Запишет путь для xml-файла документации API.
+            applicationLifetime.ApplicationStarted.Register(DocumentationFileExtension.OnApplicationStarted);
+
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Barbuuuda API");
             });
-        }
+        }        
     }
 }

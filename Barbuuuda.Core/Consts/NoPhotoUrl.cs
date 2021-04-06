@@ -1,0 +1,13 @@
+﻿namespace Barbuuuda.Core.Consts
+{
+    /// <summary>
+    /// Класс путей к иконкам пользователя, если нет фото.
+    /// </summary>
+    public class NoPhotoUrl
+    {
+        /// <summary>
+        /// Если нет фото, то выбрать по дефолту.
+        /// </summary>
+        public static string NO_PHOTO = "nophoto.jpg";
+    }
+}

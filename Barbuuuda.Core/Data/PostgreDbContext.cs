@@ -1,6 +1,7 @@
 ﻿using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.Entities.Knowlege;
 using Barbuuuda.Models.Entities.Respond;
+using Barbuuuda.Models.Entities.User;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
@@ -35,9 +36,7 @@ namespace Barbuuuda.Core.Data
         /// <summary>
         ///  Таблица типов заданий.
         /// </summary>
-        public DbSet<TaskTypeEntity> TaskTypes { get; set; }  
-
-        public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options) { }
+        public DbSet<TaskTypeEntity> TaskTypes { get; set; }          
 
         /// <summary>
         /// Таблица вопросов для теста исполнителей.
@@ -75,5 +74,17 @@ namespace Barbuuuda.Core.Data
         /// Таблица популярных статей.
         /// </summary>
         public DbSet<PopularArticleEntity> PopularArticles { get; set; }
+
+        /// <summary>
+        /// Таблица статистики исполнителей.
+        /// </summary>
+        public DbSet<StatisticEntity> Statistics { get; set; }
+
+        /// <summary>
+        /// Таблица состояний пользователей.
+        /// </summary>
+        public DbSet<StateEntity> States { get; set; }
+
+        public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options) { }
     }
 }

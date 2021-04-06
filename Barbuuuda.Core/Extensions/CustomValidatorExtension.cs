@@ -5,25 +5,23 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Barbuuuda.Core.ViewModels.User
+namespace Barbuuuda.Core.Extensions.User
 {
     /// <summary>
     /// Класс валидирует поля при регистрации юзера.
     /// </summary>
-    public sealed class CustomValidatorVm : IUserValidator<UserEntity>
+    public sealed class CustomValidatorExtension : IUserValidator<UserEntity>
     {
-        private List<IdentityError> aErrors = new List<IdentityError>();
-        private readonly IdentityDbContext _iden;
+        private List<IdentityError> errors = new List<IdentityError>();
+        private readonly PostgreDbContext _postgre;
 
-        public CustomValidatorVm(IdentityDbContext iden)
+        public CustomValidatorExtension(PostgreDbContext postgre)
         {
-            _iden = iden;
+            _postgre = postgre;
         }
 
         /// <summary>
@@ -37,19 +35,19 @@ namespace Barbuuuda.Core.ViewModels.User
             try
             {
                 // Пытается найти такого юзера по логину.
-                UserEntity isLogin = await _iden.AspNetUsers
+                UserEntity isLogin = await _postgre.Users
                     .Where(u => u.UserName.Equals(user.UserName))
                     .FirstOrDefaultAsync();
 
                 // Пытается найти такого юзера по email.
-                UserEntity isEmail = await _iden.AspNetUsers
+                UserEntity isEmail = await _postgre.Users
                     .Where(u => u.Email.Equals(user.Email))
                     .FirstOrDefaultAsync();
 
                 // Если есть юзер с таким логином.
                 if (isLogin != null)
                 {
-                    aErrors.Add(new IdentityError
+                    errors.Add(new IdentityError
                     {
                         Description = ErrorValidate.LOGIN_ERROR
                     });
@@ -58,17 +56,17 @@ namespace Barbuuuda.Core.ViewModels.User
                 // Если логин содержит admin.
                 if (user.UserName.Contains("admin"))
                 {
-                    aErrors.Add(new IdentityError
+                    errors.Add(new IdentityError
                     {
                         Description = ErrorValidate.LOGIN_NOT_ADMIN
                     });
                 }
 
                 // Проверяет Email на корректность.
-                Match isCorrectEmail = Regex.Match(user.Email, @"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}");
+                Match isCorrectEmail = Regex.Match(user.Email, RegularExpressions.REGULAR_EMAIL);
                 if (!isCorrectEmail.Success)
                 {
-                    aErrors.Add(new IdentityError
+                    errors.Add(new IdentityError
                     {
                         Description = ErrorValidate.EMAIL_NOT_CORRECT_FORMAT
                     });
@@ -77,7 +75,7 @@ namespace Barbuuuda.Core.ViewModels.User
                 // Если есть юзер с таким email.
                 if (isEmail != null)
                 {
-                    aErrors.Add(new IdentityError
+                    errors.Add(new IdentityError
                     {
                         Description = ErrorValidate.EMAIL_ERROR
                     });
@@ -86,7 +84,7 @@ namespace Barbuuuda.Core.ViewModels.User
                 // Если email содержит admin.
                 if (user.Email.Contains("admin"))
                 {
-                    aErrors.Add(new IdentityError
+                    errors.Add(new IdentityError
                     {
                         Description = ErrorValidate.LOGIN_NOT_EMAIL
                     });
@@ -94,7 +92,7 @@ namespace Barbuuuda.Core.ViewModels.User
 
                 // Проверяет наличие номера телефона.                
                 //if (string.IsNullOrEmpty(user.PhoneNumber)) {
-                //    aErrors.Add(new IdentityError {
+                //    errors.Add(new IdentityError {
                 //        Description = ErrorValidate.PHONE_ERROR_EMPTY
                 //    });                    
                 //}
@@ -102,19 +100,37 @@ namespace Barbuuuda.Core.ViewModels.User
                 //// Проверяет корректность номера телефона.
                 //Match matchPhone = Regex.Match(user.PhoneNumber, @"((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}");
                 //if (!matchPhone.Success && !string.IsNullOrEmpty(user.PhoneNumber)) {
-                //    aErrors.Add(new IdentityError {
+                //    errors.Add(new IdentityError {
                 //        Description = ErrorValidate.PHONE_ERROR_NOT_CORRECT_FORMAT
                 //    });
                 //}
 
-                return await Task.FromResult(aErrors.Count == 0 ?
-               IdentityResult.Success : IdentityResult.Failed(aErrors.ToArray()));
+                return await Task.FromResult(errors.Count == 0 ?
+               IdentityResult.Success : IdentityResult.Failed(errors.ToArray()));
             }
 
             catch (Exception ex)
             {
                 throw new Exception(ex.Message.ToString());
             }
+        }
+
+        /// <summary>
+        /// Метод проверяет, логин передан или email.
+        /// </summary>
+        /// <param name="inputParam">Входной параметр.</param>
+        /// <returns>Статус проверки: true - если передан email, false - если передан логин.</returns>
+        public bool CheckIsEmail(string inputParam)
+        {
+            if (string.IsNullOrEmpty(inputParam))
+            {
+                return false;
+            }
+
+            const RegexOptions options = RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture;
+            Regex emailValidator = new Regex(RegularExpressions.REGULAR_EMAIL, options);
+
+            return emailValidator.IsMatch(inputParam);
         }
     }
 }

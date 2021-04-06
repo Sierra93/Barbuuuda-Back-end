@@ -1,7 +1,9 @@
 ﻿using Barbuuuda.Core.Data;
+using Barbuuuda.Core.Extensions.User;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.User;
+using Barbuuuda.Models.User.Input;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -21,15 +23,15 @@ namespace Barbuuuda.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IdentityDbContext _iden;
         private readonly SignInManager<UserEntity> _signInManager;
+        private readonly UserManager<UserEntity> _userManager;
 
-        public UserService(ApplicationDbContext db, PostgreDbContext postgre, IdentityDbContext iden, SignInManager<UserEntity> signInManager)
+        public UserService(ApplicationDbContext db, PostgreDbContext postgre, SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager)
         {
             _db = db;
             _postgre = postgre;
             _signInManager = signInManager;
-            _iden = iden;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -37,27 +39,53 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="user">Объект данных юзера.</param>
         /// <returns>Статус true/false</returns>
-        public async Task<object> LoginAsync(UserEntity user)
+        public async Task<object> LoginAsync(UserInput user)
         {
             try
             {
-                // Авторизует юзера.
-                var oAuth = await _signInManager.PasswordSignInAsync(user.UserName, user.UserPassword, user.RememberMe, false);                
+                SignInResult auth = null;
+                bool isContinue = false;
+
+                // Проверит, логин передан или email.
+                CustomValidatorExtension validatorExtension = new CustomValidatorExtension(_postgre);
+                bool isEmail = validatorExtension.CheckIsEmail(user.UserName);
+
+                // Если нужно проверять по логину.
+                if (!isEmail)
+                {
+                    // Авторизует юзера.
+                    auth = await _signInManager.PasswordSignInAsync(user.UserName, user.UserPassword, user.RememberMe, false);
+                }
+
+                // Значит в UserName лежит email.
+                else
+                {
+                    // Найдет пользователя по почте.
+                    UserEntity findUser = await _userManager.FindByEmailAsync(user.UserName);
+
+                    if (findUser != null && findUser.UserPassword.Equals(user.UserPassword))
+                    {
+                        isContinue = true;
+
+                        // Перезапишет UserName на логин выбранный из БД для фронта.
+                        user.UserName = findUser.UserName;
+                    }                    
+                }
 
                 // Если авторизация успешна.
-                if (oAuth.Succeeded)
+                if ((auth != null && auth.Succeeded) || isContinue)
                 {
-                    ClaimsIdentity oClaim = GetIdentityClaim(user);
+                    ClaimsIdentity claim = GetIdentityClaim(user);
 
                     // Выбирает роли юзера.
                     IEnumerable<string> aRoles = await GetUserRole(user.UserName);
 
                     // Генерит токен юзеру.
-                    string sToken = GenerateToken(oClaim).Result;
+                    string sToken = GenerateToken(claim).Result;
 
                     return new
                     {
-                        user = oClaim.Name,
+                        user = claim.Name,
                         userToken = sToken,
                         role = aRoles
                     };
@@ -80,7 +108,7 @@ namespace Barbuuuda.Services
             {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogError();
-                throw new ArgumentException("Логин или пароль введены не верно", ex.Message.ToString());
+                throw new ArgumentException("Логин и (или) пароль введены не верно", ex.Message.ToString());
             }
 
             catch (Exception ex)
@@ -98,7 +126,7 @@ namespace Barbuuuda.Services
         /// <returns></returns>
         private async Task<IList<string>> GetUserRole(string username)
         {
-            return await _iden.AspNetUsers
+            return await _postgre.Users
                 .Where(u => u.UserName
                 .Equals(username))
                 .Select(r => r.UserRole)
@@ -113,7 +141,6 @@ namespace Barbuuuda.Services
         private ClaimsIdentity GetIdentityClaim(UserEntity user)
         {
             ClaimsIdentity oClaim = GetClaim(user.UserName);           
-            //await SetUserToken(encodedJwt, user.UserName);   // Запишет токен юзера в БД.
 
             return oClaim;
         }
@@ -124,14 +151,14 @@ namespace Barbuuuda.Services
         /// <param name="token">Токен юзера.</param>
         //private async Task SetUserToken(string token, string username)
         //{
-        //    UserEntity oUser = await _iden.AspNetUsers
+        //    UserEntity oUser = await _postgre.Users
         //        .Where(u => u.UserName
         //        .Equals(username))
         //        .FirstOrDefaultAsync();
 
         //    // Запишет токен.
         //    oUser.UserToken = token;
-        //    await _iden.SaveChangesAsync();
+        //    await _postgre.SaveChangesAsync();
         //}
 
         private ClaimsIdentity GetClaim(string username)
@@ -161,7 +188,7 @@ namespace Barbuuuda.Services
                 string userId = string.Empty;
 
                 // Выбирает юзера по логину.
-                UserEntity oUser = await _iden.AspNetUsers
+                UserEntity oUser = await _postgre.Users
                     .Where(u => u.UserName
                     .Equals(username))
                     .FirstOrDefaultAsync();
@@ -254,7 +281,6 @@ namespace Barbuuuda.Services
                         up.FirstName,
                         up.Patronymic,
                         up.UserIcon,
-                        up.Rating,
                         dateRegister = string.Format("{0:f}", up.DateRegister),
                         scoreMoney = string.Format("{0:0,0}", up.Score),
                         up.AboutInfo,

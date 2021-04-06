@@ -7,7 +7,7 @@ namespace Barbuuuda.Core.Exceptions
     /// </summary>
     public class NotFoundTaskIdException : Exception
     {
-        public NotFoundTaskIdException(int? taskId) : base($"Задания с TaskId {taskId} не найдено")
+        public NotFoundTaskIdException(long? taskId) : base($"Задания с TaskId {taskId} не найдено")
         {
 
         }

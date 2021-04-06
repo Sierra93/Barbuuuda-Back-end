@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Barbuuuda.Core.ViewModels.User
 {
-    public class UserAuthorizeVm
+    public class UserAuthorizeExtension
     {
         public string UserLogin { get; set; }
 

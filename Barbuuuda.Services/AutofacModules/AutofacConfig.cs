@@ -1,5 +1,7 @@
 ﻿using Autofac;
+using AutoMapper;
 using Barbuuuda.Core.Interfaces;
+using System.Collections.Generic;
 
 namespace Barbuuuda.Services.AutofacModules
 {
@@ -10,6 +12,21 @@ namespace Barbuuuda.Services.AutofacModules
     {
         protected override void Load(ContainerBuilder builder)
         {
+            // Регистрирует IMapper.
+            builder.RegisterAssemblyTypes(typeof(AutofacConfig).Assembly).As<Profile>();
+
+            builder.Register(context => new MapperConfiguration(cfg =>
+            {
+                foreach (var profile in context.Resolve<IEnumerable<Profile>>())
+                {
+                    cfg.AddProfile(profile);
+                }
+            })).AsSelf().SingleInstance();
+
+            builder.Register(c => c.Resolve<MapperConfiguration>().CreateMapper(c.Resolve))
+                .As<IMapper>()
+                .InstancePerLifetimeScope();
+
             // Сервис пользователя.
             builder.RegisterType<UserService>().As<IUser>();
 
@@ -26,7 +43,7 @@ namespace Barbuuuda.Services.AutofacModules
             builder.RegisterType<PaginationService>().As<IPagination>();
 
             // Сервис БЗ.
-            builder.RegisterType<KnowlegeService>().As<IKnowlege>();
-        }       
+            builder.RegisterType<KnowlegeService>().As<IKnowlege>();            
+        }
     }
 }

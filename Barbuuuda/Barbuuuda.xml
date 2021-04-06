@@ -63,11 +63,36 @@
             </summary>
             <returns>Список заданий.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.ExecutorController.RespondAsync(Barbuuuda.Models.Executor.Input.TaskInput)">
+        <member name="M:Barbuuuda.Controllers.ExecutorController.RespondTaskAsync(Barbuuuda.Models.Executor.Input.RespondInput)">
             <summary>
             Метод оставляет ставку к заданию.
             </summary>
             <param name="taskInput">Входная модель.</param>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ExecutorController.CheckRespondAsync(Barbuuuda.Models.Executor.Input.CheckRespondInput)">
+            <summary>
+            Метод проверит, была ли сделана ставка к заданию текущим исполнителем.
+            </summary>
+            <param name="checkRespondInput">Входная модель.</param>
+            <returns>Статус проверки true/false.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.KnowlegeController.GetCategoryListAsync">
+            <summary>
+            Метод выгружает список категорий для БЗ.
+            </summary>
+            <returns>Список категорий.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.KnowlegeController.GetPopularArticlesAsync">
+            <summary>
+            Метод выгружает список популярных статей.
+            </summary>
+            <returns>Список статей.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.KnowlegeController.GetCategoryArticles">
+            <summary>
+            Метод выгружает список статей категорий.
+            </summary>
+            <returns>Список статей.</returns>
         </member>
         <member name="T:Barbuuuda.Controllers.MainPageController">
             <summary>
@@ -170,7 +195,7 @@
         </member>
         <member name="M:Barbuuuda.Controllers.TaskController.EditTask(Barbuuuda.Models.Task.TaskEntity)">
             <summary>
-            Метод создает новое задание.
+            Метод изменяет новое задание.
             </summary>
             <param name="oTask">Объект с данными задания.</param>
             <returns>Вернет данные измененного задания.</returns>
@@ -254,6 +279,13 @@
             </summary>
             <returns>Список заданий.</returns>
         </member>
+        <member name="M:Barbuuuda.Controllers.TaskController.GetRespondsAsync(Barbuuuda.Models.Task.Input.GetRespondInput)">
+            <summary>
+            Метод получает список ставок к заданию.
+            </summary>
+            <param name="getRespondInput">Id задания, для которого нужно получить список ставок.</param>
+            <returns>Список ставок.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.UserController">
             <summary>
             Контроллер содержит логику работы с пользователями.
@@ -264,10 +296,10 @@
             Сервис работы с юзерами.
             </summary>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.CreateUserAsync(Barbuuuda.Models.User.UserEntity)">
+        <member name="M:Barbuuuda.Controllers.UserController.CreateUserAsync(Barbuuuda.Models.User.Input.UserInput)">
             <summary>
             Метод создает нового пользователя.
-            <paramref name="user">Объект с данными юзера.</paramref>
+            <paramref name="user">Входная модель пользователя.</paramref>
             </summary>
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.IdentityUserEmail(System.String)">
@@ -284,10 +316,10 @@
             <param name="userId">Id юзера.</param>
             <param name="code">Временный код токена.</param>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.LoginUserAsync(Barbuuuda.Models.User.UserEntity)">
+        <member name="M:Barbuuuda.Controllers.UserController.LoginUserAsync(Barbuuuda.Models.User.Input.UserInput)">
             <summary>
             Метод авторизует пользователя.
-            <paramref name="user">Объект с данными юзера.</paramref>
+            <paramref name="user">Входная модель пользователя.</paramref>
             </summary>        
         </member>
         <member name="M:Barbuuuda.Controllers.UserController.GetUserAuthorize(System.String)">
@@ -303,7 +335,7 @@
             </summary>
             <returns>Объект с данными о профиле пользователя.</returns>
         </member>
-        <member name="M:Barbuuuda.Controllers.UserController.SaveProfileDataAsync(Barbuuuda.Models.User.UserEntity)">
+        <member name="M:Barbuuuda.Controllers.UserController.SaveProfileDataAsync(Barbuuuda.Models.User.Input.UserInput)">
             <summary>
             Метод сохраняет личные данные юзера.
             </summary>
@@ -314,6 +346,13 @@
             Метод обновляет токен юзеру.
             </summary>
             <returns>Строка токена.</returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.UserController.CreateUser(Barbuuuda.Models.User.Input.UserInput)">
+            <summary>
+            Метод создает пользователя.
+            </summary>
+            <param name="user">Входная модель пользователя.</param>
+            <returns></returns>
         </member>
     </members>
 </doc>
