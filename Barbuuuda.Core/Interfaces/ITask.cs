@@ -1,5 +1,6 @@
 ﻿using Barbuuuda.Models.Respond.Outpoot;
 using Barbuuuda.Models.Task;
+using Barbuuuda.Models.Task.Outpoot;
 using System.Collections;
 using System.Threading.Tasks;
 
@@ -99,7 +100,7 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".
         /// </summary>
         /// <returns>Список заданий.</returns>
-        Task<object> LoadAuctionTasks();
+        Task<GetTaskResultOutpoot> LoadAuctionTasks();
 
         /// <summary>
         /// Метод получает логин юзера по его Id.
@@ -121,6 +122,6 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
         /// <returns>Список ставок.</returns>
-        Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId);
+        Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId, string account);
     }
 }
