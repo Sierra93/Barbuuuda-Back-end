@@ -871,6 +871,7 @@ namespace Barbuuuda.Services
         /// Метод получает список ставок к заданию.
         /// </summary>
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
+        /// <param name="account">Логин пользователя.</param>
         /// <returns>Список ставок.</returns>
         public async Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId, string account)
         {

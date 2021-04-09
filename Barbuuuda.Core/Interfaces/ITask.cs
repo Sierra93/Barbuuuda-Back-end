@@ -121,6 +121,7 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод получает список ставок к заданию.
         /// </summary>
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
+        /// <param name="account">Логин пользователя.</param>
         /// <returns>Список ставок.</returns>
         Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId, string account);
     }

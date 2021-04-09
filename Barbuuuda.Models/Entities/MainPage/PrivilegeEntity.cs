@@ -9,19 +9,19 @@ namespace Barbuuuda.Models.MainPage
     [Table("Privileges", Schema = "dbo")]
     public sealed class PrivilegeEntity
     {
-        [Key, Column("id")]
+        [Key, Column("Id")]
         public int Id { get; set; }
 
         /// <summary>
         /// Главный заголовок блока.
         /// </summary>
-        [Column("title", TypeName = "nvarchar(200)")]
+        [Column("Title", TypeName = "nvarchar(200)")]
         public string Title { get; set; }
 
         /// <summary>
         /// Описание.
         /// </summary>
-        [Column("text", TypeName = "nvarchar(500)")]
+        [Column("Text", TypeName = "nvarchar(max)")]
         public string Text { get; set; }    
     }
 }
