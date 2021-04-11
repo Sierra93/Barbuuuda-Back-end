@@ -1,4 +1,5 @@
-﻿using Barbuuuda.Models.Entities.Executor;
+﻿using Barbuuuda.Models.Entities.Chat;
+using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.Entities.Knowlege;
 using Barbuuuda.Models.Entities.Respond;
 using Barbuuuda.Models.Entities.User;
@@ -84,6 +85,21 @@ namespace Barbuuuda.Core.Data
         /// Таблица состояний пользователей.
         /// </summary>
         public DbSet<StateEntity> States { get; set; }
+
+        /// <summary>
+        /// Таблица информации о диалогах dbo.MainInfoDialogs.
+        /// </summary>
+        public DbSet<MainInfoDialogEntity> MainInfoDialogs { get; set; }
+
+        /// <summary>
+        /// Таблица участников диалога dbo.DialogMembers.
+        /// </summary>
+        public DbSet<DialogMemberEntity> DialogMembers { get; set; }
+
+        /// <summary>
+        /// Таблица сообщений dbo.DialogMessages.
+        /// </summary>
+        public DbSet<DialogMessageEntity> DialogMessages { get; set; }
 
         public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options) { }
     }
