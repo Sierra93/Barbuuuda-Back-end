@@ -102,6 +102,8 @@ namespace Barbuuuda
                             ValidateIssuerSigningKey = true,
                         };
                     });
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -137,6 +139,12 @@ namespace Barbuuuda
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Barbuuuda API");
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<ChatHub>("/chat");
+                endpoints.MapDefaultControllerRoute();
             });
         }        
     }

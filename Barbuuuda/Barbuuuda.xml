@@ -15,6 +15,18 @@
             </summary>
             <returns>Имя юзера.</returns>
         </member>
+        <member name="T:Barbuuuda.Controllers.ChatController">
+            <summary>
+            Контроллер чата.
+            </summary>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ChatController.SendAsync(Barbuuuda.Models.Chat.Input.ChatInput)">
+            <summary>
+            Метод отправляет сообщение.
+            </summary>
+            <param name="chatInput">Входная модель.</param>
+            <returns></returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.ExecutorController">
             <summary>
             Контроллер содержит методы по работе с исполнителями сервиса.
