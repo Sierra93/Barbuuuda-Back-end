@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Barbuuuda.Services.AutofacModules
 {
     /// <summary>
-    /// Конфигурация Autofac, в которой регистрируются все сервисы.
+    /// Конфигурация Autofac, в которой регистрируются все сервисы и AutoMapper.
     /// </summary>
     public class AutofacConfig : Module
     {
@@ -17,7 +17,7 @@ namespace Barbuuuda.Services.AutofacModules
 
             builder.Register(context => new MapperConfiguration(cfg =>
             {
-                foreach (var profile in context.Resolve<IEnumerable<Profile>>())
+                foreach (Profile profile in context.Resolve<IEnumerable<Profile>>())
                 {
                     cfg.AddProfile(profile);
                 }
@@ -43,7 +43,10 @@ namespace Barbuuuda.Services.AutofacModules
             builder.RegisterType<PaginationService>().As<IPagination>();
 
             // Сервис БЗ.
-            builder.RegisterType<KnowlegeService>().As<IKnowlege>();            
+            builder.RegisterType<KnowlegeService>().As<IKnowlege>();
+
+            // Чат.
+            builder.RegisterType<ChatService>().As<IChat>();
         }
     }
 }

@@ -20,6 +20,7 @@ namespace Barbuuuda.Models.Entities.Chat
         /// <summary>
         /// Id участника диалога.
         /// </summary>
+        [Column("UserId")]
         public string Id { get; set; }
 
         /// <summary>
