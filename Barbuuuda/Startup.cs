@@ -34,14 +34,20 @@ namespace Barbuuuda
 
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
             {
-                builder.WithOrigins(
-                    "https://testdevi.site",
-                    "https://testdevi.site/",
-                    "https://barbuuuda.ru",
-                    "https://barbuuuda.ru/",
-                    "http://localhost:8080/",
-                    "http://localhost:8080")
-                .AllowAnyMethod().AllowAnyHeader();
+                //builder.WithOrigins(
+                //    "https://testdevi.site",
+                //    "https://testdevi.site/",
+                //    "https://barbuuuda.ru",
+                //    "https://barbuuuda.ru/",
+                //    "http://localhost:8080/",
+                //    "http://localhost:8080")
+                //.AllowAnyMethod().AllowAnyHeader();
+                builder.AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .WithOrigins("*")
+                        .WithMethods("*")
+                        .WithHeaders("*")
+                        .DisallowCredentials();
             }));
 
             #region ПРОД.

@@ -63,5 +63,12 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="userName">Логин пользователя.</param>
         /// <returns>Id пользователя.</returns>
         Task<string> GetUserIdByLogin(string userName);
+
+        /// <summary>
+        /// Метод находит логин пользователя по его Id.
+        /// </summary>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns>Логин пользователя.</returns>
+        Task<string> FindUserIdByLogin(string userId);
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Barbuuuda.Core.Consts
+﻿namespace Barbuuuda.Core.Consts
 {
     /// <summary>
     /// Класс описывает константы ролей юзера.

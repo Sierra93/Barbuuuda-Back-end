@@ -27,5 +27,10 @@ namespace Barbuuuda.Models.Chat.Outpoot
         /// Цена к ставке.
         /// </summary>
         public string Price { get; set; }
+
+        /// <summary>
+        /// Логин пользователя.
+        /// </summary>
+        public string UserName { get; set; }
     }
 }

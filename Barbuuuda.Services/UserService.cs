@@ -442,5 +442,22 @@ namespace Barbuuuda.Services
 
             return userId;
         }
+
+
+        /// <summary>
+        /// Метод находит логин пользователя по его Id.
+        /// </summary>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns>Логин пользователя.</returns>
+        public async Task<string> FindUserIdByLogin(string userId)
+        {
+            string userLogin = await _postgre.Users
+                .Where(u => u.Id
+                .Equals(userId))
+                .Select(u => u.UserName)
+                .FirstOrDefaultAsync();
+
+            return userLogin;
+        }
     }
 }

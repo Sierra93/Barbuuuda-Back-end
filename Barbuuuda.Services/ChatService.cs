@@ -1,12 +1,15 @@
-﻿using Barbuuuda.Core.Data;
+﻿using AutoMapper;
+using Barbuuuda.Core.Consts;
+using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Chat.Outpoot;
+using Barbuuuda.Models.User;
+using Barbuuuda.Models.User.Outpoot;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -32,12 +35,15 @@ namespace Barbuuuda.Services
         /// </summary>
         private readonly IUser _user;
 
-        public ChatService(IHubContext<ChatHub> hubContext, ApplicationDbContext db, PostgreDbContext postgre, IUser user)
+        private readonly IMapper _mapper;
+
+        public ChatService(IHubContext<ChatHub> hubContext, ApplicationDbContext db, PostgreDbContext postgre, IUser user, IMapper mapper)
         {
             _hubContext = hubContext;
             _db = db;
             _postgre = postgre;
             _user = user;
+            _mapper = mapper;
         }        
 
         /// <summary>
@@ -74,10 +80,12 @@ namespace Barbuuuda.Services
             {
                 GetResultDialogOutpoot dialogsList = new GetResultDialogOutpoot();
 
-                // Находит Id пользователя, для которого подтянуть список диалогов.
-                string userId = await _user.GetUserIdByLogin(account);
+                // Находит Id пользователя, для которого подтянуть список диалогов и мапит к типу UserOutpoot.
+                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, UserOutpoot>());
+                Mapper mapper = new Mapper(config);
+                UserOutpoot user = mapper.Map<UserOutpoot>(await _user.GetUserByLogin(account));
 
-                if (string.IsNullOrEmpty(userId))
+                if (string.IsNullOrEmpty(user.Id))
                 {
                     throw new NotFoundUserException(account);
                 }
@@ -85,7 +93,7 @@ namespace Barbuuuda.Services
                 // Выберет список диалогов.
                 var dialogs = await _postgre.DialogMembers
                         .Join(_postgre.MainInfoDialogs, member => member.DialogId, info => info.DialogId, (member, info) => new { member, info })
-                        .Where(d => d.member.Id.Equals(userId))
+                        .Where(d => d.member.Id.Equals(user.Id))
                         .Select(res => new
                         {
                             res.info.DialogId,
@@ -100,11 +108,60 @@ namespace Barbuuuda.Services
                     return dialogsList;
                 }
 
-                // Добавит в результирующую коллекцию GetResultDialogOutpoot.
-                dialogsList.Dialogs.AddRange(from dialog in dialogs
-                                             let jsonString = JsonSerializer.Serialize(dialog)
-                                             let resultDialog = JsonSerializer.Deserialize<DialogOutpoot>(jsonString)
-                                             select resultDialog);
+                foreach (object dialog in dialogs)
+                {
+                    string jsonString = JsonSerializer.Serialize(dialog);
+                    DialogOutpoot resultDialog = JsonSerializer.Deserialize<DialogOutpoot>(jsonString);
+
+                    // Подтянет последнее сообщение диалога для отображения в свернутом виде.
+                    // TODO: доработать через substring или substr брать только первые 40 символов, а не сообщение целиком.
+                    resultDialog.LastMessage = await _postgre.DialogMessages
+                        .Where(d => d.DialogId == resultDialog.DialogId)
+                        .OrderBy(o => o.DialogId)
+                        .Select(m => m.Message)                        
+                        .LastOrDefaultAsync();
+
+                    // Находит Id участников диалога по DialogId.
+                    IEnumerable<string> membersIds = await _postgre.DialogMembers
+                        .Where(d => d.DialogId == resultDialog.DialogId)
+                        .Select(res => res.Id)
+                        .ToListAsync();
+                    string executorId = string.Empty;
+
+                    // Запишет логин собеседника.
+                    foreach (string id in membersIds.Where(id => !id.Equals(user.Id)))
+                    {                        
+                        resultDialog.UserName = await _user.FindUserIdByLogin(id);
+                    }
+
+                    // Находит исполнителя в диалоге.
+                    foreach (string id in membersIds)
+                    {
+                        var dialogUser = await _postgre.Users
+                            .Where(u => u.Id.Equals(id))
+                            .Select(u => new 
+                            {
+                                u.UserRole,
+                                u.Id
+                            })
+                            .FirstOrDefaultAsync();
+                        
+                        // Пропустит, если не исполнитель.
+                        if (!dialogUser.UserRole.Equals(UserRole.EXECUTOR))
+                        {                            
+                            continue;
+                        }
+
+                        executorId = dialogUser.Id;
+                    }
+
+                    // Исполнитель диалога найден, теперь подтянуть его ставку.
+                    resultDialog.Price = await _postgre.Responds
+                        .Where(r => r.ExecutorId.Equals(executorId))
+                        .Select(res => string.Format("{0:0,0}", res.Price))
+                        .FirstOrDefaultAsync();                    
+                    dialogsList.Dialogs.Add(resultDialog);
+                }
 
                 return dialogsList;
             }

@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using AutoMapper;
 using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Models.User;
+using Barbuuuda.Models.User.Outpoot;
 using System.Collections.Generic;
 
 namespace Barbuuuda.Services.AutofacModules
@@ -20,12 +22,12 @@ namespace Barbuuuda.Services.AutofacModules
                 foreach (Profile profile in context.Resolve<IEnumerable<Profile>>())
                 {
                     cfg.AddProfile(profile);
+                    //cfg.CreateMap<UserEntity, UserOutpoot>();
+                    //cfg.AddMaps(new[] { typeof(AutofacConfig).Assembly });
                 }
             })).AsSelf().SingleInstance();
 
-            builder.Register(c => c.Resolve<MapperConfiguration>().CreateMapper(c.Resolve))
-                .As<IMapper>()
-                .InstancePerLifetimeScope();
+            builder.Register(c => c.Resolve<MapperConfiguration>().CreateMapper(c.Resolve)).As<IMapper>().InstancePerLifetimeScope();
 
             // Сервис пользователя.
             builder.RegisterType<UserService>().As<IUser>();

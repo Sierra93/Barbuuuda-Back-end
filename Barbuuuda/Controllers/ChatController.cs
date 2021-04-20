@@ -1,6 +1,8 @@
 ﻿using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Chat.Input;
 using Barbuuuda.Models.Chat.Outpoot;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -10,6 +12,7 @@ namespace Barbuuuda.Controllers
     /// Контроллер чата.
     /// </summary>
     [ApiController, Route("chat")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ChatController : BaseController
     {
         public static string Module => "Barbuuuda.Chat";
@@ -56,7 +59,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(GetResultDialogOutpoot))]
         public async Task<IActionResult> GetDialogsAsync()
         {
-            var dialogs = await _chat.GetDialogsAsync(GetUserName());
+            GetResultDialogOutpoot dialogs = await _chat.GetDialogsAsync(GetUserName());
 
             return Ok(dialogs);
         }
