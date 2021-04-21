@@ -90,12 +90,14 @@ namespace Barbuuuda.Services
                 // Выберет список диалогов.
                 var dialogs = await _postgre.DialogMembers
                         .Join(_postgre.MainInfoDialogs, member => member.DialogId, info => info.DialogId, (member, info) => new { member, info })
-                        .Where(d => d.member.Id.Equals(user.Id))
+                        .Join(_postgre.MainInfoDialogs, parentMember => parentMember.member.DialogId, mainInfoDialog => mainInfoDialog.DialogId, (parentMember, mainInfoDialog) => new { parentMember, mainInfoDialog })
+                        .Where(d => d.parentMember.member.Id.Equals(user.Id))
                         .Select(res => new
                         {
-                            res.info.DialogId,
-                            res.info.DialogName,
-                            res.member.Id
+                            res.parentMember.info.DialogId,
+                            res.parentMember.info.DialogName,
+                            res.parentMember.member.Id,
+                            res.mainInfoDialog.Created
                         })
                         .ToListAsync();
 
@@ -109,7 +111,7 @@ namespace Barbuuuda.Services
                 {
                     string jsonString = JsonSerializer.Serialize(dialog);
                     DialogOutpoot resultDialog = JsonSerializer.Deserialize<DialogOutpoot>(jsonString);
-
+                    
                     // Подтянет последнее сообщение диалога для отображения в свернутом виде взяв первые 40 символов и далее ставит ...
                     resultDialog.LastMessage = await _postgre.DialogMessages
                         .Where(d => d.DialogId == resultDialog.DialogId)
@@ -171,8 +173,25 @@ namespace Barbuuuda.Services
                     resultDialog.Price = await _postgre.Responds
                         .Where(r => r.ExecutorId.Equals(executorId))
                         .Select(res => string.Format("{0:0,0}", res.Price))
-                        .FirstOrDefaultAsync();                    
-                    dialogsList.Dialogs.Add(resultDialog);
+                        .FirstOrDefaultAsync();
+
+                    // Если дата диалога совпадает с сегодняшней, то заполнит часы и минуты, иначе оставит их null.
+                    if (DateTime.Now.ToString("d").Equals(Convert.ToDateTime(resultDialog.Created).ToString("d")))
+                    {
+                        // Запишет только часы и минуты.
+                        resultDialog.CalcTime = Convert.ToDateTime(resultDialog.Created).ToString("t");
+                    }
+
+                    // Если дата диалога не совпадает с сегодняшней.
+                    else if (!DateTime.Now.ToString("d").Equals(Convert.ToDateTime(resultDialog.Created).ToString("d")))
+                    {
+                        // Запишет только дату.
+                        resultDialog.CalcShortDate = Convert.ToDateTime(resultDialog.Created).ToString("d");
+                    }
+
+                    // Форматирует дату убрав секунды.
+                    resultDialog.Created = Convert.ToDateTime(resultDialog.Created).ToString("g");
+                    dialogsList.Dialogs.Add(resultDialog);                   
                 }
 
                 return dialogsList;

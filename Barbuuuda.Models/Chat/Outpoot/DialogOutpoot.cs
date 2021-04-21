@@ -47,5 +47,20 @@ namespace Barbuuuda.Models.Chat.Outpoot
         /// Фото профиля.
         /// </summary>
         public string UserIcon { get; set; }
+
+        /// <summary>
+        /// Вычисляемое время для диалогов.
+        /// </summary>
+        public string CalcTime { get; set; }
+
+        /// <summary>
+        /// Вычисляемая дата для диалогов.
+        /// </summary>
+        public string CalcShortDate { get; set; }
+
+        /// <summary>
+        /// Полная дата.
+        /// </summary>
+        public string Created { get; set; }
     }
 }
