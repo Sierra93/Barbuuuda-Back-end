@@ -35,15 +35,12 @@ namespace Barbuuuda.Services
         /// </summary>
         private readonly IUser _user;
 
-        private readonly IMapper _mapper;
-
-        public ChatService(IHubContext<ChatHub> hubContext, ApplicationDbContext db, PostgreDbContext postgre, IUser user, IMapper mapper)
+        public ChatService(IHubContext<ChatHub> hubContext, ApplicationDbContext db, PostgreDbContext postgre, IUser user)
         {
             _hubContext = hubContext;
             _db = db;
             _postgre = postgre;
             _user = user;
-            _mapper = mapper;
         }        
 
         /// <summary>
@@ -102,7 +99,7 @@ namespace Barbuuuda.Services
                         })
                         .ToListAsync();
 
-                // Если диалоги не найдены.
+                // Если диалоги не найдены, то вернет пустой массив.
                 if (!dialogs.Any())
                 {
                     return dialogsList;
@@ -113,12 +110,11 @@ namespace Barbuuuda.Services
                     string jsonString = JsonSerializer.Serialize(dialog);
                     DialogOutpoot resultDialog = JsonSerializer.Deserialize<DialogOutpoot>(jsonString);
 
-                    // Подтянет последнее сообщение диалога для отображения в свернутом виде.
-                    // TODO: доработать через substring или substr брать только первые 40 символов, а не сообщение целиком.
+                    // Подтянет последнее сообщение диалога для отображения в свернутом виде взяв первые 40 символов и далее ставит ...
                     resultDialog.LastMessage = await _postgre.DialogMessages
                         .Where(d => d.DialogId == resultDialog.DialogId)
                         .OrderBy(o => o.DialogId)
-                        .Select(m => m.Message)                        
+                        .Select(m => m.Message.Length > 40 ? string.Concat(m.Message.Substring(0, 40), "...") : m.Message)
                         .LastOrDefaultAsync();
 
                     // Находит Id участников диалога по DialogId.
@@ -130,8 +126,21 @@ namespace Barbuuuda.Services
 
                     // Запишет логин собеседника.
                     foreach (string id in membersIds.Where(id => !id.Equals(user.Id)))
-                    {                        
+                    {
                         resultDialog.UserName = await _user.FindUserIdByLogin(id);
+
+                        // Запишет имя и фамилию, если они заполнены, иначе фронт будет использовать логин собеседника.
+                        UserOutpoot userInitial = await _user.GetUserInitialsByIdAsync(id);
+
+                        if (string.IsNullOrEmpty(userInitial.FirstName) || string.IsNullOrEmpty(userInitial.LastName))
+                        {
+                            continue;
+                        }
+
+                        resultDialog.FirstName = userInitial.FirstName;
+
+                        // Возьмет первую букву фамилии и поставит после нее точку.
+                        resultDialog.LastName = string.Concat(userInitial.LastName.Substring(0, 1), ".");
                     }
 
                     // Находит исполнителя в диалоге.

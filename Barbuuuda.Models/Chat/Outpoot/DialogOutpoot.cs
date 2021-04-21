@@ -29,8 +29,18 @@ namespace Barbuuuda.Models.Chat.Outpoot
         public string Price { get; set; }
 
         /// <summary>
-        /// Логин пользователя.
+        /// Логин собеседника.
         /// </summary>
         public string UserName { get; set; }
+
+        /// <summary>
+        /// Имя собеседника.
+        /// </summary>
+        public string FirstName { get; set; }
+
+        /// <summary>
+        /// Фамилия собеседника.
+        /// </summary>
+        public string LastName { get; set; }
     }
 }

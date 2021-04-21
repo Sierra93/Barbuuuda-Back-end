@@ -1,5 +1,6 @@
 ﻿using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
+using Barbuuuda.Models.User.Outpoot;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -70,5 +71,12 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="userId">Id пользователя.</param>
         /// <returns>Логин пользователя.</returns>
         Task<string> FindUserIdByLogin(string userId);
+
+        /// <summary>
+        /// Метод находит фамилию и имя пользователя по его Id.
+        /// </summary>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns>Фамилия и имя пользователя.</returns>
+        Task<UserOutpoot> GetUserInitialsByIdAsync(string userId);
     }
 }

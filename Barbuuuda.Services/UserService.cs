@@ -4,6 +4,7 @@ using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
+using Barbuuuda.Models.User.Outpoot;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -458,6 +459,22 @@ namespace Barbuuuda.Services
                 .FirstOrDefaultAsync();
 
             return userLogin;
+        }
+
+        /// <summary>
+        /// Метод находит фамилию и имя пользователя по его Id.
+        /// </summary>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns>Фамилия и имя пользователя.</returns>
+        public async Task<UserOutpoot> GetUserInitialsByIdAsync(string userId)
+        {
+            UserOutpoot user = await _postgre.Users
+                .Where(u => u.Id
+                .Equals(userId))
+                .Select(res => new UserOutpoot { FirstName = res.FirstName, LastName = res.LastName })
+                .FirstOrDefaultAsync();
+
+            return user;
         }
     }
 }
