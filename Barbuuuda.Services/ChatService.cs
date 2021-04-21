@@ -141,6 +141,9 @@ namespace Barbuuuda.Services
 
                         // Возьмет первую букву фамилии и поставит после нее точку.
                         resultDialog.LastName = string.Concat(userInitial.LastName.Substring(0, 1), ".");
+
+                        // Проставит фото профиля или фото по дефолту.
+                        resultDialog.UserIcon = userInitial.UserIcon ?? NoPhotoUrl.NO_PHOTO;
                     }
 
                     // Находит исполнителя в диалоге.

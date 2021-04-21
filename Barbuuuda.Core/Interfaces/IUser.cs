@@ -73,10 +73,10 @@ namespace Barbuuuda.Core.Interfaces
         Task<string> FindUserIdByLogin(string userId);
 
         /// <summary>
-        /// Метод находит фамилию и имя пользователя по его Id.
+        /// Метод находит фамилию, имя, фото профиля пользователя по его Id.
         /// </summary>
         /// <param name="userId">Id пользователя.</param>
-        /// <returns>Фамилия и имя пользователя.</returns>
+        /// <returns>Фамилия, имя, фото профиля пользователя.</returns>
         Task<UserOutpoot> GetUserInitialsByIdAsync(string userId);
     }
 }

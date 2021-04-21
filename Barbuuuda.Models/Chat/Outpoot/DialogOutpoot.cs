@@ -42,5 +42,10 @@ namespace Barbuuuda.Models.Chat.Outpoot
         /// Фамилия собеседника.
         /// </summary>
         public string LastName { get; set; }
+
+        /// <summary>
+        /// Фото профиля.
+        /// </summary>
+        public string UserIcon { get; set; }
     }
 }

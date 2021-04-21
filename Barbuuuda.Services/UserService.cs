@@ -462,16 +462,20 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод находит фамилию и имя пользователя по его Id.
+        /// Метод находит фамилию, имя, фото профиля пользователя по его Id.
         /// </summary>
         /// <param name="userId">Id пользователя.</param>
-        /// <returns>Фамилия и имя пользователя.</returns>
+        /// <returns>Фамилия, имя, фото профиля пользователя.</returns>
         public async Task<UserOutpoot> GetUserInitialsByIdAsync(string userId)
         {
             UserOutpoot user = await _postgre.Users
                 .Where(u => u.Id
                 .Equals(userId))
-                .Select(res => new UserOutpoot { FirstName = res.FirstName, LastName = res.LastName })
+                .Select(res => new UserOutpoot { 
+                    FirstName = res.FirstName, 
+                    LastName = res.LastName,
+                    UserIcon = res.UserIcon
+                })
                 .FirstOrDefaultAsync();
 
             return user;

@@ -19,5 +19,10 @@
         /// Фамилия пользователя.
         /// </summary>
         public string LastName { get; set; }
+
+        /// <summary>
+        /// Фото профиля.
+        /// </summary>
+        public string UserIcon { get; set; }
     }
 }
