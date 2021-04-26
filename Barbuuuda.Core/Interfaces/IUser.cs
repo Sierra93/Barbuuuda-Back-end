@@ -78,5 +78,12 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="userId">Id пользователя.</param>
         /// <returns>Фамилия, имя, фото профиля пользователя.</returns>
         Task<UserOutpoot> GetUserInitialsByIdAsync(string userId);
+
+        /// <summary>
+        /// Метод получит логин и иконку профиля заказчика по Id его задания.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Данные заказчика.</returns>
+        Task<CustomerOutpoot> GetCustomerLoginByTaskId(int? taskId);
     }
 }

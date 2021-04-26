@@ -8,6 +8,7 @@ using Barbuuuda.Models.Respond.Outpoot;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.Task.Outpoot;
 using Barbuuuda.Models.User;
+using Barbuuuda.Models.User.Outpoot;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
@@ -328,8 +329,10 @@ namespace Barbuuuda.Services
                 }
             }
 
-            // TODO: отрефачить этот метод, чтоб не обращаться два раза к БД за получением задания.
-            string userId = await GetUserByName(userName);
+            // Получит логин и иконку профиля заказчика задания.
+            CustomerOutpoot customer = await _user.GetCustomerLoginByTaskId(taskId);
+
+            // TODO: отрефачить этот метод, чтоб не обращаться два раза к БД за получением задания.            
             var oTask = await (from tasks in _postgre.Tasks
                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
@@ -352,7 +355,9 @@ namespace Barbuuuda.Services
                                    tasks.TaskId,
                                    taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                                    tasks.TypeCode,
-                                   userName
+                                   userName,
+                                   customerLogin = customer.CustomerLogin,
+                                   customerProfileIcon = customer.CustomerProfileIconUrl
                                })
                                .ToListAsync();
 

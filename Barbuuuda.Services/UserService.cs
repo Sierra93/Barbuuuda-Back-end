@@ -1,4 +1,7 @@
-﻿using Barbuuuda.Core.Data;
+﻿using AutoMapper;
+using Barbuuuda.Core.Consts;
+using Barbuuuda.Core.Data;
+using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Extensions.User;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
@@ -479,6 +482,68 @@ namespace Barbuuuda.Services
                 .FirstOrDefaultAsync();
 
             return user;
+        }
+
+        /// <summary>
+        /// Метод получит логин и иконку профиля заказчика по Id его задания.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Данные заказчика.</returns>
+        public async Task<CustomerOutpoot> GetCustomerLoginByTaskId(int? taskId)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NotFoundTaskIdException(taskId);
+                }
+
+                // Получит Id заказчика, который создал задание.
+                string customerId = await _postgre.Tasks
+                    .Where(t => t.TaskId == taskId)
+                    .Select(t => t.OwnerId)
+                    .FirstOrDefaultAsync();
+
+                // Если заказчика задания с таким OwnerId не найдено.
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    throw new NotFoundTaskCustomerIdException(customerId);
+                }
+
+                // Найдет логин и иконку профиля заказчика задания и мапит к типу CustomerOutpoot.
+                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, CustomerOutpoot>());
+                Mapper mapper = new Mapper(config);
+                CustomerOutpoot customer = mapper.Map<CustomerOutpoot>(await _postgre.Users
+                    .Where(u => u.Id
+                    .Equals(customerId))
+                    .Select(u => new
+                    {
+                        u.UserName,
+                        u.UserIcon
+                    })
+                    .FirstOrDefaultAsync());
+
+                // Если логина заказчика задания не найдено.
+                if (string.IsNullOrEmpty(customer.CustomerLogin))
+                {
+                    throw new NotFoundCustomerLoginException();
+                }
+
+                // Если у заказчика не установлена иконка профиля, то запишет ее по дефолту.
+                if (string.IsNullOrEmpty(customer.CustomerProfileIconUrl))
+                {
+                    customer.CustomerProfileIconUrl = NoPhotoUrl.NO_PHOTO;
+                }
+
+                return customer;
+            }
+
+            catch (Exception ex)
+            {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogCritical();
+                throw new Exception(ex.Message.ToString());
+            }
         }
     }
 }

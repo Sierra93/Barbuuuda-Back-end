@@ -35,12 +35,12 @@ namespace Barbuuuda
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
             {
                 //builder.WithOrigins(
+                //    "https://barbuuuda.ru/",
+                //    "https://barbuuuda.ru",
                 //    "https://testdevi.site",
                 //    "https://testdevi.site/",
-                //    "https://barbuuuda.ru",
-                //    "https://barbuuuda.ru/",
                 //    "http://localhost:8080/",
-                //    "http://localhost:8080")
+                //    "http://localhost:8080");
                 //.AllowAnyMethod().AllowAnyHeader();
                 builder.AllowAnyMethod()
                         .AllowAnyHeader()
