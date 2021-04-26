@@ -8,11 +8,11 @@
         /// <summary>
         /// Логин заказчика задания.
         /// </summary>
-        public string CustomerLogin { get; set; }
+        public string UserName { get; set; }
 
         /// <summary>
         /// Иконка профиля заказчика задания.
         /// </summary>
-        public string CustomerProfileIconUrl { get; set; }
+        public string UserIcon { get; set; }
     }
 }

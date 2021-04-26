@@ -356,8 +356,8 @@ namespace Barbuuuda.Services
                                    taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                                    tasks.TypeCode,
                                    userName,
-                                   customerLogin = customer.CustomerLogin,
-                                   customerProfileIcon = customer.CustomerProfileIconUrl
+                                   customerLogin = customer.UserName,
+                                   customerProfileIcon = customer.UserIcon
                                })
                                .ToListAsync();
 

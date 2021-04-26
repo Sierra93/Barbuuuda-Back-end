@@ -516,26 +516,21 @@ namespace Barbuuuda.Services
                 CustomerOutpoot customer = mapper.Map<CustomerOutpoot>(await _postgre.Users
                     .Where(u => u.Id
                     .Equals(customerId))
-                    .Select(u => new
-                    {
-                        u.UserName,
-                        u.UserIcon
-                    })
                     .FirstOrDefaultAsync());
 
                 // Если логина заказчика задания не найдено.
-                if (string.IsNullOrEmpty(customer.CustomerLogin))
+                if (!string.IsNullOrEmpty(customer.UserName))
                 {
-                    throw new NotFoundCustomerLoginException();
+                    // Если у заказчика не установлена иконка профиля, то запишет ее по дефолту.
+                    if (string.IsNullOrEmpty(customer.UserIcon))
+                    {
+                        customer.UserIcon = NoPhotoUrl.NO_PHOTO;
+                    }
+
+                    return customer;
                 }
 
-                // Если у заказчика не установлена иконка профиля, то запишет ее по дефолту.
-                if (string.IsNullOrEmpty(customer.CustomerProfileIconUrl))
-                {
-                    customer.CustomerProfileIconUrl = NoPhotoUrl.NO_PHOTO;
-                }
-
-                return customer;
+                throw new NotFoundCustomerLoginException();
             }
 
             catch (Exception ex)
