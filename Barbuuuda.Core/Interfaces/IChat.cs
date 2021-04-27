@@ -21,9 +21,9 @@ namespace Barbuuuda.Core.Interfaces
         /// <summary>
         /// Метод получает диалог, либо создает новый.
         /// </summary>
-        /// <param name="userId">Id пользователя, для которого нужно подтянуть диалог.</param>
-        /// <returns></returns>
-        Task GetDialogAsync(string userId);
+        /// <param name="dialogId">Id диалога, для которого нужно подтянуть сообщения.</param>
+        /// <returns>Список сообщений.</returns>
+        Task<GetResultMessageOutpoot> GetDialogAsync(long? dialogId);
 
         /// <summary>
         /// Метод получает список диалогов с текущим пользователем.

@@ -19,7 +19,7 @@ namespace Barbuuuda.Models.Entities.Chat
         /// <summary>
         /// Id диалога.
         /// </summary>
-        public int DialogId { get; set; }
+        public long DialogId { get; set; }
 
         /// <summary>
         /// Сообщение.

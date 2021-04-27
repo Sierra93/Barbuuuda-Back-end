@@ -14,7 +14,7 @@ namespace Barbuuuda.Models.Entities.Chat
         /// PK.
         /// </summary>
         [Key, Column("DialogId", TypeName = "serial")]
-        public int DialogId { get; set; }
+        public long DialogId { get; set; }
 
         /// <summary>
         /// Название диалога.

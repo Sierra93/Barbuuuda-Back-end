@@ -46,9 +46,12 @@ namespace Barbuuuda.Controllers
         /// <param name="dialogInput">Входная модель.</param>
         /// <returns></returns>
         [HttpPost, Route("dialog")]
+        [ProducesResponseType(200, Type = typeof(GetResultMessageOutpoot))]
         public async Task<IActionResult> GetDialogAsync([FromBody] DialogInput dialogInput)
         {
-            return Ok();
+            GetResultMessageOutpoot messages = await _chat.GetDialogAsync(dialogInput.DialogId);
+
+            return Ok(messages);
         }
 
         /// <summary>

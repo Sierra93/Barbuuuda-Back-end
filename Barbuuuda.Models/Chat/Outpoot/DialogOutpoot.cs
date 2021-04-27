@@ -10,7 +10,7 @@ namespace Barbuuuda.Models.Chat.Outpoot
         /// <summary>
         /// Id диалога.
         /// </summary>
-        public int DialogId { get; set; }
+        public long DialogId { get; set; }
 
         /// <summary>
         /// Название диалога (фамилия и имя с кем ведется переписка, либо логин пользователя).

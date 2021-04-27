@@ -9,15 +9,19 @@ using System.Threading.Tasks;
 
 namespace Barbuuuda.Tests.Unit_tests.ChatTests
 {
+    /// <summary>
+    /// Класс тестирует получение диалогов. 
+    /// </summary>
+    /// <returns>Список диалогов.</returns>
     [TestClass]
     public class GetDialogsTest
     {
         private const string ACCOUNT = "lera";
 
         /// <summary>
-        /// Метод тестирет получение диалогов. 
+        /// Метод тестирует получение диалогов. 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Список диалогов.</returns>
         [TestMethod]
         public async Task GetDialogTest()
         {

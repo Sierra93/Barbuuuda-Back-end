@@ -59,11 +59,55 @@ namespace Barbuuuda.Services
         /// <summary>
         /// Метод получает диалог, либо создает новый.
         /// </summary>
-        /// <param name="userId">Id пользователя, для которого нужно подтянуть диалог.</param>
-        /// <returns></returns>
-        public Task GetDialogAsync(string userId)
+        /// <param name="dialogId">Id диалога, для которого нужно подтянуть сообщения.</param>
+        /// <returns>Список сообщений.</returns>
+        public async Task<GetResultMessageOutpoot> GetDialogAsync(long? dialogId)
         {
-            throw new System.NotImplementedException();
+            GetResultMessageOutpoot messagesList = new GetResultMessageOutpoot();
+
+            // Если dialogId не передан, значит нужно открыть пустой чат.
+            if (dialogId == null)
+            {
+                return messagesList;
+            }
+
+            // Проверит существование диалога.
+            bool isDialog = await _postgre.MainInfoDialogs
+                .Where(d => d.DialogId == dialogId)
+                .FirstOrDefaultAsync() != null;
+
+            if (!isDialog)
+            {
+                throw new NotFoundDialogIdException(dialogId);
+            }
+
+            // Получит сообщения диалога.
+            var messages = await (_postgre.DialogMessages
+                    .Where(d => d.DialogId == dialogId)
+                    .Select(res => new
+                    {
+                        res.DialogId,
+                        res.Message,
+                        Created = string.Format("{0:f}", res.Created)
+                    })
+                    .ToListAsync());
+
+            // Если у диалога нет сообщений, значит вернуть пустой диалог, который будет открыт.
+            if (!messages.Any())
+            {
+                return null;
+            }
+
+            // TODO: Сортировать как нибудь, а то сообщения не по порядку щас идут.
+            // Приведет к типу MessageOutpoot.
+            foreach (object message in messages)
+            {
+                string jsonString = JsonSerializer.Serialize(message);
+                MessageOutpoot messageOutpoot = JsonSerializer.Deserialize<MessageOutpoot>(jsonString);
+                messagesList.Messages.Add(messageOutpoot);
+            }
+
+            return messagesList;
         }
 
         /// <summary>
