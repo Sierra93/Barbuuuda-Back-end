@@ -1,8 +1,6 @@
 ﻿using Barbuuuda.Controllers;
-using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Chat.Outpoot;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -14,14 +12,57 @@ namespace Barbuuuda.Tests.Unit_tests.ChatTests
     [TestClass]
     public class GetDialogsTest
     {
+        private const string ACCOUNT = "lera";
+
+        /// <summary>
+        /// Метод тестирет получение диалогов. 
+        /// </summary>
+        /// <returns></returns>
         [TestMethod]
         public async Task GetDialogTest()
         {
-            var mock = new Mock<IChat>();
-            mock.Setup(a => a.GetDialogsAsync("lera")).Returns(Task.FromResult(new GetResultDialogOutpoot()));
+            Mock<IChat> mock = new Mock<IChat>();
+            mock.Setup(a => a.GetDialogsAsync(ACCOUNT)).Returns(Task.FromResult(GetResultDialogs()));
             ChatController controller = new ChatController(mock.Object);
-            var result = controller.GetDialogsAsync();
-            System.Console.WriteLine();
+            OkObjectResult viewResult = await controller.GetDialogsAsync() as OkObjectResult;
+            GetResultDialogOutpoot result = viewResult.Value as GetResultDialogOutpoot;
+
+            Assert.AreEqual(4, result.Dialogs.Count);
+        }
+
+        private GetResultDialogOutpoot GetResultDialogs()
+        {
+            GetResultDialogOutpoot dialogs = new GetResultDialogOutpoot()
+            {
+                Dialogs = new List<DialogOutpoot>()
+                {
+                    new DialogOutpoot()
+                    {
+                        DialogId = 1,
+                        DialogName = "Dialog1"
+                    },
+
+                   new DialogOutpoot()
+                    {
+                        DialogId = 2,
+                        DialogName = "Dialog2"
+                    },
+
+                   new DialogOutpoot()
+                    {
+                        DialogId = 3,
+                        DialogName = "Dialog3"
+                    },
+
+                   new DialogOutpoot()
+                    {
+                        DialogId = 4,
+                        DialogName = "Dialog4"
+                    },
+                }
+            };
+
+            return dialogs;
         }
     }
 }
