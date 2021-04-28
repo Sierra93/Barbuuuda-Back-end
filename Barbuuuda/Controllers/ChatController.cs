@@ -49,7 +49,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(GetResultMessageOutpoot))]
         public async Task<IActionResult> GetDialogAsync([FromBody] DialogInput dialogInput)
         {
-            GetResultMessageOutpoot messages = await _chat.GetDialogAsync(dialogInput.DialogId);
+            GetResultMessageOutpoot messages = await _chat.GetDialogAsync(dialogInput.DialogId, GetUserName());
 
             return Ok(messages);
         }

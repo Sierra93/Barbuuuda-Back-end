@@ -61,8 +61,9 @@ namespace Barbuuuda.Services
         /// Метод получает диалог, либо создает новый.
         /// </summary>
         /// <param name="dialogId">Id диалога, для которого нужно подтянуть сообщения.</param>
+        /// <param name="account">Логин текущего пользователя.</param>
         /// <returns>Список сообщений.</returns>
-        public async Task<GetResultMessageOutpoot> GetDialogAsync(long? dialogId)
+        public async Task<GetResultMessageOutpoot> GetDialogAsync(long? dialogId, string account)
         {
             GetResultMessageOutpoot messagesList = new GetResultMessageOutpoot();
 
@@ -73,6 +74,9 @@ namespace Barbuuuda.Services
 
                 return messagesList;
             }
+
+            // Найдет Id пользователя.
+            string userId = await _user.GetUserIdByLogin(account);
 
             // Проверит существование диалога.
             bool isDialog = await _postgre.MainInfoDialogs
@@ -87,14 +91,17 @@ namespace Barbuuuda.Services
             // Получит сообщения диалога.
             var messages = await (_postgre.DialogMessages
                     .Where(d => d.DialogId == dialogId)
+                    .OrderBy(m => m.Created)
                     .Select(res => new
                     {
-                        res.DialogId,
-                        res.Message,
-                        Created = string.Format("{0:f}", res.Created)
-                    })
+                        dialogId = res.DialogId,
+                        message = res.Message,
+                        created = string.Format("{0:f}", res.Created),
+                        userId = res.UserId,
+                        isMyMessage = res.IsMyMessage
+                    })                    
                     .ToListAsync());
-
+            
             // Если у диалога нет сообщений, значит вернуть пустой диалог, который будет открыт.
             if (!messages.Any())
             {
@@ -103,14 +110,21 @@ namespace Barbuuuda.Services
                 return messagesList;
             }
 
-            // TODO: Сортировать как нибудь, а то сообщения не по порядку щас идут.
             // Приведет к типу MessageOutpoot.
             foreach (object message in messages)
             {
                 string jsonString = JsonSerializer.Serialize(message);
                 MessageOutpoot messageOutpoot = JsonSerializer.Deserialize<MessageOutpoot>(jsonString);
+
+                // Проставит флаг принадлежности сообщения.
+                messageOutpoot.IsMyMessage = messageOutpoot.UserId.Equals(userId) ? true : false;
+
+                // Затирает Id пользователя, чтобы фронт не видел.
+                messageOutpoot.UserId = null;
+
                 messagesList.Messages.Add(messageOutpoot);
             }
+            messagesList.DialogState = DialogStateEnum.Open.ToString();
 
             return messagesList;
         }

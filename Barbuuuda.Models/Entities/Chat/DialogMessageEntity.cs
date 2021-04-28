@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Barbuuuda.Models.User;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -35,5 +36,19 @@ namespace Barbuuuda.Models.Entities.Chat
 
         [ForeignKey("DialogId")]
         public MainInfoDialogEntity Dialog { get; set; }
+
+        /// <summary>
+        /// Id пользователя, которому принадлежит сообщение.
+        /// </summary>        
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// Флаг принадлежности сообщения текущему пользователю.
+        /// </summary>
+        [ForeignKey("IsMyMessage")]
+        public bool IsMyMessage { get; set; }
+
+        [ForeignKey("UserId")]
+        public UserEntity User { get; set; }
     }
 }
