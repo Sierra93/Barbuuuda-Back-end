@@ -16,5 +16,10 @@ namespace Barbuuuda.Models.Chat.Outpoot
         /// Кол-во сообщений.
         /// </summary>
         public long Count { get { return Messages.Count; } set { } }
+
+        /// <summary>
+        /// Состояние диалога.
+        /// </summary>
+        public string DialogState { get; set; }
     }
 }

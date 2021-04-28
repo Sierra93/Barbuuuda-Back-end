@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Data;
+using Barbuuuda.Core.Enums;
 using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
@@ -68,6 +69,8 @@ namespace Barbuuuda.Services
             // Если dialogId не передан, значит нужно открыть пустой чат.
             if (dialogId == null)
             {
+                messagesList.DialogState = DialogStateEnum.None.ToString();
+
                 return messagesList;
             }
 
@@ -95,7 +98,9 @@ namespace Barbuuuda.Services
             // Если у диалога нет сообщений, значит вернуть пустой диалог, который будет открыт.
             if (!messages.Any())
             {
-                return null;
+                messagesList.DialogState = DialogStateEnum.Empty.ToString();
+
+                return messagesList;
             }
 
             // TODO: Сортировать как нибудь, а то сообщения не по порядку щас идут.

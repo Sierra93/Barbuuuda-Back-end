@@ -1,4 +1,4 @@
-﻿namespace Barbuuuda.Core.Enums {
+﻿namespace Barbuuuda.Core.Consts {
     /// <summary>
     /// Класс типов получения заданий. Все либо одно.
     /// </summary>
