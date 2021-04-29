@@ -6,6 +6,7 @@ using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Chat.Outpoot;
+using Barbuuuda.Models.Entities.Chat;
 using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Outpoot;
 using Microsoft.AspNetCore.SignalR;
@@ -42,19 +43,95 @@ namespace Barbuuuda.Services
             _db = db;
             _postgre = postgre;
             _user = user;
-        }        
+        }
+
 
         /// <summary>
         /// Метод пишет сообщение.
         /// </summary>
-        /// <param name="message">Сообщение.</param>
-        /// <param name="lastName">Фамилия.</param>
-        /// <param name="firstName">Имя.</param>
         /// <param name="account">Логин пользователя.</param>
-        /// <returns></returns>
-        public Task SendAsync(string message, string lastName, string firstName, string account)
+        /// <param name="message">Сообщение.</param>
+        /// <param name="dialogId">Id диалога.</param>
+        /// <returns>Список сообщений.</returns>
+        public async Task<GetResultMessageOutpoot> SendAsync(string message, string account, long dialogId)
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                GetResultMessageOutpoot messagesList = new GetResultMessageOutpoot();
+
+                // Если сообщения не передано, то ничего не делать.
+                if (string.IsNullOrEmpty(message))
+                {
+                    return null;
+                }
+
+                // Найдет Id пользователя.
+                string userId = await _user.GetUserIdByLogin(account);
+
+                // Проверит существование диалога.
+                bool isDialog = await _postgre.MainInfoDialogs
+                    .Where(d => d.DialogId == dialogId)
+                    .FirstOrDefaultAsync() != null;
+
+                if (!isDialog)
+                {
+                    throw new NotFoundDialogIdException(dialogId);
+                }
+
+                // Вернет сообщение фронту.
+                //await _hubContext.Clients.All.SendAsync("Notify", message);
+
+                // Запишет сообщение в диалог.
+                await _postgre.DialogMessages.AddAsync(new DialogMessageEntity()
+                {
+                    Message = message,
+                    DialogId = dialogId,
+                    Created = DateTime.Now,
+                    UserId = userId,
+                    IsMyMessage = true
+                });
+
+                await _postgre.SaveChangesAsync();
+
+                // Получит сообщения диалога.
+                var messages = await (_postgre.DialogMessages
+                        .Where(d => d.DialogId == dialogId)
+                        .OrderBy(m => m.Created)
+                        .Select(res => new
+                        {
+                            dialogId = res.DialogId,
+                            message = res.Message,
+                            created = string.Format("{0:f}", res.Created),
+                            userId = res.UserId,
+                            isMyMessage = res.IsMyMessage
+                        })
+                        .ToListAsync());
+
+                // Приведет к типу MessageOutpoot.
+                foreach (object messageText in messages)
+                {
+                    string jsonString = JsonSerializer.Serialize(messageText);
+                    MessageOutpoot messageOutpoot = JsonSerializer.Deserialize<MessageOutpoot>(jsonString);
+
+                    // Проставит флаг принадлежности сообщения.
+                    messageOutpoot.IsMyMessage = messageOutpoot.UserId.Equals(userId) ? true : false;
+
+                    // Затирает Id пользователя, чтобы фронт не видел.
+                    messageOutpoot.UserId = null;
+
+                    messagesList.Messages.Add(messageOutpoot);
+                }
+                messagesList.DialogState = DialogStateEnum.Open.ToString();                
+
+                return messagesList;
+            }
+
+            catch (Exception ex)
+            {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
+                throw new Exception(ex.Message.ToString());
+            }
         }
 
         /// <summary>
@@ -65,68 +142,78 @@ namespace Barbuuuda.Services
         /// <returns>Список сообщений.</returns>
         public async Task<GetResultMessageOutpoot> GetDialogAsync(long? dialogId, string account)
         {
-            GetResultMessageOutpoot messagesList = new GetResultMessageOutpoot();
-
-            // Если dialogId не передан, значит нужно открыть пустой чат.
-            if (dialogId == null)
+            try
             {
-                messagesList.DialogState = DialogStateEnum.None.ToString();
+                GetResultMessageOutpoot messagesList = new GetResultMessageOutpoot();
 
-                return messagesList;
-            }
+                // Если dialogId не передан, значит нужно открыть пустой чат.
+                if (dialogId == null)
+                {
+                    messagesList.DialogState = DialogStateEnum.None.ToString();
 
-            // Найдет Id пользователя.
-            string userId = await _user.GetUserIdByLogin(account);
+                    return messagesList;
+                }
 
-            // Проверит существование диалога.
-            bool isDialog = await _postgre.MainInfoDialogs
-                .Where(d => d.DialogId == dialogId)
-                .FirstOrDefaultAsync() != null;
+                // Найдет Id пользователя.
+                string userId = await _user.GetUserIdByLogin(account);
 
-            if (!isDialog)
-            {
-                throw new NotFoundDialogIdException(dialogId);
-            }
-
-            // Получит сообщения диалога.
-            var messages = await (_postgre.DialogMessages
+                // Проверит существование диалога.
+                bool isDialog = await _postgre.MainInfoDialogs
                     .Where(d => d.DialogId == dialogId)
-                    .OrderBy(m => m.Created)
-                    .Select(res => new
-                    {
-                        dialogId = res.DialogId,
-                        message = res.Message,
-                        created = string.Format("{0:f}", res.Created),
-                        userId = res.UserId,
-                        isMyMessage = res.IsMyMessage
-                    })                    
-                    .ToListAsync());
-            
-            // Если у диалога нет сообщений, значит вернуть пустой диалог, который будет открыт.
-            if (!messages.Any())
-            {
-                messagesList.DialogState = DialogStateEnum.Empty.ToString();
+                    .FirstOrDefaultAsync() != null;
+
+                if (!isDialog)
+                {
+                    throw new NotFoundDialogIdException(dialogId);
+                }
+
+                // Получит сообщения диалога.
+                var messages = await (_postgre.DialogMessages
+                        .Where(d => d.DialogId == dialogId)
+                        .OrderBy(m => m.Created)
+                        .Select(res => new
+                        {
+                            dialogId = res.DialogId,
+                            message = res.Message,
+                            created = string.Format("{0:f}", res.Created),
+                            userId = res.UserId,
+                            isMyMessage = res.IsMyMessage
+                        })
+                        .ToListAsync());
+
+                // Если у диалога нет сообщений, значит вернуть пустой диалог, который будет открыт.
+                if (!messages.Any())
+                {
+                    messagesList.DialogState = DialogStateEnum.Empty.ToString();
+
+                    return messagesList;
+                }
+
+                // Приведет к типу MessageOutpoot.
+                foreach (object message in messages)
+                {
+                    string jsonString = JsonSerializer.Serialize(message);
+                    MessageOutpoot messageOutpoot = JsonSerializer.Deserialize<MessageOutpoot>(jsonString);
+
+                    // Проставит флаг принадлежности сообщения.
+                    messageOutpoot.IsMyMessage = messageOutpoot.UserId.Equals(userId) ? true : false;
+
+                    // Затирает Id пользователя, чтобы фронт не видел.
+                    messageOutpoot.UserId = null;
+
+                    messagesList.Messages.Add(messageOutpoot);
+                }
+                messagesList.DialogState = DialogStateEnum.Open.ToString();
 
                 return messagesList;
             }
 
-            // Приведет к типу MessageOutpoot.
-            foreach (object message in messages)
+            catch (Exception ex)
             {
-                string jsonString = JsonSerializer.Serialize(message);
-                MessageOutpoot messageOutpoot = JsonSerializer.Deserialize<MessageOutpoot>(jsonString);
-
-                // Проставит флаг принадлежности сообщения.
-                messageOutpoot.IsMyMessage = messageOutpoot.UserId.Equals(userId) ? true : false;
-
-                // Затирает Id пользователя, чтобы фронт не видел.
-                messageOutpoot.UserId = null;
-
-                messagesList.Messages.Add(messageOutpoot);
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
+                throw new Exception(ex.Message.ToString());
             }
-            messagesList.DialogState = DialogStateEnum.Open.ToString();
-
-            return messagesList;
         }
 
         /// <summary>
@@ -189,7 +276,7 @@ namespace Barbuuuda.Services
                         .ToListAsync();
                     string executorId = string.Empty;
 
-                    // Запишет логин собеседника.
+                    //// Запишет логин собеседника.
                     foreach (string id in membersIds.Where(id => !id.Equals(user.Id)))
                     {
                         resultDialog.UserName = await _user.FindUserIdByLogin(id);

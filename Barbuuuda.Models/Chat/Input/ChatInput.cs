@@ -11,13 +11,8 @@
         public string Message { get; set; }
 
         /// <summary>
-        /// Фамилия.
+        /// Id диалога.
         /// </summary>
-        public string LastName { get; set; }
-
-        /// <summary>
-        /// Имя.
-        /// </summary>
-        public string FirstName { get; set; }
+        public long DialogId { get; set; }
     }
 }

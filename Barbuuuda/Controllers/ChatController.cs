@@ -28,16 +28,17 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод отправляет сообщение.
+        /// Метод отправит сообщение.
         /// </summary>
         /// <param name="chatInput">Входная модель.</param>
         /// <returns></returns>
         [HttpPost, Route("send")]
+        [ProducesResponseType(200, Type = typeof(GetResultMessageOutpoot))]
         public async Task<IActionResult> SendAsync([FromBody] ChatInput chatInput)
         {
-            //await _hubContext.Clients.All.SendAsync("Notify", chatInput.Message);
+            GetResultMessageOutpoot messages = await _chat.SendAsync(chatInput.Message, GetUserName(), chatInput.DialogId);
 
-            return Ok();
+            return Ok(messages);
         }
 
         /// <summary>

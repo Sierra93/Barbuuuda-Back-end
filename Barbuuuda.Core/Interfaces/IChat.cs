@@ -9,14 +9,13 @@ namespace Barbuuuda.Core.Interfaces
     public interface IChat
     {
         /// <summary>
-        /// Метод пишет сообщение.
+        /// Метод отправит сообщение.
         /// </summary>
-        /// <param name="message">Сообщение.</param>
-        /// <param name="lastName">Фамилия.</param>
-        /// <param name="firstName">Имя.</param>
         /// <param name="account">Логин пользователя.</param>
-        /// <returns></returns>
-        Task SendAsync(string message, string lastName, string firstName, string account);
+        /// <param name="message">Сообщение.</param>
+        /// <param name="dialogId">Id диалога.</param>
+        /// <returns>Список сообщений.</returns>
+        Task<GetResultMessageOutpoot> SendAsync(string message, string account, long dialogId);
 
         /// <summary>
         /// Метод получает диалог, либо создает новый.

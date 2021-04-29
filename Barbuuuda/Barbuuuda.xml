@@ -27,7 +27,7 @@
         </member>
         <member name="M:Barbuuuda.Controllers.ChatController.SendAsync(Barbuuuda.Models.Chat.Input.ChatInput)">
             <summary>
-            Метод отправляет сообщение.
+            Метод отправит сообщение.
             </summary>
             <param name="chatInput">Входная модель.</param>
             <returns></returns>
