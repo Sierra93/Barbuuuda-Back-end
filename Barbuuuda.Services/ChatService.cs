@@ -9,7 +9,6 @@ using Barbuuuda.Models.Chat.Outpoot;
 using Barbuuuda.Models.Entities.Chat;
 using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Outpoot;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -28,18 +27,12 @@ namespace Barbuuuda.Services
         private readonly PostgreDbContext _postgre;
 
         /// <summary>
-        /// Абстракция хаба.
-        /// </summary>
-        IHubContext<ChatHub> _hubContext;
-
-        /// <summary>
         /// Абстракция пользователя.
         /// </summary>
         private readonly IUser _user;
 
-        public ChatService(IHubContext<ChatHub> hubContext, ApplicationDbContext db, PostgreDbContext postgre, IUser user)
+        public ChatService(ApplicationDbContext db, PostgreDbContext postgre, IUser user)
         {
-            _hubContext = hubContext;
             _db = db;
             _postgre = postgre;
             _user = user;
@@ -77,9 +70,6 @@ namespace Barbuuuda.Services
                 {
                     throw new NotFoundDialogIdException(dialogId);
                 }
-
-                // Вернет сообщение фронту.
-                //await _hubContext.Clients.All.SendAsync("Notify", message);
 
                 // Запишет сообщение в диалог.
                 await _postgre.DialogMessages.AddAsync(new DialogMessageEntity()
