@@ -141,6 +141,8 @@ namespace Barbuuuda.Services
                 {
                     messagesList.DialogState = DialogStateEnum.None.ToString();
 
+                    //TODO: доработать создание нового диалога.
+
                     return messagesList;
                 }
 
@@ -255,7 +257,7 @@ namespace Barbuuuda.Services
                     // Подтянет последнее сообщение диалога для отображения в свернутом виде взяв первые 40 символов и далее ставит ...
                     resultDialog.LastMessage = await _postgre.DialogMessages
                         .Where(d => d.DialogId == resultDialog.DialogId)
-                        .OrderBy(o => o.DialogId)
+                        .OrderBy(o => o.Created)
                         .Select(m => m.Message.Length > 40 ? string.Concat(m.Message.Substring(0, 40), "...") : m.Message)
                         .LastOrDefaultAsync();
 
