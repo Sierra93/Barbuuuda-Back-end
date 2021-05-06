@@ -184,8 +184,12 @@ namespace Barbuuuda.Controllers
                     {
                         // Генерит временный токен для пользователя.
                         string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                        // Готовит ссылку, которая будет отображена в письме.
                         string callbackUrl = Url.Action("ConfirmAsync", "User", new { userId = user.Id, code = code },
-                            protocol: HttpContext.Request.Scheme);
+                            protocol: HttpContext.Request.Scheme)
+                            .Replace("http://localhost:58822", "https://barbuuuda.ru")
+                            .Replace("https://barbuuuda.online", "https://barbuuuda.ru");
 
                         // Отправит уведомление на email.
                         await EmailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
