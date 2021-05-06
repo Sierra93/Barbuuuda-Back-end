@@ -44,5 +44,15 @@
         /// Иконка профиля исполнителя.
         /// </summary>
         public string UserIcon { get; set; }
+
+        /// <summary>
+        /// Флаг видимости кнопки "ИЗМЕНИТЬ СТАВКУ".
+        /// </summary>
+        public bool IsVisibleButton { get; set; }
+
+        /// <summary>
+        /// Id исполнителя.
+        /// </summary>
+        public string ExecutorId { get; set; }
     }
 }

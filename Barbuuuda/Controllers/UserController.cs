@@ -1,6 +1,8 @@
-﻿using Barbuuuda.Core.Data;
+﻿using Barbuuuda.Core.Consts;
+using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Extensions.User;
 using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Core.Logger;
 using Barbuuuda.Emails;
 using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
@@ -23,6 +25,7 @@ namespace Barbuuuda.Controllers
     [ApiController, Route("user")]
     public class UserController : BaseController
     {
+        private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly UserManager<UserEntity> _userManager;
         public static string Module => "Barbuuuda.User";
@@ -32,11 +35,12 @@ namespace Barbuuuda.Controllers
         /// </summary>
         private readonly IUser _user;
 
-        public UserController(PostgreDbContext postgre, UserManager<UserEntity> userManager, IUser user) : base(Module)
+        public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUser user) : base(Module)
         {
             _userManager = userManager;
             _user = user;
             _postgre = postgre;
+            _db = db;
         }
 
 
@@ -57,6 +61,8 @@ namespace Barbuuuda.Controllers
 
             catch (Exception ex)
             {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -157,48 +163,73 @@ namespace Barbuuuda.Controllers
         /// Метод создает пользователя.
         /// </summary>
         /// <param name="user">Входная модель пользователя.</param>
-        /// <returns></returns>
+        /// <returns>Список ошибок или статус успеха регистрации.</returns>
         private async Task<IActionResult> CreateUser(UserInput user)
         {
-            IdentityResult errors = null;
-
-            if (user.Score == null)
+            try
             {
-                user.Score = 0;
-            }
+                IdentityResult errors = null;
 
-            // Ищет такой email в БД.
-            bool bErrorEmail = await IdentityUserEmail(user.Email);
-
-            if (!bErrorEmail)
-            {
-                // Добавляет юзера.
-                user.DateRegister = DateTime.UtcNow;
-                IdentityResult oAddedUser = await _userManager.CreateAsync(user, user.UserPassword);
-
-                if (oAddedUser.Succeeded)
+                if (user.Score == null)
                 {
-                    // Генерит временный токен для юзера.
-                    string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    string callbackUrl = Url.Action("ConfirmAsync", "User", new { userId = user.Id, code = code },
-                        protocol: HttpContext.Request.Scheme);
-
-                    // Отправит уведомление на email.
-                    await EmailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
-                        $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
-
-                    return Ok(oAddedUser);
+                    user.Score = 0;
                 }
-            }
 
-            else
-            {
+                // Ищет такой email в БД.
+                bool bErrorEmail = await IdentityUserEmail(user.Email);
+
+                if (!bErrorEmail)
+                {                   
+                    try
+                    {
+                        // Генерит временный токен для пользователя.
+                        string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        string callbackUrl = Url.Action("ConfirmAsync", "User", new { userId = user.Id, code = code },
+                            protocol: HttpContext.Request.Scheme);
+
+                        // Отправит уведомление на email.
+                        await EmailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
+                            $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
+                    }
+
+                    // Если почта не существует.
+                    catch (Exception ex)
+                    {
+                        Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                        _ = _logger.LogCritical();
+
+                        return BadRequest(ErrorValidate.EMAIL_NOT_ENTITY);
+                    }
+
+                    // Проставит дату регистрации = текущая дата и время.
+                    user.DateRegister = DateTime.UtcNow;
+
+                    // Регистрирует пользователя.
+                    IdentityResult oAddedUser = await _userManager.CreateAsync(user, user.UserPassword);
+
+                    // Если регистрация успешна.
+                    if (oAddedUser.Succeeded)
+                    {
+                        return Ok(oAddedUser);
+                    }
+                }
+
                 // Что-то пошло не так, собирает ошибки запуская цепочку проверок валидации.
-                CustomValidatorExtension custom = new CustomValidatorExtension(_postgre);
-                errors = await custom.ValidateAsync(_userManager, user);
+                else
+                {                    
+                    CustomValidatorExtension custom = new CustomValidatorExtension(_postgre);
+                    errors = await custom.ValidateAsync(_userManager, user);
+                }
+
+                return BadRequest(errors);
             }
 
-            return BadRequest(errors);
+            catch (Exception ex)
+            {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogCritical();
+                throw new Exception(ex.Message.ToString());
+            }
         }
     }
 }

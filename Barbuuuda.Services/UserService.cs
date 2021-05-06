@@ -1,9 +1,13 @@
-﻿using Barbuuuda.Core.Data;
+﻿using AutoMapper;
+using Barbuuuda.Core.Consts;
+using Barbuuuda.Core.Data;
+using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Extensions.User;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
+using Barbuuuda.Models.User.Outpoot;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -405,6 +409,8 @@ namespace Barbuuuda.Services
 
             catch (Exception ex)
             {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
         }
@@ -423,6 +429,117 @@ namespace Barbuuuda.Services
                 .FirstOrDefaultAsync();
 
             return user;
+        }
+
+        /// <summary>
+        /// Метод находит Id пользователя по его логину.
+        /// </summary>
+        /// <param name="userName">Логин пользователя.</param>
+        /// <returns>Id пользователя.</returns>
+        public async Task<string> GetUserIdByLogin(string userName)
+        {
+            string userId = await _postgre.Users
+                .Where(u => u.UserName
+                .Equals(userName))
+                .Select(u => u.Id)
+                .FirstOrDefaultAsync();
+
+            return userId;
+        }
+
+
+        /// <summary>
+        /// Метод находит логин пользователя по его Id.
+        /// </summary>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns>Логин пользователя.</returns>
+        public async Task<string> FindUserIdByLogin(string userId)
+        {
+            string userLogin = await _postgre.Users
+                .Where(u => u.Id
+                .Equals(userId))
+                .Select(u => u.UserName)
+                .FirstOrDefaultAsync();
+
+            return userLogin;
+        }
+
+        /// <summary>
+        /// Метод находит фамилию, имя, фото профиля пользователя по его Id.
+        /// </summary>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns>Фамилия, имя, фото профиля пользователя.</returns>
+        public async Task<UserOutpoot> GetUserInitialsByIdAsync(string userId)
+        {
+            UserOutpoot user = await _postgre.Users
+                .Where(u => u.Id
+                .Equals(userId))
+                .Select(res => new UserOutpoot { 
+                    FirstName = res.FirstName, 
+                    LastName = res.LastName,
+                    UserIcon = res.UserIcon,
+                    UserRole = res.UserRole
+                })
+                .FirstOrDefaultAsync();
+
+            return user;
+        }
+
+        /// <summary>
+        /// Метод получит логин и иконку профиля заказчика по Id его задания.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Данные заказчика.</returns>
+        public async Task<CustomerOutpoot> GetCustomerLoginByTaskId(int? taskId)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NotFoundTaskIdException(taskId);
+                }
+
+                // Получит Id заказчика, который создал задание.
+                string customerId = await _postgre.Tasks
+                    .Where(t => t.TaskId == taskId)
+                    .Select(t => t.OwnerId)
+                    .FirstOrDefaultAsync();
+
+                // Если заказчика задания с таким OwnerId не найдено.
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    throw new NotFoundTaskCustomerIdException(customerId);
+                }
+
+                // Найдет логин и иконку профиля заказчика задания и мапит к типу CustomerOutpoot.
+                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, CustomerOutpoot>());
+                Mapper mapper = new Mapper(config);
+                CustomerOutpoot customer = mapper.Map<CustomerOutpoot>(await _postgre.Users
+                    .Where(u => u.Id
+                    .Equals(customerId))
+                    .FirstOrDefaultAsync());
+
+                // Если логина заказчика задания не найдено.
+                if (!string.IsNullOrEmpty(customer.UserName))
+                {
+                    // Если у заказчика не установлена иконка профиля, то запишет ее по дефолту.
+                    if (string.IsNullOrEmpty(customer.UserIcon))
+                    {
+                        customer.UserIcon = NoPhotoUrl.NO_PHOTO;
+                    }
+
+                    return customer;
+                }
+
+                throw new NotFoundCustomerLoginException();
+            }
+
+            catch (Exception ex)
+            {
+                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = _logger.LogCritical();
+                throw new Exception(ex.Message.ToString());
+            }
         }
     }
 }

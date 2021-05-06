@@ -34,53 +34,51 @@ namespace Barbuuuda
 
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
             {
-                builder.WithOrigins(
-                    "https://testdevi.site",
-                    "https://testdevi.site/",
-                    "https://barbuuuda.ru",
-                    "https://barbuuuda.ru/",
-                    "http://localhost:8080/",
-                    "http://localhost:8080")
-                .AllowAnyMethod().AllowAnyHeader();
+                builder.AllowAnyMethod()
+                       .AllowAnyHeader()
+                       .WithOrigins("*")
+                       .WithMethods("*")
+                       .WithHeaders("*")
+                       .DisallowCredentials();
             }));
 
             #region ПРОД.
-            services.AddDbContext<ApplicationDbContext>(options =>
-              options.UseSqlServer(
-                  Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //    services.AddDbContext<ApplicationDbContext>(options =>
+            //      options.UseSqlServer(
+            //          Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-        opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
+            //opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            services.AddDbContext<IdentityDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //    services.AddDbContext<IdentityDbContext>(options =>
+            //        options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
             #endregion
 
             #region ТЕСТ.
-            //    services.AddDbContext<ApplicationDbContext>(options =>
-            //     options.UseSqlServer(
-            //         Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            services.AddDbContext<ApplicationDbContext>(options =>
+             options.UseSqlServer(
+                 Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-            //opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
+        opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
 
-            //    services.AddDbContext<IdentityDbContext>(options =>
-            //        options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            services.AddDbContext<IdentityDbContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
             #endregion
 
             services.AddIdentity<UserEntity, IdentityRole>(opts =>
             {
-                opts.Password.RequiredLength = 5;   
-                opts.Password.RequireNonAlphanumeric = false;   
-                opts.Password.RequireLowercase = false; 
-                opts.Password.RequireUppercase = false; 
-                opts.Password.RequireDigit = false; 
+                opts.Password.RequiredLength = 5;
+                opts.Password.RequireNonAlphanumeric = false;
+                opts.Password.RequireLowercase = false;
+                opts.Password.RequireUppercase = false;
+                opts.Password.RequireDigit = false;
             })
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
 
             services.AddSwaggerGen(options =>
-            {             
+            {
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(Directory.GetCurrentDirectory(), xmlFile);
@@ -94,7 +92,7 @@ namespace Barbuuuda
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
                             ValidateIssuer = true,
-                            ValidIssuer = AuthOptions.ISSUER,                          
+                            ValidIssuer = AuthOptions.ISSUER,
                             ValidateAudience = true,
                             ValidAudience = AuthOptions.AUDIENCE,
                             ValidateLifetime = true,
@@ -102,6 +100,8 @@ namespace Barbuuuda
                             ValidateIssuerSigningKey = true,
                         };
                     });
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -138,6 +138,12 @@ namespace Barbuuuda
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Barbuuuda API");
             });
-        }        
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<ChatHub>("/chat");
+                endpoints.MapDefaultControllerRoute();
+            });
+        }
     }
 }

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Barbuuuda.Core.Consts
+﻿namespace Barbuuuda.Core.Consts
 {
+    /// <summary>
+    /// Класс списка констант ошибок валидации при регистрации.
+    /// </summary>
     public class ErrorValidate
     {
         public const string LOGIN_ERROR = "Такой логин уже существует";
@@ -13,5 +12,6 @@ namespace Barbuuuda.Core.Consts
         public const string EMAIL_NOT_CORRECT_FORMAT = "Email некорректный";
         public const string PHONE_ERROR_EMPTY = "Не указан номер телефона";
         public const string PHONE_ERROR_NOT_CORRECT_FORMAT = "Номер телефона некорректный";
+        public const string EMAIL_NOT_ENTITY = "Такой email не существует";
     }
 }

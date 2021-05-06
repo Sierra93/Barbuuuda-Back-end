@@ -1,12 +1,14 @@
 ﻿using Autofac;
 using AutoMapper;
 using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Models.User;
+using Barbuuuda.Models.User.Outpoot;
 using System.Collections.Generic;
 
 namespace Barbuuuda.Services.AutofacModules
 {
     /// <summary>
-    /// Конфигурация Autofac, в которой регистрируются все сервисы.
+    /// Конфигурация Autofac, в которой регистрируются все сервисы и AutoMapper.
     /// </summary>
     public class AutofacConfig : Module
     {
@@ -17,15 +19,15 @@ namespace Barbuuuda.Services.AutofacModules
 
             builder.Register(context => new MapperConfiguration(cfg =>
             {
-                foreach (var profile in context.Resolve<IEnumerable<Profile>>())
+                foreach (Profile profile in context.Resolve<IEnumerable<Profile>>())
                 {
                     cfg.AddProfile(profile);
+                    //cfg.CreateMap<UserEntity, UserOutpoot>();
+                    //cfg.AddMaps(new[] { typeof(AutofacConfig).Assembly });
                 }
             })).AsSelf().SingleInstance();
 
-            builder.Register(c => c.Resolve<MapperConfiguration>().CreateMapper(c.Resolve))
-                .As<IMapper>()
-                .InstancePerLifetimeScope();
+            builder.Register(c => c.Resolve<MapperConfiguration>().CreateMapper(c.Resolve)).As<IMapper>().InstancePerLifetimeScope();
 
             // Сервис пользователя.
             builder.RegisterType<UserService>().As<IUser>();
@@ -43,7 +45,10 @@ namespace Barbuuuda.Services.AutofacModules
             builder.RegisterType<PaginationService>().As<IPagination>();
 
             // Сервис БЗ.
-            builder.RegisterType<KnowlegeService>().As<IKnowlege>();            
+            builder.RegisterType<KnowlegeService>().As<IKnowlege>();
+
+            // Чат.
+            builder.RegisterType<ChatService>().As<IChat>();
         }
     }
 }

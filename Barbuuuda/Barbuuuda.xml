@@ -15,6 +15,36 @@
             </summary>
             <returns>Имя юзера.</returns>
         </member>
+        <member name="T:Barbuuuda.Controllers.ChatController">
+            <summary>
+            Контроллер чата.
+            </summary>
+        </member>
+        <member name="F:Barbuuuda.Controllers.ChatController._chat">
+            <summary>
+            Абстракция чата.
+            </summary>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ChatController.SendAsync(Barbuuuda.Models.Chat.Input.ChatInput)">
+            <summary>
+            Метод отправит сообщение.
+            </summary>
+            <param name="chatInput">Входная модель.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ChatController.GetDialogAsync(Barbuuuda.Models.Chat.Input.DialogInput)">
+            <summary>
+            Метод получает диалог, либо создает новый.
+            </summary>
+            <param name="dialogInput">Входная модель.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Barbuuuda.Controllers.ChatController.GetDialogsAsync">
+            <summary>
+            Метод получает список диалогов с текущим пользователем.
+            </summary>
+            <returns>Список диалогов.</returns>
+        </member>
         <member name="T:Barbuuuda.Controllers.ExecutorController">
             <summary>
             Контроллер содержит методы по работе с исполнителями сервиса.
@@ -352,7 +382,7 @@
             Метод создает пользователя.
             </summary>
             <param name="user">Входная модель пользователя.</param>
-            <returns></returns>
+            <returns>Список ошибок или статус успеха регистрации.</returns>
         </member>
     </members>
 </doc>

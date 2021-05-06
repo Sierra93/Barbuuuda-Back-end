@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Barbuuuda.Models.Task.Input;
 using Barbuuuda.Models.Respond.Outpoot;
-using Microsoft.AspNetCore.Http;
+using Barbuuuda.Models.Task.Outpoot;
 
 namespace Barbuuuda.Controllers
 {
@@ -204,11 +204,12 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <returns>Список заданий.</returns>
         [HttpPost, Route("auction")]
+        [ProducesResponseType(200, Type = typeof(GetTaskResultOutpoot))]
         public async Task<IActionResult> LoadAuctionTasks()
         {
-            object aAuctionTasks = await _task.LoadAuctionTasks();
+            GetTaskResultOutpoot auctionTasks = await _task.LoadAuctionTasks();
 
-            return Ok(aAuctionTasks);
+            return Ok(auctionTasks);
         }
 
         /// <summary>
@@ -216,11 +217,11 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <param name="getRespondInput">Id задания, для которого нужно получить список ставок.</param>
         /// <returns>Список ставок.</returns>
-        [HttpPost("get-responds")]
+        [HttpPost, Route("get-responds")]
         [ProducesResponseType(200, Type = typeof(GetRespondResultOutpoot))]
         public async Task<IActionResult> GetRespondsAsync([FromBody] GetRespondInput getRespondInput)
         {
-            GetRespondResultOutpoot respondsList = await _task.GetRespondsAsync(getRespondInput.TaskId);
+            GetRespondResultOutpoot respondsList = await _task.GetRespondsAsync(getRespondInput.TaskId, GetUserName());
 
             return Ok(respondsList);
         }

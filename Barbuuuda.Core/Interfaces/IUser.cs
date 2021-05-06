@@ -1,5 +1,7 @@
 ﻿using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
+using Barbuuuda.Models.User.Outpoot;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -53,8 +55,36 @@ namespace Barbuuuda.Core.Interfaces
         /// <summary>
         /// Метод находит юзера по его логину.
         /// </summary>
-        /// <param name="userName">Логин юзера.</param>
-        /// <returns>Объект с данными юзера.</returns>
+        /// <param name="userName">Логин пользователя.</param>
+        /// <returns>Объект с данными пользователя.</returns>
         Task<UserEntity> GetUserByLogin(string userName);
+
+        /// <summary>
+        /// Метод находит Id пользователя по его логину.
+        /// </summary>
+        /// <param name="userName">Логин пользователя.</param>
+        /// <returns>Id пользователя.</returns>
+        Task<string> GetUserIdByLogin(string userName);
+
+        /// <summary>
+        /// Метод находит логин пользователя по его Id.
+        /// </summary>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns>Логин пользователя.</returns>
+        Task<string> FindUserIdByLogin(string userId);
+
+        /// <summary>
+        /// Метод находит фамилию, имя, фото профиля пользователя по его Id.
+        /// </summary>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns>Фамилия, имя, фото профиля пользователя.</returns>
+        Task<UserOutpoot> GetUserInitialsByIdAsync(string userId);
+
+        /// <summary>
+        /// Метод получит логин и иконку профиля заказчика по Id его задания.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Данные заказчика.</returns>
+        Task<CustomerOutpoot> GetCustomerLoginByTaskId(int? taskId);
     }
 }

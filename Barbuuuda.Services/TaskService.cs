@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Barbuuuda.Core.Consts;
+﻿using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Enums;
 using Barbuuuda.Core.Exceptions;
@@ -7,7 +6,9 @@ using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Respond.Outpoot;
 using Barbuuuda.Models.Task;
+using Barbuuuda.Models.Task.Outpoot;
 using Barbuuuda.Models.User;
+using Barbuuuda.Models.User.Outpoot;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
@@ -26,14 +27,12 @@ namespace Barbuuuda.Services
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly IUser _user;
-        private readonly IMapper _mapper;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUser user, IMapper mapper)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUser user)
         {
             _db = db;
             _postgre = postgre;
             _user = user;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -330,8 +329,10 @@ namespace Barbuuuda.Services
                 }
             }
 
-            // TODO: отрефачить этот метод, чтоб не обращаться два раза к БД за получением задания.
-            string userId = await GetUserByName(userName);
+            // Получит логин и иконку профиля заказчика задания.
+            CustomerOutpoot customer = await _user.GetCustomerLoginByTaskId(taskId);
+
+            // TODO: отрефачить этот метод, чтоб не обращаться два раза к БД за получением задания.            
             var oTask = await (from tasks in _postgre.Tasks
                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
@@ -354,7 +355,9 @@ namespace Barbuuuda.Services
                                    tasks.TaskId,
                                    taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
                                    tasks.TypeCode,
-                                   userName
+                                   userName,
+                                   customerLogin = customer.UserName,
+                                   customerProfileIcon = customer.UserIcon
                                })
                                .ToListAsync();
 
@@ -635,47 +638,6 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод получает задания в статусе "В аукционе".
-        /// </summary>
-        /// <param name="taskId"></param>
-        /// <returns></returns>
-        async Task<object> GetAuctionTasks()
-        {
-            var aAuctionTasks = await (from tasks in _postgre.Tasks
-                                         join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                                         join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                                         join users in _postgre.Users on tasks.OwnerId equals users.Id
-                                         where statuses.StatusName.Equals(StatusTask.AUCTION)
-                                         select new
-                                         {
-                                             tasks.CategoryCode,
-                                             tasks.CountOffers,
-                                             tasks.CountViews,
-                                             tasks.OwnerId,
-                                             tasks.SpecCode,
-                                             categories.CategoryName,
-                                             tasks.StatusCode,
-                                             statuses.StatusName,
-                                             taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                             taskEndda = string.Format("{0:f}", tasks.TaskEndda),
-                                             tasks.TaskTitle,
-                                             tasks.TaskDetail,
-                                             tasks.TaskId,
-                                             taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                                             tasks.TypeCode,
-                                             users.UserName
-                                         })
-                          .OrderBy(o => o.TaskId)
-                          .ToListAsync();
-
-            return new
-            {
-                aTasks = aAuctionTasks,
-                countTasks = aAuctionTasks.Count
-            };
-        }
-
-        /// <summary>
         /// Метод получает кол-во задач определенного статуса.
         /// </summary>
         /// <param name="status">Имя статуса, кол-во задач которых нужно получить.</param>
@@ -819,14 +781,59 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".
+        /// Метод получает задания в статусе "В аукционе".
         /// </summary>
-        /// <returns>Список заданий.</returns>
-        public async Task<object> LoadAuctionTasks()
+        /// <param name="taskId"></param>
+        /// <returns>Список заданий в аукционе.</returns>
+        public async Task<GetTaskResultOutpoot> LoadAuctionTasks()
         {
             try
             {
-                return await GetAuctionTasks();
+                GetTaskResultOutpoot resultTasks = new GetTaskResultOutpoot();
+                IEnumerable auctionTasks = await (from tasks in _postgre.Tasks
+                                                  join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                                                  join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                                                  join users in _postgre.Users on tasks.OwnerId equals users.Id
+                                                  where statuses.StatusName.Equals(StatusTask.AUCTION)
+                                                  select new
+                                                  {
+                                                      tasks.CategoryCode,
+                                                      tasks.CountOffers,
+                                                      tasks.CountViews,
+                                                      tasks.OwnerId,
+                                                      tasks.SpecCode,
+                                                      categories.CategoryName,
+                                                      tasks.StatusCode,
+                                                      statuses.StatusName,
+                                                      TaskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                                      TaskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                                      tasks.TaskTitle,
+                                                      tasks.TaskDetail,
+                                                      tasks.TaskId,
+                                                      TaskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                                      tasks.TypeCode,
+                                                      users.UserName
+                                                  })
+                          .OrderBy(o => o.TaskId)
+                          .ToListAsync();
+
+                // Приводит к типу коллекции GetTaskResultOutpoot.
+                foreach (object task in auctionTasks)
+                {
+                    string jsonString = JsonSerializer.Serialize(task);
+                    TaskOutpoot result = JsonSerializer.Deserialize<TaskOutpoot>(jsonString);
+
+                    // Считает кол-во ставок к заданию, либо проставит 0.
+                    int countResponds = await _postgre.Responds
+                        .Where(r => r.TaskId == result.TaskId)
+                        .Select(r => r.RespondId)
+                        .CountAsync();
+                    result.CountOffers = countResponds > 0 ? countResponds : 0;
+
+                    resultTasks.Tasks.Add(result);
+                }
+
+                return resultTasks;
             }
 
             catch (Exception ex)
@@ -869,8 +876,9 @@ namespace Barbuuuda.Services
         /// Метод получает список ставок к заданию.
         /// </summary>
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
+        /// <param name="account">Логин пользователя.</param>
         /// <returns>Список ставок.</returns>
-        public async Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId)
+        public async Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId, string account)
         {
             try
             {
@@ -890,20 +898,30 @@ namespace Barbuuuda.Services
                         res.st.CountNegative,
                         res.st.CountTotalCompletedTask,
                         res.st.Rating,
-                        UserIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO
+                        UserIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO,
+                        res.st.ExecutorId
                     })
                     .ToListAsync());
 
                 GetRespondResultOutpoot result = new GetRespondResultOutpoot();
+
+                // Находит Id исполнителя.
+                string userId = await _user.GetUserIdByLogin(account);
 
                 // Приведет к типу коллекции GetRespondResultOutpoot.
                 foreach (object respond in respondsList)
                 {
                     string jsonString = JsonSerializer.Serialize(respond);
                     RespondOutpoot resultObject = JsonSerializer.Deserialize<RespondOutpoot>(jsonString);
+
+                    // Если исполнитель оставлял ставку к данному заданию, то проставит флаг видимости кнопки "ИЗМЕНИТЬ СТАВКУ", иначе скроет ее.
+                    if (resultObject.ExecutorId.Equals(userId))
+                    {
+                        resultObject.IsVisibleButton = true;
+                    }
+
                     result.Responds.Add(resultObject);
                 }
-                result.Count = result.Responds.Count;
 
                 return result;
             }
