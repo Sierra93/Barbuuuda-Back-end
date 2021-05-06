@@ -13,6 +13,6 @@
         /// <summary>
         /// Id диалога.
         /// </summary>
-        public long DialogId { get; set; }
+        public long DialogId { get; set; }        
     }
 }

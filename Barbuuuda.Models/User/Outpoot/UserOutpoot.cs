@@ -39,5 +39,10 @@
         /// Полная дата.
         /// </summary>
         public string Created { get; set; }
+
+        /// <summary>
+        /// Роль пользователя.
+        /// </summary>
+        public string UserRole { get; set; }
     }
 }

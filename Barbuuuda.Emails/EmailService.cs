@@ -1,12 +1,5 @@
-﻿using Barbuuuda.Core.Data;
-using Barbuuuda.Models.User;
-using MailKit.Net.Smtp;
-using Microsoft.EntityFrameworkCore;
+﻿using MailKit.Net.Smtp;
 using MimeKit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Emails
@@ -24,29 +17,21 @@ namespace Barbuuuda.Emails
         /// <param name="message">Сообщение.</param>
         public async static Task SendEmailAsync(string email, string subject, string message)
         {
-            try
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress("Администрация сервиса Barbuuuda", "info.barbuuuda@gmail.com"));
+            emailMessage.To.Add(new MailboxAddress("", email));
+            emailMessage.Subject = subject;
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
             {
-                var emailMessage = new MimeMessage();
-                emailMessage.From.Add(new MailboxAddress("Администрация сервиса Barbuuuda", "info.barbuuuda@mail.ru"));
-                emailMessage.To.Add(new MailboxAddress("", email));
-                emailMessage.Subject = subject;
-                emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
-                {
-                    Text = message
-                };
+                Text = message
+            };
 
-                using (var client = new SmtpClient())
-                {
-                    await client.ConnectAsync("smtp.mail.ru", 2525, MailKit.Security.SecureSocketOptions.StartTls);
-                    await client.AuthenticateAsync("info.barbuuuda@mail.ru", "13467kvm");
-                    await client.SendAsync(emailMessage);
-                    await client.DisconnectAsync(true);
-                }
-            }
-
-            catch (Exception ex)
+            using (var client = new SmtpClient())
             {
-                throw new Exception(ex.Message.ToString());
+                await client.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync("info.barbuuuda@gmail.com", "13467kvm");
+                await client.SendAsync(emailMessage);
+                await client.DisconnectAsync(true);
             }
         }
     }

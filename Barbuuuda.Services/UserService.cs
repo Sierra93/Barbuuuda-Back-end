@@ -477,7 +477,8 @@ namespace Barbuuuda.Services
                 .Select(res => new UserOutpoot { 
                     FirstName = res.FirstName, 
                     LastName = res.LastName,
-                    UserIcon = res.UserIcon
+                    UserIcon = res.UserIcon,
+                    UserRole = res.UserRole
                 })
                 .FirstOrDefaultAsync();
 

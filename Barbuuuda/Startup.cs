@@ -34,20 +34,12 @@ namespace Barbuuuda
 
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
             {
-                //builder.WithOrigins(
-                //    "https://barbuuuda.ru/",
-                //    "https://barbuuuda.ru",
-                //    "https://testdevi.site",
-                //    "https://testdevi.site/",
-                //    "http://localhost:8080/",
-                //    "http://localhost:8080");
-                //.AllowAnyMethod().AllowAnyHeader();
                 builder.AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .WithOrigins("*")
-                        .WithMethods("*")
-                        .WithHeaders("*")
-                        .DisallowCredentials();
+                       .AllowAnyHeader()
+                       .WithOrigins("*")
+                       .WithMethods("*")
+                       .WithHeaders("*")
+                       .DisallowCredentials();
             }));
 
             #region ПРОД.
@@ -76,17 +68,17 @@ namespace Barbuuuda
 
             services.AddIdentity<UserEntity, IdentityRole>(opts =>
             {
-                opts.Password.RequiredLength = 5;   
-                opts.Password.RequireNonAlphanumeric = false;   
-                opts.Password.RequireLowercase = false; 
-                opts.Password.RequireUppercase = false; 
-                opts.Password.RequireDigit = false; 
+                opts.Password.RequiredLength = 5;
+                opts.Password.RequireNonAlphanumeric = false;
+                opts.Password.RequireLowercase = false;
+                opts.Password.RequireUppercase = false;
+                opts.Password.RequireDigit = false;
             })
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
 
             services.AddSwaggerGen(options =>
-            {             
+            {
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(Directory.GetCurrentDirectory(), xmlFile);
@@ -100,7 +92,7 @@ namespace Barbuuuda
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
                             ValidateIssuer = true,
-                            ValidIssuer = AuthOptions.ISSUER,                          
+                            ValidIssuer = AuthOptions.ISSUER,
                             ValidateAudience = true,
                             ValidAudience = AuthOptions.AUDIENCE,
                             ValidateLifetime = true,
@@ -152,6 +144,6 @@ namespace Barbuuuda
                 endpoints.MapHub<ChatHub>("/chat");
                 endpoints.MapDefaultControllerRoute();
             });
-        }        
+        }
     }
 }

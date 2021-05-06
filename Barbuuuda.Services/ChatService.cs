@@ -129,25 +129,97 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="dialogId">Id диалога, для которого нужно подтянуть сообщения.</param>
         /// <param name="account">Логин текущего пользователя.</param>
-        /// <returns>Список сообщений.</returns>
-        public async Task<GetResultMessageOutpoot> GetDialogAsync(long? dialogId, string account)
+        /// <param name="isWriteBtn">Флаг кнопки "Написать".</param>
+        /// <param name="executorId">Id исполнителя, на ставку которого нажали.</param>
+        /// <returns>Список сообщений диалога.</returns>
+        public async Task<GetResultMessageOutpoot> GetDialogAsync(long? dialogId, string account, string executorId, bool isWriteBtn = false)
         {
             try
             {
                 GetResultMessageOutpoot messagesList = new GetResultMessageOutpoot();
 
-                // Если dialogId не передан, значит нужно открыть пустой чат.
-                if (dialogId == null)
+                // Если dialogId не передан и не передан флаг кнопки, значит нужно открыть пустой чат.
+                if (dialogId == null && !isWriteBtn)
                 {
                     messagesList.DialogState = DialogStateEnum.None.ToString();
-
-                    //TODO: доработать создание нового диалога.
 
                     return messagesList;
                 }
 
                 // Найдет Id пользователя.
                 string userId = await _user.GetUserIdByLogin(account);
+
+                // Если dialogId не передан но передан флаг кнопки "Ответить", значит нужно поискать существующий диалог с исполнителем или создать новый.
+                if (dialogId == null && isWriteBtn)
+                {
+                    // Есть ли роль заказчика.
+                    UserOutpoot user = await _user.GetUserInitialsByIdAsync(userId);
+
+                    // Пытается найти существующий диалог заказчика с исполнителем.
+                    if (user.UserRole.Equals(UserRole.CUSTOMER) && !string.IsNullOrEmpty(executorId))
+                    {
+                        // Ищет Id диалога с текущим заказчиком и исполнителем, на ставку которого нажали. Затем сравнит их DialogId, если он совпадает, значит заказчик с исполнителем общаются.
+                        // Выберет DialogId заказчика.
+                        long customerDialogId = await _postgre.DialogMembers
+                            .Where(d => d.Id
+                            .Equals(userId))
+                            .Select(res => res.DialogId)
+                            .FirstOrDefaultAsync();
+
+                        // Выберет DialogId исполнителя.
+                        long executorDialogId = await _postgre.DialogMembers
+                            .Where(d => d.Id
+                            .Equals(executorId))
+                            .Select(res => res.DialogId)
+                            .FirstOrDefaultAsync();
+
+                        // Сравнит DialogId заказчика и исполнителя. Если они равны, значит заказчик и исполнитель общаются в одном чате и возьмет DialogId этого чата.
+                        if (customerDialogId != executorDialogId)
+                        {
+                            // Создаст новый диалог.
+                            await _postgre.MainInfoDialogs.AddAsync(new MainInfoDialogEntity()
+                            {
+                                DialogName = string.Empty,
+                                Created = DateTime.Now
+                            });
+
+                            await _postgre.SaveChangesAsync();
+
+                            // Выберет DialogId созданного диалога.
+                            long newDialogId = await _postgre.MainInfoDialogs
+                                .OrderBy(d => d.DialogId)
+                                .Select(d => d.DialogId)
+                                .LastOrDefaultAsync();
+
+                            // Добавит заказчика и исполнителя к новому диалогу.
+                            await _postgre.DialogMembers.AddRangeAsync(
+                                new DialogMemberEntity()
+                                {
+                                    DialogId = newDialogId,
+                                    Id = userId,
+                                    Joined = DateTime.Now
+                                },
+                                new DialogMemberEntity()
+                                {
+                                    DialogId = newDialogId,
+                                    Id = executorId,
+                                    Joined = DateTime.Now
+                                });
+
+                            await _postgre.SaveChangesAsync();
+
+                            messagesList.DialogState = DialogStateEnum.Empty.ToString();
+
+                            return messagesList;
+                        }
+
+                        // Без разницы, какой присвоить. Они здесь одинаковы.
+                        else
+                        {                            
+                            dialogId = executorDialogId;
+                        }
+                    }
+                }               
 
                 // Проверит существование диалога.
                 bool isDialog = await _postgre.MainInfoDialogs
@@ -346,5 +418,15 @@ namespace Barbuuuda.Services
                 throw new Exception(ex.Message.ToString());
             }
         }
+
+        /// <summary>
+        /// Метод получит Id диалога, у которого стоит указанный UserId.
+        /// </summary>
+        /// <param name="userId">UserId здесь может быть как заказчика так и исполнителя.</param>
+        /// <returns>Id диалога.</returns>
+        //private async Task<long> GetDialogId(string userId)
+        //{
+
+        //}
     }
 }

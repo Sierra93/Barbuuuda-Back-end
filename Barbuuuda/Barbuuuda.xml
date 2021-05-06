@@ -382,7 +382,7 @@
             Метод создает пользователя.
             </summary>
             <param name="user">Входная модель пользователя.</param>
-            <returns></returns>
+            <returns>Список ошибок или статус успеха регистрации.</returns>
         </member>
     </members>
 </doc>
