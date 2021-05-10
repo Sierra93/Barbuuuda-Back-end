@@ -104,7 +104,7 @@ namespace Barbuuuda.Services
                     MessageOutpoot messageOutpoot = JsonSerializer.Deserialize<MessageOutpoot>(jsonString);
 
                     // Проставит флаг принадлежности сообщения.
-                    messageOutpoot.IsMyMessage = messageOutpoot.UserId.Equals(userId) ? true : false;
+                    messageOutpoot.IsMyMessage = messageOutpoot.UserId.Equals(userId);
 
                     // Затирает Id пользователя, чтобы фронт не видел.
                     messageOutpoot.UserId = null;
@@ -118,9 +118,9 @@ namespace Barbuuuda.Services
 
             catch (Exception ex)
             {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                await _logger.LogCritical();
-                throw new Exception(ex.Message.ToString());
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message, ex.StackTrace);
+                await logger.LogCritical();
+                throw new Exception(ex.Message);
             }
         }
 
@@ -149,8 +149,8 @@ namespace Barbuuuda.Services
                 // Найдет Id пользователя.
                 string userId = await _user.GetUserIdByLogin(account);
 
-                // Если dialogId не передан но передан флаг кнопки "Ответить", значит нужно поискать существующий диалог с исполнителем или создать новый.
-                if (dialogId == null && isWriteBtn)
+                // Если передан флаг кнопки "Ответить", значит нужно поискать существующий диалог с исполнителем или создать новый.
+                if (isWriteBtn)
                 {
                     // Есть ли роль заказчика.
                     UserOutpoot user = await _user.GetUserInitialsByIdAsync(userId);
@@ -208,16 +208,12 @@ namespace Barbuuuda.Services
 
                             await _postgre.SaveChangesAsync();
 
-                            messagesList.DialogState = DialogStateEnum.Empty.ToString();
+                            messagesList.DialogState = DialogStateEnum.Open.ToString();
 
                             return messagesList;
                         }
 
-                        // Без разницы, какой присвоить. Они здесь одинаковы.
-                        else
-                        {                            
-                            dialogId = executorDialogId;
-                        }
+                        dialogId = executorDialogId;
                     }
                 }               
 
@@ -260,7 +256,7 @@ namespace Barbuuuda.Services
                     MessageOutpoot messageOutpoot = JsonSerializer.Deserialize<MessageOutpoot>(jsonString);
 
                     // Проставит флаг принадлежности сообщения.
-                    messageOutpoot.IsMyMessage = messageOutpoot.UserId.Equals(userId) ? true : false;
+                    messageOutpoot.IsMyMessage = messageOutpoot.UserId.Equals(userId);
 
                     // Затирает Id пользователя, чтобы фронт не видел.
                     messageOutpoot.UserId = null;
@@ -274,9 +270,9 @@ namespace Barbuuuda.Services
 
             catch (Exception ex)
             {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                await _logger.LogCritical();
-                throw new Exception(ex.Message.ToString());
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message, ex.StackTrace);
+                await logger.LogCritical();
+                throw new Exception(ex.Message);
             }
         }
 
@@ -413,9 +409,9 @@ namespace Barbuuuda.Services
 
             catch (Exception ex)
             {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                await _logger.LogCritical();
-                throw new Exception(ex.Message.ToString());
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message, ex.StackTrace);
+                await logger.LogCritical();
+                throw new Exception(ex.Message);
             }
         }
 

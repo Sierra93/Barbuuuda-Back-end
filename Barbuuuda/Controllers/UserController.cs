@@ -8,7 +8,6 @@ using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -61,9 +60,9 @@ namespace Barbuuuda.Controllers
 
             catch (Exception ex)
             {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                _ = _logger.LogCritical();
-                throw new Exception(ex.Message.ToString());
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = logger.LogCritical();
+                throw new Exception(ex.Message);
             }
         }
 
@@ -79,7 +78,7 @@ namespace Barbuuuda.Controllers
                     .Equals(email))
                     .FirstOrDefaultAsync();
 
-            return oUser != null ? true : false;
+            return oUser != null;
         }
 
         /// <summary>
@@ -232,7 +231,7 @@ namespace Barbuuuda.Controllers
             {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 _ = _logger.LogCritical();
-                throw new Exception(ex.Message.ToString());
+                throw new Exception(ex.Message);
             }
         }
     }
