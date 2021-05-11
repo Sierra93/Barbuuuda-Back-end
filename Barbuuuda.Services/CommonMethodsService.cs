@@ -7,8 +7,8 @@ namespace Barbuuuda.Services
     /// </summary>
     public class CommonMethodsService
     {
-        ApplicationDbContext _db;
-        PostgreDbContext _postgre;
+        private readonly ApplicationDbContext _db;
+        private readonly PostgreDbContext _postgre;
 
         public CommonMethodsService(ApplicationDbContext db, PostgreDbContext postgre)
         {

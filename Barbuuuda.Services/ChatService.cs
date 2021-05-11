@@ -309,7 +309,8 @@ namespace Barbuuuda.Services
                         res.member.Id,
                         res.info.Created,
                         res.member.User.UserName,
-                        res.member.User.UserRole
+                        res.member.User.UserRole,
+                        UserIcon = res.member.User.UserIcon ?? NoPhotoUrl.NO_PHOTO
                     })
                     .ToListAsync();
 
