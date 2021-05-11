@@ -258,7 +258,7 @@ namespace Barbuuuda.Services
                     // Проставит флаг принадлежности сообщения.
                     messageOutpoot.IsMyMessage = messageOutpoot.UserId.Equals(userId);
 
-                    // Затирает Id пользователя, чтобы фронт не видел.
+                    // Затирает Id пользователя, чтобы фронт его не видел.
                     messageOutpoot.UserId = null;
 
                     messagesList.Messages.Add(messageOutpoot);
@@ -286,6 +286,7 @@ namespace Barbuuuda.Services
             try
             {
                 GetResultDialogOutpoot dialogsList = new GetResultDialogOutpoot();
+                List<DialogOutpoot> distinctDialogs = new List<DialogOutpoot>();
 
                 // Находит Id пользователя, для которого подтянуть список диалогов и мапит к типу UserOutpoot.
                 MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, UserOutpoot>());
@@ -299,17 +300,18 @@ namespace Barbuuuda.Services
 
                 // Выберет список диалогов.
                 var dialogs = await _postgre.DialogMembers
-                        .Join(_postgre.MainInfoDialogs, member => member.DialogId, info => info.DialogId, (member, info) => new { member, info })
-                        .Join(_postgre.MainInfoDialogs, parentMember => parentMember.member.DialogId, mainInfoDialog => mainInfoDialog.DialogId, (parentMember, mainInfoDialog) => new { parentMember, mainInfoDialog })
-                        .Where(d => d.parentMember.member.Id.Equals(user.Id))
-                        .Select(res => new
-                        {
-                            res.parentMember.info.DialogId,
-                            res.parentMember.info.DialogName,
-                            res.parentMember.member.Id,
-                            res.mainInfoDialog.Created
-                        })
-                        .ToListAsync();
+                    .Join(_postgre.MainInfoDialogs, member => member.DialogId, info => info.DialogId, (member, info) => new { member, info })
+                    //.Where(u => !u.member.User.UserName.Equals(account))
+                    .Select(res => new
+                    {
+                        res.info.DialogId,
+                        res.info.DialogName,
+                        res.member.Id,
+                        res.info.Created,
+                        res.member.User.UserName,
+                        res.member.User.UserRole
+                    })
+                    .ToListAsync();
 
                 // Если диалоги не найдены, то вернет пустой массив.
                 if (!dialogs.Any())
@@ -317,7 +319,68 @@ namespace Barbuuuda.Services
                     return dialogsList;
                 }
 
+                // Находит и убирает дубли.
+                int i = 0;
                 foreach (object dialog in dialogs)
+                {
+                    string jsonString = JsonSerializer.Serialize(dialog);
+                    DialogOutpoot resultDialog = JsonSerializer.Deserialize<DialogOutpoot>(jsonString);
+                    resultDialog.UserId ??= string.Empty;
+
+                    if (distinctDialogs.Count == 0 && !resultDialog.UserName.Equals(account))
+                    {
+                        distinctDialogs.Add(resultDialog);
+                    }
+
+                    List<DialogOutpoot> dublicate = distinctDialogs
+                        .Where(u => u.UserId
+                        .Equals(dialogs[i].Id))
+                        .ToList();
+
+                    if (dublicate.Count != 0 || resultDialog.UserName.Equals(account))
+                    {
+                        i++;
+                        continue;
+                    }
+
+                    distinctDialogs.Add(resultDialog);
+                    i++;
+                }
+
+                switch (user.UserRole)
+                {
+                    // Диалог просматривает исполнитель, значит нужно удалить из массива других исполнителей.
+                    case UserRole.EXECUTOR:
+                    {
+                        DialogOutpoot itemToRemove = distinctDialogs
+                            .FirstOrDefault(r => r.UserRole
+                            .Equals(UserRole.EXECUTOR));
+
+                        if (itemToRemove != null)
+                        {
+                            distinctDialogs.Remove(itemToRemove);
+                        }
+
+                        break;
+                    }
+
+                    // Диалог просматривает заказчик, значит нужно удалить из массива других заказчиков.
+                    case UserRole.CUSTOMER:
+                    {
+                        DialogOutpoot itemToRemove = distinctDialogs
+                            .FirstOrDefault(r => r.UserRole
+                            .Equals(UserRole.CUSTOMER));
+
+                        if (itemToRemove != null)
+                        {
+                            distinctDialogs.Remove(itemToRemove);
+                        }
+
+                        break;
+                    }
+                }
+
+                foreach (object dialog in distinctDialogs)
                 {
                     string jsonString = JsonSerializer.Serialize(dialog);
                     DialogOutpoot resultDialog = JsonSerializer.Deserialize<DialogOutpoot>(jsonString);
@@ -414,15 +477,5 @@ namespace Barbuuuda.Services
                 throw new Exception(ex.Message);
             }
         }
-
-        /// <summary>
-        /// Метод получит Id диалога, у которого стоит указанный UserId.
-        /// </summary>
-        /// <param name="userId">UserId здесь может быть как заказчика так и исполнителя.</param>
-        /// <returns>Id диалога.</returns>
-        //private async Task<long> GetDialogId(string userId)
-        //{
-
-        //}
     }
 }

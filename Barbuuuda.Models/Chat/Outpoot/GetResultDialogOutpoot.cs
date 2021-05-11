@@ -11,5 +11,10 @@ namespace Barbuuuda.Models.Chat.Outpoot
         /// Список диалогов.
         /// </summary>
         public List<DialogOutpoot> Dialogs { get; set; } = new List<DialogOutpoot>();
+
+        /// <summary>
+        /// Кол-во диалогов.
+        /// </summary>
+        public long Count => Dialogs.Count;
     }
 }

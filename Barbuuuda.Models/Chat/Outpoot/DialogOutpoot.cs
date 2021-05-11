@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Barbuuuda.Models.Chat.Outpoot
 {
@@ -29,7 +30,7 @@ namespace Barbuuuda.Models.Chat.Outpoot
         public string Price { get; set; }
 
         /// <summary>
-        /// Логин собеседника.
+        /// Логин пользователя.
         /// </summary>
         public string UserName { get; set; }
 
@@ -62,5 +63,16 @@ namespace Barbuuuda.Models.Chat.Outpoot
         /// Полная дата.
         /// </summary>
         public string Created { get; set; }
+
+        /// <summary>
+        /// Id пользователя, который есть в диалоге.
+        /// </summary>
+        [JsonPropertyName("Id")]
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// Роль пользователя.
+        /// </summary>
+        public string UserRole { get; set; }
     }
 }
