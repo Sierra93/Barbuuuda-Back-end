@@ -19,14 +19,12 @@ namespace Barbuuuda.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TaskController : BaseController
     {
-        public static string Module => "Barbuuuda.Task";
-
         /// <summary>
         /// Сервис заданий.
         /// </summary>
         private readonly ITask _task;
 
-        public TaskController(ITask task) : base(Module)
+        public TaskController(ITask task)
         {
             _task = task;
         }
@@ -103,7 +101,7 @@ namespace Barbuuuda.Controllers
         /// Метод удаляет задание.
         /// </summary>
         /// <param name="taskId">Id задачи.</param>
-        [HttpGet, Route("delete/{taskId}")]
+        [HttpGet, Route("delete/{taskId:int}")]
         public async Task<IActionResult> DeleteTask([FromRoute] int taskId)
         {
             await _task.DeleteTask(taskId);

@@ -7,12 +7,6 @@ namespace Barbuuuda.Controllers
     /// </summary>
     public class BaseController : ControllerBase
     {
-        private readonly string _moduleName;
-
-        protected BaseController(string moduleName) {
-            _moduleName = moduleName;
-        }
-
         /// <summary>
         /// Метод получает имя текущего юзера.
         /// </summary>

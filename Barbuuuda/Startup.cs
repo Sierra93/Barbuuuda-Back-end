@@ -12,7 +12,6 @@ using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Autofac;
-using Barbuuuda.Core.Extensions;
 
 namespace Barbuuuda
 {
@@ -27,7 +26,6 @@ namespace Barbuuuda
             containerBuilder = new ContainerBuilder();
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
@@ -79,7 +77,6 @@ namespace Barbuuuda
 
             services.AddSwaggerGen(options =>
             {
-                // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(Directory.GetCurrentDirectory(), xmlFile);
                 options.IncludeXmlComments(xmlPath);
@@ -104,7 +101,6 @@ namespace Barbuuuda
             services.AddSignalR();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
         {
             app.UseCors("ApiCorsPolicy");
@@ -130,7 +126,7 @@ namespace Barbuuuda
             });
 
             // Запишет путь для xml-файла документации API.
-            applicationLifetime.ApplicationStarted.Register(DocumentationFileExtension.OnApplicationStarted);
+            //applicationLifetime.ApplicationStarted.Register(DocumentationFileExtension.OnApplicationStarted);
 
             app.UseSwagger();
 
@@ -141,7 +137,7 @@ namespace Barbuuuda
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<ChatHub>("/chat");
+                //endpoints.MapHub<ChatHub>("/chat");
                 endpoints.MapDefaultControllerRoute();
             });
         }

@@ -18,14 +18,12 @@ namespace Barbuuuda.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ExecutorController : BaseController
     {
-        public static string Module => "Barbuuuda.Executor";
-
         /// <summary>
         /// Сервис исполнителя.
         /// </summary>
         private readonly IExecutor _executor;
 
-        public ExecutorController(IExecutor executor) : base(Module)
+        public ExecutorController(IExecutor executor)
         {
             _executor = executor;
         }

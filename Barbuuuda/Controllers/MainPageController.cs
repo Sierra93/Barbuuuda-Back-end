@@ -12,14 +12,12 @@ namespace Barbuuuda.Controllers
     [ApiController, Route("main")]
     public class MainPageController : BaseController
     {
-        public static string Module => "Barbuuuda.Main";
-
         /// <summary>
         /// Сервис стартовой страницы.
         /// </summary>
         private readonly IMainPage _mainPage;
 
-        public MainPageController(IMainPage mainPage) : base(Module)
+        public MainPageController(IMainPage mainPage)
         {
             _mainPage = mainPage;
         }

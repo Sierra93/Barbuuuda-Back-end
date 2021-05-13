@@ -301,7 +301,6 @@ namespace Barbuuuda.Services
                 // Выберет список диалогов.
                 var dialogs = await _postgre.DialogMembers
                     .Join(_postgre.MainInfoDialogs, member => member.DialogId, info => info.DialogId, (member, info) => new { member, info })
-                    //.Where(u => !u.member.User.UserName.Equals(account))
                     .Select(res => new
                     {
                         res.info.DialogId,

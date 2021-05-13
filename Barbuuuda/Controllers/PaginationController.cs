@@ -13,15 +13,13 @@ namespace Barbuuuda.Controllers
     [ApiController, Route("pagination")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PaginationController : BaseController
-    {        
-        public static string Module => "Barbuuuda.Pagination";
-
+    {
         /// <summary>
         /// Абстракция сервиса пагинации.
         /// </summary>
         private readonly IPagination _pagination;
 
-        public PaginationController(IPagination pagination) : base(Module)
+        public PaginationController(IPagination pagination)
         {
             _pagination = pagination;
         }
@@ -47,7 +45,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("auction")]
         public async Task<IActionResult> GetPaginationAuction([FromQuery] int pageIdx)
         {
-            var paginationData = await _pagination.GetPaginationAuction(pageIdx);
+            IndexOutpoot paginationData = await _pagination.GetPaginationAuction(pageIdx);
 
             return Ok(paginationData);
         }

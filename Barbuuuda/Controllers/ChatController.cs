@@ -15,14 +15,12 @@ namespace Barbuuuda.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ChatController : BaseController
     {
-        public static string Module => "Barbuuuda.Chat";
-
         /// <summary>
         /// Абстракция чата.
         /// </summary>
         private readonly IChat _chat;
 
-        public ChatController(IChat chat) : base(Module)
+        public ChatController(IChat chat)
         {
             _chat = chat;
         }

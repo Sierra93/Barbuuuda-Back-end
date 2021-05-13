@@ -27,14 +27,13 @@ namespace Barbuuuda.Controllers
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly UserManager<UserEntity> _userManager;
-        public static string Module => "Barbuuuda.User";
 
         /// <summary>
         /// Сервис работы с юзерами.
         /// </summary>
         private readonly IUser _user;
 
-        public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUser user) : base(Module)
+        public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUser user)
         {
             _userManager = userManager;
             _user = user;
@@ -153,7 +152,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("token")]
         public async Task<IActionResult> RefreshToken([FromQuery] string userName)
         {
-            string sToken = await _user.GenerateToken(userName ?? GetUserName() ?? null);
+            string sToken = await _user.GenerateToken(userName ?? GetUserName());
 
             return Ok(sToken);
         }
@@ -169,10 +168,7 @@ namespace Barbuuuda.Controllers
             {
                 IdentityResult errors = null;
 
-                if (user.Score == null)
-                {
-                    user.Score = 0;
-                }
+                user.Score ??= 0;
 
                 // Ищет такой email в БД.
                 bool bErrorEmail = await IdentityUserEmail(user.Email);

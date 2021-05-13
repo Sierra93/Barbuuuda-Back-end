@@ -1,8 +1,6 @@
 ﻿using Autofac;
 using AutoMapper;
 using Barbuuuda.Core.Interfaces;
-using Barbuuuda.Models.User;
-using Barbuuuda.Models.User.Outpoot;
 using System.Collections.Generic;
 
 namespace Barbuuuda.Services.AutofacModules
@@ -48,7 +46,10 @@ namespace Barbuuuda.Services.AutofacModules
             builder.RegisterType<KnowlegeService>().As<IKnowlege>();
 
             // Чат.
-            builder.RegisterType<ChatService>().As<IChat>();
+            builder.RegisterType<ChatService>().As<IChat>(); 
+
+            // Платежная система.
+            builder.RegisterType<PaymentService>().As<IPayment>();
         }
     }
 }
