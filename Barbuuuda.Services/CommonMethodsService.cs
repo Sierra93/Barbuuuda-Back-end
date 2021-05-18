@@ -27,5 +27,15 @@ namespace Barbuuuda.Services
 
             return str;
         }
+
+        /// <summary>
+        /// Функция оставит в строке тольк опервую букву с точкой.
+        /// </summary>
+        /// <param name="lastName">Фамилия.</param>
+        /// <returns>ИЗмененную строку.</returns>
+        public static string SubstringLastName(string lastName)
+        {
+            return string.Concat(lastName.Substring(0, 1), ".");
+        }
     }
 }

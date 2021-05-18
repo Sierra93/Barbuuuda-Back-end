@@ -146,7 +146,7 @@ namespace Barbuuuda.Services
                     return messagesList;
                 }
 
-                // Найдет Id пользователя.
+                // Найдет Id текущего пользователя.
                 string userId = await _user.GetUserIdByLogin(account);
 
                 // Если передан флаг кнопки "Ответить", значит нужно поискать существующий диалог с исполнителем или создать новый.
@@ -260,10 +260,33 @@ namespace Barbuuuda.Services
 
                     // Затирает Id пользователя, чтобы фронт его не видел.
                     messageOutpoot.UserId = null;
-
                     messagesList.Messages.Add(messageOutpoot);
                 }
                 messagesList.DialogState = DialogStateEnum.Open.ToString();
+
+                // Находит Id участников диалога по DialogId.
+                IEnumerable<string> membersIds = await GetDialogMembers(dialogId);
+
+                if (membersIds == null)
+                {
+                    throw new NotDialogMembersException(dialogId);
+                }
+
+                string id = membersIds.FirstOrDefault(i => !i.Equals(userId));
+                UserOutpoot otherUser = await _user.GetUserInitialsByIdAsync(id);
+
+                // Запишет имя и фамилию пользователя, диалог с которым открыт.
+                if (!string.IsNullOrEmpty(otherUser.FirstName) && !string.IsNullOrEmpty(otherUser.LastName))
+                {
+                    messagesList.FirstName = otherUser.FirstName;
+                    messagesList.LastName = CommonMethodsService.SubstringLastName(otherUser.LastName); 
+                }
+
+                // Если не заполнено имя и фамилия, значит записать логин.
+                else
+                {
+                    messagesList.UserName = otherUser.UserName;
+                }
 
                 return messagesList;
             }
@@ -393,13 +416,15 @@ namespace Barbuuuda.Services
                         .LastOrDefaultAsync();
 
                     // Находит Id участников диалога по DialogId.
-                    IEnumerable<string> membersIds = await _postgre.DialogMembers
-                        .Where(d => d.DialogId == resultDialog.DialogId)
-                        .Select(res => res.Id)
-                        .ToListAsync();
+                    IEnumerable<string> membersIds = await GetDialogMembers(resultDialog.DialogId);
                     string executorId = string.Empty;
 
-                    //// Запишет логин собеседника.
+                    if (membersIds == null)
+                    {
+                        throw new NotDialogMembersException(resultDialog.DialogId);
+                    }
+
+                    // Запишет логин собеседника.
                     foreach (string id in membersIds.Where(id => !id.Equals(user.Id)))
                     {
                         resultDialog.UserName = await _user.FindUserIdByLogin(id);
@@ -415,7 +440,7 @@ namespace Barbuuuda.Services
                         resultDialog.FirstName = userInitial.FirstName;
 
                         // Возьмет первую букву фамилии и поставит после нее точку.
-                        resultDialog.LastName = string.Concat(userInitial.LastName.Substring(0, 1), ".");
+                        resultDialog.LastName = CommonMethodsService.SubstringLastName(userInitial.LastName);
 
                         // Проставит фото профиля или фото по дефолту.
                         resultDialog.UserIcon = userInitial.UserIcon ?? NoPhotoUrl.NO_PHOTO;
@@ -476,6 +501,19 @@ namespace Barbuuuda.Services
                 await logger.LogCritical();
                 throw new Exception(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Метод найдет список Id участников диалога по DialogId.
+        /// </summary>
+        /// <param name="dialogId">Id диалога, участников которого нужно найти.</param>
+        /// <returns>Список Id участников диалога.</returns>
+        private async Task<IEnumerable<string>> GetDialogMembers(long? dialogId)
+        {
+            return await _postgre.DialogMembers
+                .Where(d => d.DialogId == dialogId)
+                .Select(res => res.Id)
+                .ToListAsync();
         }
     }
 }

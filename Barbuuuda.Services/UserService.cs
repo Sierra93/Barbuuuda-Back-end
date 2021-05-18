@@ -478,7 +478,8 @@ namespace Barbuuuda.Services
                     FirstName = res.FirstName, 
                     LastName = res.LastName,
                     UserIcon = res.UserIcon,
-                    UserRole = res.UserRole
+                    UserRole = res.UserRole,
+                    UserName = res.UserName
                 })
                 .FirstOrDefaultAsync();
 

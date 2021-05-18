@@ -44,5 +44,10 @@
         /// Роль пользователя.
         /// </summary>
         public string UserRole { get; set; }
+
+        /// <summary>
+        /// Логин пользователя.
+        /// </summary>
+        public string UserName { get; set; }
     }
 }
