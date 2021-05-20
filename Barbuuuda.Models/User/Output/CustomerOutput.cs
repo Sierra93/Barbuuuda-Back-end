@@ -1,9 +1,9 @@
-﻿namespace Barbuuuda.Models.User.Outpoot
+﻿namespace Barbuuuda.Models.User.Output
 {
     /// <summary>
     /// Выходная модель заказчика.
     /// </summary>
-    public class CustomerOutpoot
+    public class CustomerOutput
     {
         /// <summary>
         /// Логин заказчика задания.

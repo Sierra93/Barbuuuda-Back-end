@@ -5,10 +5,10 @@ using Barbuuuda.Core.Enums;
 using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
-using Barbuuuda.Models.Chat.Outpoot;
+using Barbuuuda.Models.Chat.Output;
 using Barbuuuda.Models.Entities.Chat;
 using Barbuuuda.Models.User;
-using Barbuuuda.Models.User.Outpoot;
+using Barbuuuda.Models.User.Output;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -46,11 +46,11 @@ namespace Barbuuuda.Services
         /// <param name="message">Сообщение.</param>
         /// <param name="dialogId">Id диалога.</param>
         /// <returns>Список сообщений.</returns>
-        public async Task<GetResultMessageOutpoot> SendAsync(string message, string account, long dialogId)
+        public async Task<GetResultMessageOutput> SendAsync(string message, string account, long dialogId)
         {
             try
             {
-                GetResultMessageOutpoot messagesList = new GetResultMessageOutpoot();
+                GetResultMessageOutput messagesList = new GetResultMessageOutput();
 
                 // Если сообщения не передано, то ничего не делать.
                 if (string.IsNullOrEmpty(message))
@@ -97,19 +97,19 @@ namespace Barbuuuda.Services
                         })
                         .ToListAsync());
 
-                // Приведет к типу MessageOutpoot.
+                // Приведет к типу MessageOutput.
                 foreach (object messageText in messages)
                 {
                     string jsonString = JsonSerializer.Serialize(messageText);
-                    MessageOutpoot messageOutpoot = JsonSerializer.Deserialize<MessageOutpoot>(jsonString);
+                    MessageOutput messageOutput = JsonSerializer.Deserialize<MessageOutput>(jsonString);
 
                     // Проставит флаг принадлежности сообщения.
-                    messageOutpoot.IsMyMessage = messageOutpoot.UserId.Equals(userId);
+                    messageOutput.IsMyMessage = messageOutput.UserId.Equals(userId);
 
                     // Затирает Id пользователя, чтобы фронт не видел.
-                    messageOutpoot.UserId = null;
+                    messageOutput.UserId = null;
 
-                    messagesList.Messages.Add(messageOutpoot);
+                    messagesList.Messages.Add(messageOutput);
                 }
                 messagesList.DialogState = DialogStateEnum.Open.ToString();                
 
@@ -132,11 +132,11 @@ namespace Barbuuuda.Services
         /// <param name="isWriteBtn">Флаг кнопки "Написать".</param>
         /// <param name="executorId">Id исполнителя, на ставку которого нажали.</param>
         /// <returns>Список сообщений диалога.</returns>
-        public async Task<GetResultMessageOutpoot> GetDialogAsync(long? dialogId, string account, string executorId, bool isWriteBtn = false)
+        public async Task<GetResultMessageOutput> GetDialogAsync(long? dialogId, string account, string executorId, bool isWriteBtn = false)
         {
             try
             {
-                GetResultMessageOutpoot messagesList = new GetResultMessageOutpoot();
+                GetResultMessageOutput messagesList = new GetResultMessageOutput();
 
                 // Если dialogId не передан и не передан флаг кнопки, значит нужно открыть пустой чат.
                 if (dialogId == null && !isWriteBtn)
@@ -153,7 +153,7 @@ namespace Barbuuuda.Services
                 if (isWriteBtn)
                 {
                     // Есть ли роль заказчика.
-                    UserOutpoot user = await _user.GetUserInitialsByIdAsync(userId);
+                    UserOutput user = await _user.GetUserInitialsByIdAsync(userId);
 
                     // Пытается найти существующий диалог заказчика с исполнителем.
                     if (user.UserRole.Equals(UserRole.CUSTOMER) && !string.IsNullOrEmpty(executorId))
@@ -249,18 +249,18 @@ namespace Barbuuuda.Services
                     return messagesList;
                 }
 
-                // Приведет к типу MessageOutpoot.
+                // Приведет к типу MessageOutput.
                 foreach (object message in messages)
                 {
                     string jsonString = JsonSerializer.Serialize(message);
-                    MessageOutpoot messageOutpoot = JsonSerializer.Deserialize<MessageOutpoot>(jsonString);
+                    MessageOutput messageOutput = JsonSerializer.Deserialize<MessageOutput>(jsonString);
 
                     // Проставит флаг принадлежности сообщения.
-                    messageOutpoot.IsMyMessage = messageOutpoot.UserId.Equals(userId);
+                    messageOutput.IsMyMessage = messageOutput.UserId.Equals(userId);
 
                     // Затирает Id пользователя, чтобы фронт его не видел.
-                    messageOutpoot.UserId = null;
-                    messagesList.Messages.Add(messageOutpoot);
+                    messageOutput.UserId = null;
+                    messagesList.Messages.Add(messageOutput);
                 }
                 messagesList.DialogState = DialogStateEnum.Open.ToString();
 
@@ -273,7 +273,7 @@ namespace Barbuuuda.Services
                 }
 
                 string id = membersIds.FirstOrDefault(i => !i.Equals(userId));
-                UserOutpoot otherUser = await _user.GetUserInitialsByIdAsync(id);
+                UserOutput otherUser = await _user.GetUserInitialsByIdAsync(id);
 
                 // Запишет имя и фамилию пользователя, диалог с которым открыт.
                 if (!string.IsNullOrEmpty(otherUser.FirstName) && !string.IsNullOrEmpty(otherUser.LastName))
@@ -304,17 +304,17 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Список диалогов.</returns>
-        public async Task<GetResultDialogOutpoot> GetDialogsAsync(string account)
+        public async Task<GetResultDialogOutput> GetDialogsAsync(string account)
         {
             try
             {
-                GetResultDialogOutpoot dialogsList = new GetResultDialogOutpoot();
-                List<DialogOutpoot> distinctDialogs = new List<DialogOutpoot>();
+                GetResultDialogOutput dialogsList = new GetResultDialogOutput();
+                List<DialogOutput> distinctDialogs = new List<DialogOutput>();
 
-                // Находит Id пользователя, для которого подтянуть список диалогов и мапит к типу UserOutpoot.
-                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, UserOutpoot>());
+                // Находит Id пользователя, для которого подтянуть список диалогов и мапит к типу UserOutput.
+                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, UserOutput>());
                 Mapper mapper = new Mapper(config);
-                UserOutpoot user = mapper.Map<UserOutpoot>(await _user.GetUserByLogin(account));
+                UserOutput user = mapper.Map<UserOutput>(await _user.GetUserByLogin(account));
 
                 if (string.IsNullOrEmpty(user.Id))
                 {
@@ -347,7 +347,7 @@ namespace Barbuuuda.Services
                 foreach (object dialog in dialogs)
                 {
                     string jsonString = JsonSerializer.Serialize(dialog);
-                    DialogOutpoot resultDialog = JsonSerializer.Deserialize<DialogOutpoot>(jsonString);
+                    DialogOutput resultDialog = JsonSerializer.Deserialize<DialogOutput>(jsonString);
                     resultDialog.UserId ??= string.Empty;
 
                     if (distinctDialogs.Count == 0 && !resultDialog.UserName.Equals(account))
@@ -355,7 +355,7 @@ namespace Barbuuuda.Services
                         distinctDialogs.Add(resultDialog);
                     }
 
-                    List<DialogOutpoot> dublicate = distinctDialogs
+                    List<DialogOutput> dublicate = distinctDialogs
                         .Where(u => u.UserId
                         .Equals(dialogs[i].Id))
                         .ToList();
@@ -375,7 +375,7 @@ namespace Barbuuuda.Services
                     // Диалог просматривает исполнитель, значит нужно удалить из массива других исполнителей.
                     case UserRole.EXECUTOR:
                     {
-                        DialogOutpoot itemToRemove = distinctDialogs
+                        DialogOutput itemToRemove = distinctDialogs
                             .FirstOrDefault(r => r.UserRole
                             .Equals(UserRole.EXECUTOR));
 
@@ -390,7 +390,7 @@ namespace Barbuuuda.Services
                     // Диалог просматривает заказчик, значит нужно удалить из массива других заказчиков.
                     case UserRole.CUSTOMER:
                     {
-                        DialogOutpoot itemToRemove = distinctDialogs
+                        DialogOutput itemToRemove = distinctDialogs
                             .FirstOrDefault(r => r.UserRole
                             .Equals(UserRole.CUSTOMER));
 
@@ -406,7 +406,7 @@ namespace Barbuuuda.Services
                 foreach (object dialog in distinctDialogs)
                 {
                     string jsonString = JsonSerializer.Serialize(dialog);
-                    DialogOutpoot resultDialog = JsonSerializer.Deserialize<DialogOutpoot>(jsonString);
+                    DialogOutput resultDialog = JsonSerializer.Deserialize<DialogOutput>(jsonString);
                     
                     // Подтянет последнее сообщение диалога для отображения в свернутом виде взяв первые 40 символов и далее ставит ...
                     resultDialog.LastMessage = await _postgre.DialogMessages
@@ -430,7 +430,7 @@ namespace Barbuuuda.Services
                         resultDialog.UserName = await _user.FindUserIdByLogin(id);
 
                         // Запишет имя и фамилию, если они заполнены, иначе фронт будет использовать логин собеседника.
-                        UserOutpoot userInitial = await _user.GetUserInitialsByIdAsync(id);
+                        UserOutput userInitial = await _user.GetUserInitialsByIdAsync(id);
 
                         if (string.IsNullOrEmpty(userInitial.FirstName) || string.IsNullOrEmpty(userInitial.LastName))
                         {

@@ -4,11 +4,11 @@ using Barbuuuda.Core.Enums;
 using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
-using Barbuuuda.Models.Respond.Outpoot;
+using Barbuuuda.Models.Respond.Output;
 using Barbuuuda.Models.Task;
-using Barbuuuda.Models.Task.Outpoot;
+using Barbuuuda.Models.Task.Output;
 using Barbuuuda.Models.User;
-using Barbuuuda.Models.User.Outpoot;
+using Barbuuuda.Models.User.Output;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
@@ -330,7 +330,7 @@ namespace Barbuuuda.Services
             }
 
             // Получит логин и иконку профиля заказчика задания.
-            CustomerOutpoot customer = await _user.GetCustomerLoginByTaskId(taskId);
+            CustomerOutput customer = await _user.GetCustomerLoginByTaskId(taskId);
 
             // TODO: отрефачить этот метод, чтоб не обращаться два раза к БД за получением задания.            
             var oTask = await (from tasks in _postgre.Tasks
@@ -785,11 +785,11 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="taskId"></param>
         /// <returns>Список заданий в аукционе.</returns>
-        public async Task<GetTaskResultOutpoot> LoadAuctionTasks()
+        public async Task<GetTaskResultOutput> LoadAuctionTasks()
         {
             try
             {
-                GetTaskResultOutpoot resultTasks = new GetTaskResultOutpoot();
+                GetTaskResultOutput resultTasks = new GetTaskResultOutput();
                 IEnumerable auctionTasks = await (from tasks in _postgre.Tasks
                                                   join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                                   join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
@@ -817,11 +817,11 @@ namespace Barbuuuda.Services
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
 
-                // Приводит к типу коллекции GetTaskResultOutpoot.
+                // Приводит к типу коллекции GetTaskResultOutput.
                 foreach (object task in auctionTasks)
                 {
                     string jsonString = JsonSerializer.Serialize(task);
-                    TaskOutpoot result = JsonSerializer.Deserialize<TaskOutpoot>(jsonString);
+                    TaskOutput result = JsonSerializer.Deserialize<TaskOutput>(jsonString);
 
                     // Считает кол-во ставок к заданию, либо проставит 0.
                     int countResponds = await _postgre.Responds
@@ -878,7 +878,7 @@ namespace Barbuuuda.Services
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Список ставок.</returns>
-        public async Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId, string account)
+        public async Task<GetRespondResultOutput> GetRespondsAsync(int taskId, string account)
         {
             try
             {
@@ -903,16 +903,16 @@ namespace Barbuuuda.Services
                     })
                     .ToListAsync());
 
-                GetRespondResultOutpoot result = new GetRespondResultOutpoot();
+                GetRespondResultOutput result = new GetRespondResultOutput();
 
                 // Находит Id исполнителя.
                 string userId = await _user.GetUserIdByLogin(account);
 
-                // Приведет к типу коллекции GetRespondResultOutpoot.
+                // Приведет к типу коллекции GetRespondResultOutput.
                 foreach (object respond in respondsList)
                 {
                     string jsonString = JsonSerializer.Serialize(respond);
-                    RespondOutpoot resultObject = JsonSerializer.Deserialize<RespondOutpoot>(jsonString);
+                    RespondOutput resultObject = JsonSerializer.Deserialize<RespondOutput>(jsonString);
 
                     // Если исполнитель оставлял ставку к данному заданию, то проставит флаг видимости кнопки "ИЗМЕНИТЬ СТАВКУ", иначе скроет ее.
                     if (resultObject.ExecutorId.Equals(userId))

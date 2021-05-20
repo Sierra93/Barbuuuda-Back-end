@@ -1,9 +1,9 @@
-﻿namespace Barbuuuda.Models.Task.Outpoot
+﻿namespace Barbuuuda.Models.Task.Output
 {
     /// <summary>
     /// Класс выходной модели списка заданий аукциона.
     /// </summary>
-    public class TaskOutpoot {
+    public class TaskOutput {
         /// <summary>
         /// Id задания.
         /// </summary>

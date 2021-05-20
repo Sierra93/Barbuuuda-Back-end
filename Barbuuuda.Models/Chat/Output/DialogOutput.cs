@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Barbuuuda.Models.Chat.Outpoot
+namespace Barbuuuda.Models.Chat.Output
 {
     /// <summary>
     /// Класс выходной модели для диалога.
     /// </summary>
-    public class DialogOutpoot
+    public class DialogOutput
     {
         /// <summary>
         /// Id диалога.

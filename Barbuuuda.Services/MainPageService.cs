@@ -9,6 +9,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Barbuuuda.Models.Entities.MainPage;
+using Barbuuuda.Models.Entities.MainPage.Output;
+using Barbuuuda.Models.User;
+using Barbuuuda.Models.User.Output;
 
 namespace Barbuuuda.Services
 {
@@ -217,6 +222,19 @@ namespace Barbuuuda.Services
             {
                 throw new Exception(ex.Message.ToString());
             }
-        }        
+        }
+
+        /// <summary>
+        /// Метод получит контактные данные сервиса.
+        /// </summary>
+        /// <returns>Контактная информация.</returns>
+        public async Task<ContactOutput> GetContactsAsync()
+        {
+            MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<ContactEntity, ContactOutput>());
+            Mapper mapper = new Mapper(config);
+            ContactOutput contact = mapper.Map<ContactOutput>(await _db.Contacts.SingleOrDefaultAsync());
+
+            return contact;
+        }
     }
 }

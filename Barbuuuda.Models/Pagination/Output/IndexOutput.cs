@@ -1,15 +1,15 @@
-﻿using Barbuuuda.Models.Pagination.Outpoot;
+﻿using Barbuuuda.Models.Pagination.Output;
 using System.Collections;
 
-namespace Barbuuuda.Models.Pagination.Outpoot
+namespace Barbuuuda.Models.Pagination.Output
 {
     /// <summary>
     /// Класс с информацией о пагинации.
     /// </summary>
-    public class IndexOutpoot
+    public class IndexOutput
     {
         public IEnumerable Tasks { get; set; }
 
-        public PaginationOutpoot PageData { get; set; }
+        public PaginationOutput PageData { get; set; }
     }
 }

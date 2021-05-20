@@ -3,6 +3,7 @@ using Barbuuuda.Models.MainPage;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Entities.MainPage.Output;
 
 namespace Barbuuuda.Controllers
 {
@@ -107,6 +108,19 @@ namespace Barbuuuda.Controllers
             IEnumerable aLastTasks = await _mainPage.GetLastTasksAsync();
 
             return Ok(aLastTasks);
+        }
+
+        /// <summary>
+        /// Метод получит контактные данные сервиса.
+        /// </summary>
+        /// <returns>Контактная информация.</returns>
+        [HttpPost, Route("contacts")]
+        [ProducesResponseType(200, Type = typeof(ContactOutput))]
+        public async Task<IActionResult> GetContactsAsync()
+        {
+            ContactOutput contact = await _mainPage.GetContactsAsync();
+
+            return Ok(contact);
         }
     }
 }

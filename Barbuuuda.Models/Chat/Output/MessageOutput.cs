@@ -1,11 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Barbuuuda.Models.Chat.Outpoot
+namespace Barbuuuda.Models.Chat.Output
 {
     /// <summary>
     /// Класс выходной модели для сообщений диалога.
     /// </summary>
-    public class MessageOutpoot
+    public class MessageOutput
     {
         /// <summary>
         /// Текст сообщения.

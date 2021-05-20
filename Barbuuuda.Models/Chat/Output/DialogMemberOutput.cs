@@ -1,9 +1,9 @@
-﻿namespace Barbuuuda.Models.Chat.Outpoot
+﻿namespace Barbuuuda.Models.Chat.Output
 {
     /// <summary>
     /// Класс выходной модели участников диалога.
     /// </summary>
-    public class DialogMemberOutpoot
+    public class DialogMemberOutput
     {
         /// <summary>
         /// Id участника диалога.

@@ -1,4 +1,4 @@
-﻿using Barbuuuda.Models.Chat.Outpoot;
+﻿using Barbuuuda.Models.Chat.Output;
 using System.Threading.Tasks;
 
 namespace Barbuuuda.Core.Interfaces
@@ -15,7 +15,7 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="message">Сообщение.</param>
         /// <param name="dialogId">Id диалога.</param>
         /// <returns>Список сообщений.</returns>
-        Task<GetResultMessageOutpoot> SendAsync(string message, string account, long dialogId);
+        Task<GetResultMessageOutput> SendAsync(string message, string account, long dialogId);
 
         /// <summary>
         /// Метод получает диалог, либо создает новый.
@@ -25,13 +25,13 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="isWriteBtn">Флаг кнопки "Написать".</param>
         /// <param name="executorId">Id исполнителя, на которого нажали при нажатии на кнопку "Написать."</param>
         /// <returns>Список сообщений.</returns>
-        Task<GetResultMessageOutpoot> GetDialogAsync(long? dialogId, string account, string executorId, bool isWriteBtn = false);
+        Task<GetResultMessageOutput> GetDialogAsync(long? dialogId, string account, string executorId, bool isWriteBtn = false);
 
         /// <summary>
         /// Метод получает список диалогов с текущим пользователем.
         /// </summary>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Список диалогов.</returns>
-        Task<GetResultDialogOutpoot> GetDialogsAsync(string account);
+        Task<GetResultDialogOutput> GetDialogsAsync(string account);
     }
 }

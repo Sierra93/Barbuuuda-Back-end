@@ -1,9 +1,9 @@
-﻿namespace Barbuuuda.Models.Respond.Outpoot
+﻿namespace Barbuuuda.Models.Respond.Output
 {
     /// <summary>
     /// Класс выходной модели для списка ставок задания.
     /// </summary>
-    public class RespondOutpoot
+    public class RespondOutput
     {
         /// <summary>
         /// Логин исполнителя.

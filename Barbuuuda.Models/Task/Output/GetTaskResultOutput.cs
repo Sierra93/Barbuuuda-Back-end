@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 
-namespace Barbuuuda.Models.Task.Outpoot
+namespace Barbuuuda.Models.Task.Output
 {
     /// <summary>
     /// Класс выходной модели со списком моделей заданий аукциона.
     /// </summary>
-    public class GetTaskResultOutpoot
+    public class GetTaskResultOutput
     {
         /// <summary>
         /// Список заданий.
         /// </summary>
-        public List<TaskOutpoot> Tasks { get; set; } = new List<TaskOutpoot>();
+        public List<TaskOutput> Tasks { get; set; } = new List<TaskOutput>();
 
         /// <summary>
         /// Общее кол-во заданий аукциона.

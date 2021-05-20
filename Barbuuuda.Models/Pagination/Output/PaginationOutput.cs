@@ -1,16 +1,16 @@
 ﻿using System;
 
-namespace Barbuuuda.Models.Pagination.Outpoot
+namespace Barbuuuda.Models.Pagination.Output
 {
     /// <summary>
     /// Класс пагинации.
     /// </summary>
-    public class PaginationOutpoot
+    public class PaginationOutput
     {
         public int PageNumber { get; private set; }
         public int TotalPages { get; private set; }
 
-        public PaginationOutpoot(int count, int pageNumber, int pageSize)
+        public PaginationOutput(int count, int pageNumber, int pageSize)
         {
             PageNumber = pageNumber;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);

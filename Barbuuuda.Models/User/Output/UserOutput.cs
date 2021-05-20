@@ -1,9 +1,9 @@
-﻿namespace Barbuuuda.Models.User.Outpoot
+﻿namespace Barbuuuda.Models.User.Output
 {
     /// <summary>
     /// Класс выходной модели пользователя.
     /// </summary>
-    public class UserOutpoot
+    public class UserOutput
     {
         /// <summary>
         /// Id пользователя.

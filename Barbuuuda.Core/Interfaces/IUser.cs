@@ -1,6 +1,6 @@
 ﻿using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
-using Barbuuuda.Models.User.Outpoot;
+using Barbuuuda.Models.User.Output;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -78,13 +78,13 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="userId">Id пользователя.</param>
         /// <returns>Фамилия, имя, фото профиля пользователя.</returns>
-        Task<UserOutpoot> GetUserInitialsByIdAsync(string userId);
+        Task<UserOutput> GetUserInitialsByIdAsync(string userId);
 
         /// <summary>
         /// Метод получит логин и иконку профиля заказчика по Id его задания.
         /// </summary>
         /// <param name="taskId">Id задания.</param>
         /// <returns>Данные заказчика.</returns>
-        Task<CustomerOutpoot> GetCustomerLoginByTaskId(int? taskId);
+        Task<CustomerOutput> GetCustomerLoginByTaskId(int? taskId);
     }
 }

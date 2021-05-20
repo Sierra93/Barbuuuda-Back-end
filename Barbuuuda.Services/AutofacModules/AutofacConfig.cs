@@ -20,7 +20,7 @@ namespace Barbuuuda.Services.AutofacModules
                 foreach (Profile profile in context.Resolve<IEnumerable<Profile>>())
                 {
                     cfg.AddProfile(profile);
-                    //cfg.CreateMap<UserEntity, UserOutpoot>();
+                    //cfg.CreateMap<UserEntity, UserOutput>();
                     //cfg.AddMaps(new[] { typeof(AutofacConfig).Assembly });
                 }
             })).AsSelf().SingleInstance();

@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
 
-namespace Barbuuuda.Models.Respond.Outpoot
+namespace Barbuuuda.Models.Respond.Output
 {
     /// <summary>
     /// Класс выходной модели со списком и кол-вом ставок.
     /// </summary>
-    public class GetRespondResultOutpoot
+    public class GetRespondResultOutput
     {
         /// <summary>
         /// Список ставок.
         /// </summary>
-        public List<RespondOutpoot> Responds { get; set; } = new List<RespondOutpoot>();
+        public List<RespondOutput> Responds { get; set; } = new List<RespondOutput>();
 
         /// <summary>
         /// Кол-во ставок.
         /// </summary>
-        public int Count { get { return Responds.Count; } set { } }
+        public int Count => Responds.Count;
     }
 }

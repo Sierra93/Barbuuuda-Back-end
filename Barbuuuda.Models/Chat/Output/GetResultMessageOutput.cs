@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 
-namespace Barbuuuda.Models.Chat.Outpoot
+namespace Barbuuuda.Models.Chat.Output
 {
     /// <summary>
     /// Класс выходной модели списка сообщений диалога.
     /// </summary>
-    public class GetResultMessageOutpoot
+    public class GetResultMessageOutput
     {
         /// <summary>
         /// Список сообщений.
         /// </summary>
-        public List<MessageOutpoot> Messages { get; set; } = new List<MessageOutpoot>();
+        public List<MessageOutput> Messages { get; set; } = new List<MessageOutput>();
 
         /// <summary>
         /// Кол-во сообщений.

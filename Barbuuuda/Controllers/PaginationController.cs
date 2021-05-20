@@ -1,5 +1,5 @@
 ﻿using Barbuuuda.Core.Interfaces;
-using Barbuuuda.Models.Pagination.Outpoot;
+using Barbuuuda.Models.Pagination.Output;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +32,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("page")]
         public async Task<IActionResult> GetPaginationTasks(int pageIdx = 1)
         {
-            IndexOutpoot paginationData = await _pagination.GetPaginationTasks(pageIdx, GetUserName());
+            IndexOutput paginationData = await _pagination.GetPaginationTasks(pageIdx, GetUserName());
 
             return Ok(paginationData);
         }
@@ -45,7 +45,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("auction")]
         public async Task<IActionResult> GetPaginationAuction([FromQuery] int pageIdx)
         {
-            IndexOutpoot paginationData = await _pagination.GetPaginationAuction(pageIdx);
+            IndexOutput paginationData = await _pagination.GetPaginationAuction(pageIdx);
 
             return Ok(paginationData);
         }

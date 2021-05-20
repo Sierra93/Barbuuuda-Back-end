@@ -7,7 +7,7 @@ using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
-using Barbuuuda.Models.User.Outpoot;
+using Barbuuuda.Models.User.Output;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -469,12 +469,12 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userId">Id пользователя.</param>
         /// <returns>Фамилия, имя, фото профиля пользователя.</returns>
-        public async Task<UserOutpoot> GetUserInitialsByIdAsync(string userId)
+        public async Task<UserOutput> GetUserInitialsByIdAsync(string userId)
         {
-            UserOutpoot user = await _postgre.Users
+            UserOutput user = await _postgre.Users
                 .Where(u => u.Id
                 .Equals(userId))
-                .Select(res => new UserOutpoot { 
+                .Select(res => new UserOutput { 
                     FirstName = res.FirstName, 
                     LastName = res.LastName,
                     UserIcon = res.UserIcon,
@@ -491,7 +491,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="taskId">Id задания.</param>
         /// <returns>Данные заказчика.</returns>
-        public async Task<CustomerOutpoot> GetCustomerLoginByTaskId(int? taskId)
+        public async Task<CustomerOutput> GetCustomerLoginByTaskId(int? taskId)
         {
             try
             {
@@ -512,10 +512,10 @@ namespace Barbuuuda.Services
                     throw new NotFoundTaskCustomerIdException(customerId);
                 }
 
-                // Найдет логин и иконку профиля заказчика задания и мапит к типу CustomerOutpoot.
-                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, CustomerOutpoot>());
+                // Найдет логин и иконку профиля заказчика задания и мапит к типу CustomerOutput.
+                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, CustomerOutput>());
                 Mapper mapper = new Mapper(config);
-                CustomerOutpoot customer = mapper.Map<CustomerOutpoot>(await _postgre.Users
+                CustomerOutput customer = mapper.Map<CustomerOutput>(await _postgre.Users
                     .Where(u => u.Id
                     .Equals(customerId))
                     .FirstOrDefaultAsync());
