@@ -43,6 +43,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Barbuuuda.Commerces\Barbuuuda.Commerces.csproj" />
     <ProjectReference Include="..\Barbuuuda.Core\Barbuuuda.Core.csproj" />
     <ProjectReference Include="..\Barbuuuda.Emails\Barbuuuda.Emails.csproj" />
     <ProjectReference Include="..\Barbuuuda.Models\Barbuuuda.Models.csproj" />
