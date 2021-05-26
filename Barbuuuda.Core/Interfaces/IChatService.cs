@@ -6,7 +6,7 @@ namespace Barbuuuda.Core.Interfaces
     /// <summary>
     /// Абстракция чата.
     /// </summary>
-    public interface IChat
+    public interface IChatService
     {
         /// <summary>
         /// Метод отправит сообщение.

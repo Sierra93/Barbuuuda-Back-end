@@ -10,7 +10,7 @@ namespace Barbuuuda.Core.Interfaces
     /// <summary>
     /// Абстракция описывает методы по работе с исполнителями сервиса.
     /// </summary>
-    public interface IExecutor
+    public interface IExecutorService
     {
         /// <summary>
         /// Метод выгружает список исполнителей сервиса.

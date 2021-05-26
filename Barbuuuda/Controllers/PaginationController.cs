@@ -17,9 +17,9 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Абстракция сервиса пагинации.
         /// </summary>
-        private readonly IPagination _pagination;
+        private readonly IPaginationService _pagination;
 
-        public PaginationController(IPagination pagination)
+        public PaginationController(IPaginationService pagination)
         {
             _pagination = pagination;
         }

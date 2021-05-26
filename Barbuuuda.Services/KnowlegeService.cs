@@ -11,7 +11,7 @@ namespace Barbuuuda.Services
     /// <summary>
     /// Сервис реализует методы БЗ.
     /// </summary>
-    public sealed class KnowlegeService : IKnowlege
+    public sealed class KnowlegeService : IKnowlegeService
     {
         private readonly PostgreDbContext _postgre;
 

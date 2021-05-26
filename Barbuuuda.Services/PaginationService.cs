@@ -10,12 +10,12 @@ using Barbuuuda.Core.Consts;
 
 namespace Barbuuuda.Services
 {
-    public sealed class PaginationService : IPagination
+    public sealed class PaginationService : IPaginationService
     {
         private readonly PostgreDbContext _postgre;
-        private readonly IUser _user;
+        private readonly IUserService _user;
 
-        public PaginationService(PostgreDbContext postgre, IUser user)
+        public PaginationService(PostgreDbContext postgre, IUserService user)
         {
             _postgre = postgre;
             _user = user;

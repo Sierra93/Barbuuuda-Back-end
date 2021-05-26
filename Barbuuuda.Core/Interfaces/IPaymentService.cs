@@ -3,7 +3,7 @@
     /// <summary>
     /// Абстракция платежной системы.
     /// </summary>
-    public interface IPayment
+    public interface IPaymentService
     {
     }
 }

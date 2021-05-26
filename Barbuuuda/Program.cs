@@ -1,4 +1,4 @@
-using Autofac;
+﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Barbuuuda.Services.AutofacModules;
 using Microsoft.AspNetCore.Hosting;

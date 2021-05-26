@@ -22,9 +22,9 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Сервис заданий.
         /// </summary>
-        private readonly ITask _task;
+        private readonly ITaskService _task;
 
-        public TaskController(ITask task)
+        public TaskController(ITaskService task)
         {
             _task = task;
         }

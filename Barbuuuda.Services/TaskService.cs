@@ -22,13 +22,13 @@ namespace Barbuuuda.Services
     /// <summary>
     /// Сервис реализует методы заданий.
     /// </summary>
-    public sealed class TaskService : ITask
+    public sealed class TaskService : ITaskService
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IUser _user;
+        private readonly IUserService _user;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUser user)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUserService user)
         {
             _db = db;
             _postgre = postgre;

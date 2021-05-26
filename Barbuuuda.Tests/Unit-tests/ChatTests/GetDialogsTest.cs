@@ -25,7 +25,7 @@ namespace Barbuuuda.Tests.Unit_tests.ChatTests
         [TestMethod]
         public async Task GetDialogTest()
         {
-            Mock<IChat> mock = new Mock<IChat>();
+            Mock<IChatService> mock = new Mock<IChatService>();
             mock.Setup(a => a.GetDialogsAsync(ACCOUNT)).Returns(Task.FromResult(GetResultDialogs()));
             ChatController controller = new ChatController(mock.Object);
             OkObjectResult viewResult = await controller.GetDialogsAsync() as OkObjectResult;

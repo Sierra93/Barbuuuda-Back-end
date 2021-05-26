@@ -7,7 +7,7 @@ namespace Barbuuuda.Core.Interfaces
     /// <summary>
     /// Абстракция сервиса БЗ.
     /// </summary>
-    public interface IKnowlege
+    public interface IKnowlegeService
     {
         /// <summary>
         /// Метод выгружает список категорий для БЗ.

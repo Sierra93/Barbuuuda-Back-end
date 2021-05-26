@@ -21,9 +21,9 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Сервис исполнителя.
         /// </summary>
-        private readonly IExecutor _executor;
+        private readonly IExecutorService _executor;
 
-        public ExecutorController(IExecutor executor)
+        public ExecutorController(IExecutorService executor)
         {
             _executor = executor;
         }

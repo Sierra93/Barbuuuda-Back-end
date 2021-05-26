@@ -20,13 +20,13 @@ namespace Barbuuuda.Services
     /// <summary>
     /// Сервис реализует методы по работе с исполнителями сервиса.
     /// </summary>
-    public sealed class ExecutorService : IExecutor
+    public sealed class ExecutorService : IExecutorService
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IUser _user;
+        private readonly IUserService _user;
 
-        public ExecutorService(ApplicationDbContext db, PostgreDbContext postgre, IUser user)
+        public ExecutorService(ApplicationDbContext db, PostgreDbContext postgre, IUserService user)
         {
             _db = db;
             _postgre = postgre;

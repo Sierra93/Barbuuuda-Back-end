@@ -28,28 +28,28 @@ namespace Barbuuuda.Services.AutofacModules
             builder.Register(c => c.Resolve<MapperConfiguration>().CreateMapper(c.Resolve)).As<IMapper>().InstancePerLifetimeScope();
 
             // Сервис пользователя.
-            builder.RegisterType<UserService>().As<IUser>();
+            builder.RegisterType<UserService>().As<IUserService>();
 
             // Сервис стартовой страницы.
-            builder.RegisterType<MainPageService>().As<IMainPage>();
+            builder.RegisterType<MainPageService>().As<IMainPageService>();
 
             // Сервис заданий.
-            builder.RegisterType<TaskService>().As<ITask>();
+            builder.RegisterType<TaskService>().As<ITaskService>();
 
             // Сервис исполнителя.
-            builder.RegisterType<ExecutorService>().As<IExecutor>();
+            builder.RegisterType<ExecutorService>().As<IExecutorService>();
 
             // Сервис пагинации.
-            builder.RegisterType<PaginationService>().As<IPagination>();
+            builder.RegisterType<PaginationService>().As<IPaginationService>();
 
             // Сервис БЗ.
-            builder.RegisterType<KnowlegeService>().As<IKnowlege>();
+            builder.RegisterType<KnowlegeService>().As<IKnowlegeService>();
 
             // Чат.
-            builder.RegisterType<ChatService>().As<IChat>(); 
+            builder.RegisterType<ChatService>().As<IChatService>(); 
 
             // Платежная система.
-            builder.RegisterType<PaymentService>().As<IPayment>();
+            builder.RegisterType<PaymentService>().As<IPaymentService>();
         }
     }
 }

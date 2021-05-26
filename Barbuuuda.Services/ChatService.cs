@@ -21,7 +21,7 @@ namespace Barbuuuda.Services
     /// <summary>
     /// Сервис реализует методы работы с чатом.
     /// </summary>
-    public sealed class ChatService : IChat
+    public sealed class ChatService : IChatService
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
@@ -29,9 +29,9 @@ namespace Barbuuuda.Services
         /// <summary>
         /// Абстракция пользователя.
         /// </summary>
-        private readonly IUser _user;
+        private readonly IUserService _user;
 
-        public ChatService(ApplicationDbContext db, PostgreDbContext postgre, IUser user)
+        public ChatService(ApplicationDbContext db, PostgreDbContext postgre, IUserService user)
         {
             _db = db;
             _postgre = postgre;

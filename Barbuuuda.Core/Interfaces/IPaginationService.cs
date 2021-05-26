@@ -6,7 +6,7 @@ namespace Barbuuuda.Core.Interfaces
     /// <summary>
     /// Абстракция пагинации.
     /// </summary>
-    public interface IPagination
+    public interface IPaginationService
     {
         /// <summary>
         /// Метод пагинации.

@@ -9,7 +9,7 @@ namespace Barbuuuda.Core.Interfaces
     /// <summary>
     /// Интерфейс содержит логику работы с заданиями.
     /// </summary>
-    public interface ITask
+    public interface ITaskService
     {
         /// <summary>
         /// Метод создает новое задание.

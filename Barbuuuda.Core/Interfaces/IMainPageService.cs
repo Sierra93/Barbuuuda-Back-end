@@ -9,7 +9,7 @@ namespace Barbuuuda.Core.Interfaces
     /// <summary>
     /// Интерфейс определяет методы главной страницы.
     /// </summary>
-    public interface IMainPage
+    public interface IMainPageService
     {
         /// <summary>
         /// Метод получает информацию для главного фона.

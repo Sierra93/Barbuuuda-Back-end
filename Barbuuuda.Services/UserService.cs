@@ -23,7 +23,7 @@ namespace Barbuuuda.Services
     /// <summary>
     /// Сервис реализует методы пользователя.
     /// </summary>
-    public sealed class UserService : IUser
+    public sealed class UserService : IUserService
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;

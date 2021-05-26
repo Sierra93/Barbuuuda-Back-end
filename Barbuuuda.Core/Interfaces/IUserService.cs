@@ -10,7 +10,7 @@ namespace Barbuuuda.Core.Interfaces
     /// <summary>
     /// Интерфейс определяет методы работы с пользователями.
     /// </summary>
-    public interface IUser
+    public interface IUserService
     {
         /// <summary>
         /// Метод авторизует пользователя.

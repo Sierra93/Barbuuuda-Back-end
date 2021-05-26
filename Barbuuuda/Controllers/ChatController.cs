@@ -18,9 +18,9 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Абстракция чата.
         /// </summary>
-        private readonly IChat _chat;
+        private readonly IChatService _chat;
 
-        public ChatController(IChat chat)
+        public ChatController(IChatService chat)
         {
             _chat = chat;
         }

@@ -12,15 +12,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Barbuuuda.Models.Entities.MainPage;
 using Barbuuuda.Models.Entities.MainPage.Output;
-using Barbuuuda.Models.User;
-using Barbuuuda.Models.User.Output;
 
 namespace Barbuuuda.Services
 {
     /// <summary>
     /// Сервис реализует методы главной страницы.
     /// </summary>
-    public sealed class MainPageService : IMainPage
+    public sealed class MainPageService : IMainPageService
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;

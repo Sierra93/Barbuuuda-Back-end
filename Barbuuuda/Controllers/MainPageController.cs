@@ -16,9 +16,9 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Сервис стартовой страницы.
         /// </summary>
-        private readonly IMainPage _mainPage;
+        private readonly IMainPageService _mainPage;
 
-        public MainPageController(IMainPage mainPage)
+        public MainPageController(IMainPageService mainPage)
         {
             _mainPage = mainPage;
         }

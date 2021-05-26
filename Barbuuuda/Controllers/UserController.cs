@@ -31,9 +31,9 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Сервис работы с юзерами.
         /// </summary>
-        private readonly IUser _user;
+        private readonly IUserService _user;
 
-        public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUser user)
+        public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUserService user)
         {
             _userManager = userManager;
             _user = user;
