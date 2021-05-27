@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Threading.Tasks;
+using Barbuuuda.Commerces.Core;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PayPalHttp;
 
 namespace Barbuuuda.Controllers
 {
@@ -11,15 +14,24 @@ namespace Barbuuuda.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PaymentController : BaseController
     {
-        public PaymentController()
-        {
+        private readonly IPayPalService _payPalService;
 
+        public PaymentController(IPayPalService payService)
+        {
+            _payPalService = payService;
         }
 
-        [HttpGet, Route("paytest")]
-        public IActionResult PayTest()
+        /// <summary>
+        /// Метод собирает данные транзакции.
+        /// </summary>
+        /// <returns>Данные транзакции.</returns>
+        [HttpPost, Route("create-order")]
+        [ProducesResponseType(200, Type = typeof(HttpResponse))]
+        public async Task<IActionResult> CreateOrderAsync()
         {
-            return Ok();
+            HttpResponse result = await _payPalService.CreateOrderAsync();
+
+            return Ok(result);
         }
     }
 }

@@ -2,6 +2,8 @@
 using AutoMapper;
 using Barbuuuda.Core.Interfaces;
 using System.Collections.Generic;
+using Barbuuuda.Commerces.Core;
+using Barbuuuda.Commerces.Service;
 
 namespace Barbuuuda.Services.AutofacModules
 {
@@ -50,6 +52,8 @@ namespace Barbuuuda.Services.AutofacModules
 
             // Платежная система.
             builder.RegisterType<PaymentService>().As<IPaymentService>();
+
+            builder.RegisterType<PayPalService>().As<IPayPalService>();
         }
     }
 }

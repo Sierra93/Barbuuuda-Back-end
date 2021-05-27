@@ -17,12 +17,12 @@ namespace Barbuuuda
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        public ContainerBuilder containerBuilder { get; }
+        public ContainerBuilder ContainerBuilder { get; }
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            containerBuilder = new ContainerBuilder();
+            ContainerBuilder = new ContainerBuilder();
         }
 
         public void ConfigureServices(IServiceCollection services)

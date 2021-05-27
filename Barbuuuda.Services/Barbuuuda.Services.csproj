@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Barbuuuda.Commerces\Barbuuuda.Commerces.csproj" />
     <ProjectReference Include="..\Barbuuuda.Core\Barbuuuda.Core.csproj" />
     <ProjectReference Include="..\Barbuuuda.Emails\Barbuuuda.Emails.csproj" />
     <ProjectReference Include="..\Barbuuuda.Models\Barbuuuda.Models.csproj" />

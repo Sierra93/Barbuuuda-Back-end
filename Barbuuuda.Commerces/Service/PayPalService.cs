@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Barbuuuda.Commerces.Core;
 using Barbuuuda.Commerces.Data;
@@ -18,28 +19,46 @@ namespace Barbuuuda.Commerces.Service
         /// <returns>Данные заказа на оплату.</returns>
         public async Task<HttpResponse> CreateOrderAsync()
         {
-            // Формирует запрос с заголовками.
-            OrdersCreateRequest request = new OrdersCreateRequest();
-            request.Prefer("return=representation");
-            request.RequestBody(BuildRequestBody());
+            try
+            {
+                // Формирует запрос с заголовками.
+                OrdersCreateRequest request = new OrdersCreateRequest();
+                request.Prefer("return=representation");
+                request.RequestBody(BuildRequestBody());
 
-            // Настроит транзакцию.
-            HttpResponse response = await ClientConfigure.Client().Execute(request);
+                // Настроит транзакцию.
+                HttpResponse response = await ClientConfigure.Client().Execute(request);
 
-            return response;
+                return response;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
         }
 
         public async Task<HttpResponse> CaptureOrderAsync(string orderId)
         {
-            // Формирует запрос с заголовками.
-            OrdersCaptureRequest request = new OrdersCaptureRequest(orderId);
-            request.Prefer("return=representation");
-            request.RequestBody(new OrderActionRequest());
+            try
+            {
+                // Формирует запрос с заголовками.
+                OrdersCaptureRequest request = new OrdersCaptureRequest(orderId);
+                request.Prefer("return=representation");
+                request.RequestBody(new OrderActionRequest());
 
-            // Настроит транзакцию.
-            HttpResponse response = await ClientConfigure.Client().Execute(request);
+                // Настроит транзакцию.
+                HttpResponse response = await ClientConfigure.Client().Execute(request);
 
-            return response;
+                return response;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
         }
 
         /// <summary>
