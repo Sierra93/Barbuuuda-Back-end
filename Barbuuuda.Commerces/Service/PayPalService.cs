@@ -106,33 +106,33 @@ namespace Barbuuuda.Commerces.Service
                     SoftDescriptor = "HighFashions",
                     AmountWithBreakdown = new AmountWithBreakdown
                     {
-                      CurrencyCode = "USD",
+                      CurrencyCode = "RUB",
                       Value = "230.00",
                       AmountBreakdown = new AmountBreakdown
                       {
                         ItemTotal = new Money
                         {
-                          CurrencyCode = "USD",
+                          CurrencyCode = "RUB",
                           Value = "180.00"
                         },
                         Shipping = new Money
                         {
-                          CurrencyCode = "USD",
+                          CurrencyCode = "RUB",
                           Value = "30.00"
                         },
                         Handling = new Money
                         {
-                          CurrencyCode = "USD",
+                          CurrencyCode = "RUB",
                           Value = "10.00"
                         },
                         TaxTotal = new Money
                         {
-                          CurrencyCode = "USD",
+                          CurrencyCode = "RUB",
                           Value = "20.00"
                         },
                         ShippingDiscount = new Money
                         {
-                          CurrencyCode = "USD",
+                          CurrencyCode = "RUB",
                           Value = "10.00"
                         }
                       }
@@ -146,12 +146,12 @@ namespace Barbuuuda.Commerces.Service
                         Sku = "sku01",
                         UnitAmount = new Money
                         {
-                          CurrencyCode = "USD",
+                          CurrencyCode = "RUB",
                           Value = "90.00"
                         },
                         Tax = new Money
                         {
-                          CurrencyCode = "USD",
+                          CurrencyCode = "RUB",
                           Value = "10.00"
                         },
                         Quantity = "1",
@@ -164,12 +164,12 @@ namespace Barbuuuda.Commerces.Service
                         Sku = "sku02",
                         UnitAmount = new Money
                         {
-                          CurrencyCode = "USD",
+                          CurrencyCode = "RUB",
                           Value = "45.00"
                         },
                         Tax = new Money
                         {
-                          CurrencyCode = "USD",
+                          CurrencyCode = "RUB",
                           Value = "5.00"
                         },
                         Quantity = "2",
@@ -189,7 +189,7 @@ namespace Barbuuuda.Commerces.Service
                         AdminArea2 = "San Francisco",
                         AdminArea1 = "CA",
                         PostalCode = "94107",
-                        CountryCode = "US"
+                        CountryCode = "RU"
                       }
                     }
                   }

@@ -17,7 +17,11 @@ namespace Barbuuuda.Commerces.Data
         /// <returns>Client ID и Secret.</returns>
         public static PayPalEnvironment Environment()
         {
-            return new SandboxEnvironment("AaT69mnC2Wl5xQ4i2vk67EscPVhnE6yNFzzwTFr8V93AVddY14Lhj29ZRyECJ_ReduhNyd6gX_AqzgR4", "EHmOOAJT93nlqMps5jKFfi8GiSD97VJlHfJSoK5p0iPc3JSqA-45O6mx4VVhM-L-ry9q-RGYzNX9aia1");
+            // USD
+            //return new SandboxEnvironment("AaT69mnC2Wl5xQ4i2vk67EscPVhnE6yNFzzwTFr8V93AVddY14Lhj29ZRyECJ_ReduhNyd6gX_AqzgR4", "EHmOOAJT93nlqMps5jKFfi8GiSD97VJlHfJSoK5p0iPc3JSqA-45O6mx4VVhM-L-ry9q-RGYzNX9aia1");
+
+            // RUB
+            return new SandboxEnvironment("ATfnkhcgXA5maHFKQr3dWRFC5nxAKSlo0C24C2UGAvYAV1j0Eo0PbABMI2K8L1x2SSyerj_ptQi3kOGT", "EFQFc4MmNXqmAV_XaBd1jeYhvWEYy_-g9XTJICWhS6R9kh3cgA_V-djdSViAqxQTCGolAIPK6-zipLRv");
         }
 
         public static HttpClient Client()
