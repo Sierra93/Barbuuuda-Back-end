@@ -47,7 +47,13 @@ namespace Barbuuuda.Commerces.Service
             }
         }
 
-        public async Task<HttpResponse> CaptureOrderAsync(string orderId)
+
+        /// <summary>
+        /// Метод собирает средства от транзакции после того, как покупатель одобряет транзакцию.
+        /// </summary>
+        /// <param name="orderId">Id заказа.</param>
+        /// <returns>Данные от сбора транзакции.</returns>
+        public async Task<HttpResponse> CaptureTransactionAsync(string orderId)
         {
             try
             {
@@ -58,8 +64,10 @@ namespace Barbuuuda.Commerces.Service
 
                 // Настроит транзакцию.
                 HttpResponse response = await ClientConfigure.Client().Execute(request);
+                Order capture = response.Result<Order>();
 
-                return response;
+                // TODO: Вынести статусы в константы!
+                return capture.Status.Equals("COMPLETED") ? response : throw new NotCaptureOrderByOrderId(orderId);
             }
 
             catch (Exception ex)

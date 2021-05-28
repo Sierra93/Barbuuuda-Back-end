@@ -20,6 +20,6 @@ namespace Barbuuuda.Commerces.Core
         /// </summary>
         /// <param name="orderId">Id заказа на оплату.</param>
         /// <returns>Данные от сбора транзакции.</returns>
-        Task<HttpResponse> CaptureOrderAsync(string orderId);
+        Task<HttpResponse> CaptureTransactionAsync(string orderId);
     }
 }
