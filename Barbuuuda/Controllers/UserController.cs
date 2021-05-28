@@ -168,7 +168,7 @@ namespace Barbuuuda.Controllers
             {
                 IdentityResult errors = null;
 
-                user.Score ??= 0;
+                //user.Score ??= 0;
 
                 // Ищет такой email в БД.
                 bool bErrorEmail = await IdentityUserEmail(user.Email);

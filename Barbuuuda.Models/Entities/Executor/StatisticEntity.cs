@@ -48,8 +48,8 @@ namespace Barbuuuda.Models.Entities.Executor
         /// <summary>
         /// Счет.
         /// </summary>
-        [Column("Score", TypeName = "numeric(12,2)")]
-        public decimal Score { get; set; }
+        //[Column("Score", TypeName = "numeric(12,2)")]
+        //public decimal Score { get; set; }
 
         /// <summary>
         /// Код категории.

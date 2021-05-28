@@ -52,13 +52,13 @@ namespace Barbuuuda
 
             #region ТЕСТ.
             services.AddDbContext<ApplicationDbContext>(options =>
-             options.UseSqlServer(Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+             options.UseSqlServer(Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
 
             services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-        opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+        opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
 
             services.AddDbContext<IdentityDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+                options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
             #endregion
 
             services.AddIdentity<UserEntity, IdentityRole>(opts =>

@@ -286,7 +286,7 @@ namespace Barbuuuda.Services
                         up.Patronymic,
                         up.UserIcon,
                         dateRegister = string.Format("{0:f}", up.DateRegister),
-                        scoreMoney = string.Format("{0:0,0}", up.Score),
+                        //scoreMoney = string.Format("{0:0,0}", up.Score),
                         up.AboutInfo,
                         up.Plan,
                         up.City,
