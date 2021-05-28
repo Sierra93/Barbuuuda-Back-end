@@ -41,13 +41,13 @@ namespace Barbuuuda
 
             #region ПРОД.
             //    services.AddDbContext<ApplicationDbContext>(options =>
-            //      options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //      options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
 
             //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-            //opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
 
             //    services.AddDbContext<IdentityDbContext>(options =>
-            //        options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //        options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
             #endregion
 
             #region ТЕСТ.
