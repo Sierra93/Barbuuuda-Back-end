@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Barbuuuda.Commerces.Models.PayPal.Output;
 using PayPalHttp;
 
 namespace Barbuuuda.Commerces.Core
@@ -9,10 +10,10 @@ namespace Barbuuuda.Commerces.Core
     public interface IPayPalService
     {
         /// <summary>
-        /// Метод создает заказ на оплату.
+        /// Метод настраивает транзакцию.
         /// </summary>
-        /// <returns>Данные заказа на оплату.</returns>
-        Task<HttpResponse> CreateOrderAsync();
+        /// <returns>Данные транзакции.</returns>
+        Task<SetupTransactionOutput> SetupTransactionAsync();
 
         /// <summary>
         /// Метод собирает средства от транзакции после того, как покупатель одобряет транзакцию.

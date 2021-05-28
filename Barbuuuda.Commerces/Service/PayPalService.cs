@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using Barbuuuda.Commerces.Core;
 using Barbuuuda.Commerces.Data;
+using Barbuuuda.Commerces.Exceptions;
+using Barbuuuda.Commerces.Models.PayPal.Output;
 using PayPalCheckoutSdk.Orders;
 using PayPalHttp;
 
@@ -14,10 +17,10 @@ namespace Barbuuuda.Commerces.Service
     public sealed class PayPalService : IPayPalService
     {
         /// <summary>
-        /// Метод создает заказ на оплату.
+        /// Метод настраивает транзакцию.
         /// </summary>
-        /// <returns>Данные заказа на оплату.</returns>
-        public async Task<HttpResponse> CreateOrderAsync()
+        /// <returns>Данные транзакции.</returns>
+        public async Task<SetupTransactionOutput> SetupTransactionAsync()
         {
             try
             {
@@ -29,7 +32,12 @@ namespace Barbuuuda.Commerces.Service
                 // Настроит транзакцию.
                 HttpResponse response = await ClientConfigure.Client().Execute(request);
 
-                return response;
+                // Мапит к типу SetupTransactionOutput.
+                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<Order, SetupTransactionOutput>());
+                Mapper mapper = new Mapper(config);
+                SetupTransactionOutput transaction = mapper.Map<SetupTransactionOutput>(response.Result<Order>());
+
+                return !string.IsNullOrEmpty(transaction.Id) ? transaction : throw new NotCreateOrderException(transaction.Id);
             }
 
             catch (Exception ex)

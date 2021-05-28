@@ -53,6 +53,7 @@ namespace Barbuuuda.Services.AutofacModules
             // Платежная система.
             builder.RegisterType<PaymentService>().As<IPaymentService>();
 
+            // Сервис PayPal.
             builder.RegisterType<PayPalService>().As<IPayPalService>();
         }
     }

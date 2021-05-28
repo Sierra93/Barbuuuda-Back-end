@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Barbuuuda.Commerces.Core;
+using Barbuuuda.Commerces.Models.PayPal.Output;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PayPalHttp;
 
 namespace Barbuuuda.Controllers
 {
@@ -22,16 +22,16 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод собирает данные транзакции.
+        /// Метод настраивает транзакцию.
         /// </summary>
         /// <returns>Данные транзакции.</returns>
         [HttpPost, Route("create-order")]
-        [ProducesResponseType(200, Type = typeof(HttpResponse))]
-        public async Task<IActionResult> CreateOrderAsync()
+        [ProducesResponseType(200, Type = typeof(SetupTransactionOutput))]
+        public async Task<IActionResult> SetupTransactionAsync()
         {
-            HttpResponse result = await _payPalService.CreateOrderAsync();
+            SetupTransactionOutput transaction = await _payPalService.SetupTransactionAsync();
 
-            return Ok(result);
+            return Ok(transaction);
         }
     }
 }
