@@ -38,8 +38,8 @@ namespace Barbuuuda.Models.Entities.Payment
         /// <summary>
         /// Номер счета, на который производятся выплаты и возвраты.
         /// </summary>
-        [Required, Column("ScoreNumber", TypeName = "int")]
-        public int ScoreNumber { get; set; }
+        [Required, Column("ScoreNumber", TypeName = "int"), MinLength(20)]
+        public int? ScoreNumber { get; set; }
 
         public UserEntity User { get; set; }
     }
