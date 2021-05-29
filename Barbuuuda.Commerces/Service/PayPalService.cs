@@ -61,8 +61,9 @@ namespace Barbuuuda.Commerces.Service
         /// Метод собирает средства от транзакции после того, как покупатель одобряет транзакцию.
         /// </summary>
         /// <param name="orderId">Id заказа.</param>
+        /// <param name="account">Логин пользователя, который пополняет свой счет.</param>
         /// <returns>Данные от сбора транзакции.</returns>
-        public async Task<HttpResponse> CaptureTransactionAsync(string orderId)
+        public async Task<HttpResponse> CaptureTransactionAsync(string orderId, string account)
         {
             try
             {
@@ -82,12 +83,12 @@ namespace Barbuuuda.Commerces.Service
                     throw new NotCaptureOrderByOrderId(orderId);
                 }
 
-                //capture.Payer.Email
-                //capture.PurchaseUnits.FirstOrDefault().AmountWithBreakdown.Value
-                //capture.PurchaseUnits.FirstOrDefault().AmountWithBreakdown.CurrencyCode
+                string scoreEmail = capture.Payer.Email;
+                decimal amount = Convert.ToDecimal(capture.PurchaseUnits.FirstOrDefault()?.AmountWithBreakdown.Value);
+                string currency = capture.PurchaseUnits.FirstOrDefault()?.AmountWithBreakdown.CurrencyCode;
 
                 // Пополнит баланс счета пользователя сервиса.
-                //await _paymentService.RefillBalance();
+                await _paymentService.RefillBalance(amount, currency, scoreEmail, account);
 
                 return response;
             }
@@ -99,6 +100,7 @@ namespace Barbuuuda.Commerces.Service
             }
         }
 
+        /// TODO: Доработать этот метод и тянуть с БД данные перед формированием транзакции!
         /// <summary>
         /// Метод формирует заказ на оплату.
         /// </summary>
@@ -114,19 +116,50 @@ namespace Barbuuuda.Commerces.Service
 
                 ApplicationContext = new ApplicationContext
                 {
+                    //BrandName = "EXAMPLE INC",
                     LandingPage = "BILLING",    // Тип целевой страницы, отображаемой на сайте PayPal для оплаты пользователем. Чтобы использовать целевую страницу, не относящуюся к учетной записи PayPal, установите значение Billing. Чтобы использовать целевую страницу входа в учетную запись PayPal, установите значение Login.
                     UserAction = "CONTINUE",
-                    ShippingPreference = "NO_SHIPPING"  // Не показывать поля адреса при оплате через кнопку PayPal.
+                    ShippingPreference = "NO_SHIPPING"  // Не показывать поля адреса при оплате через PayPal.
                 },
                 PurchaseUnits = new List<PurchaseUnitRequest>
                 {
-                  new PurchaseUnitRequest {
+                    new PurchaseUnitRequest {
                       AmountWithBreakdown = new AmountWithBreakdown
                     {
                       CurrencyCode = "RUB",
                       Value = "100"
+                    },
+                    ShippingDetail = new ShippingDetail()
+                    {
+                        Name = new Name
+                      {
+                          // Имя + Фамилия. Конкантенировать Имя и Фамилию (если с фронта пришло отдельными полями).
+                          FullName = "John Doe"
+                      },
+                        AddressPortable = new AddressPortable
+                      {
+                        AddressLine1 = "123 Townsend St",
+                        AddressLine2 = "Floor 6",
+                        AdminArea2 = "San Francisco",
+                        AdminArea1 = "CA",
+                        PostalCode = "194107",
+                        CountryCode = "RU"
+                      }
                     }
                   }
+                },
+                Payer = new Payer()
+                {
+                    Email = "testmail@mail.ru",
+                    PhoneWithType = new PhoneWithType()
+                    {
+                        // TODO: Вынести в константы тип телефона!
+                        PhoneType = "MOBILE",
+                        PhoneNumber = new Phone()
+                        {
+                            NationalNumber = "89856838046"
+                        }
+                    }
                 }
             };
 

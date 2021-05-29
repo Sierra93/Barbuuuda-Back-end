@@ -51,8 +51,7 @@ namespace Barbuuuda.Services
                 bool isContinue = false;
 
                 // Проверит, логин передан или email.
-                CustomValidatorExtension validatorExtension = new CustomValidatorExtension(_postgre);
-                bool isEmail = validatorExtension.CheckIsEmail(user.UserName);
+                bool isEmail = CustomValidatorExtension.CheckIsEmail(user.UserName);
 
                 // Если нужно проверять по логину.
                 if (!isEmail)

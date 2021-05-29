@@ -12,7 +12,8 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="amount">Сумма пополнения.</param>
         /// <param name="currency">Валюта.</param>
+        /// <param name="scoreEmail">Адрес выставления счета.</param>
         /// <param name="account">Логин пользователя.</param>
-        Task RefillBalance(decimal amount, string currency, string account);
+        Task RefillBalance(decimal amount, string currency, string scoreEmail, string account);
     }
 }

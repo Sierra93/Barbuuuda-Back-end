@@ -19,7 +19,8 @@ namespace Barbuuuda.Commerces.Core
         /// Метод собирает средства от транзакции после того, как покупатель одобряет транзакцию.
         /// </summary>
         /// <param name="orderId">Id заказа на оплату.</param>
+        /// <param name="account">Логин пользователя, который пополняет свой счет.</param>
         /// <returns>Данные от сбора транзакции.</returns>
-        Task<HttpResponse> CaptureTransactionAsync(string orderId);
+        Task<HttpResponse> CaptureTransactionAsync(string orderId, string account);
     }
 }

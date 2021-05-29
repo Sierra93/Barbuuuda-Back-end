@@ -43,7 +43,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("capture-transaction")]
         public async Task<IActionResult> CaptureTransactionAsync([FromBody] CaptureTransactionInput captureInput)
         {
-            var capture = await _payPalService.CaptureTransactionAsync(captureInput.OrderId);
+            var capture = await _payPalService.CaptureTransactionAsync(captureInput.OrderId, GetUserName());
 
             return Ok(capture);
         }
