@@ -1,6 +1,7 @@
 ﻿using Barbuuuda.Models.Entities.Chat;
 using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.Entities.Knowlege;
+using Barbuuuda.Models.Entities.Payment;
 using Barbuuuda.Models.Entities.Respond;
 using Barbuuuda.Models.Entities.User;
 using Barbuuuda.Models.Task;
@@ -69,8 +70,6 @@ namespace Barbuuuda.Core.Data
         /// </summary>
         public DbSet<RespondEntity> Responds { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
-
         /// <summary>
         /// Таблица популярных статей.
         /// </summary>
@@ -101,6 +100,13 @@ namespace Barbuuuda.Core.Data
         /// </summary>
         public DbSet<DialogMessageEntity> DialogMessages { get; set; }
 
+        /// <summary>
+        /// Таблица счетов пользователей dbo.Invoices.
+        /// </summary>
+        public DbSet<InvoiceEntity> Invoices { get; set; }
+
         public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
     }
 }
