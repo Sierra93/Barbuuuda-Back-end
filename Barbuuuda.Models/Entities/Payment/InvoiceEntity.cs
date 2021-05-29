@@ -9,7 +9,7 @@ namespace Barbuuuda.Models.Entities.Payment
     /// Класс сопоставляется с таблицей счетов пользователей dbo.Invoices.
     /// </summary>
     [Table("Invoices", Schema = "dbo")]
-    public sealed class InvoiceEntity
+    public class InvoiceEntity
     {
         /// <summary>
         /// Id счета.

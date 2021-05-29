@@ -11,7 +11,7 @@ namespace Barbuuuda.Commerces.Models.PayPal.Input
         /// <summary>
         /// Id заказа.
         /// </summary>
-        [Required, JsonPropertyName("orderID")]
+        [Required(ErrorMessage = "Не заполнен OrderId"), JsonPropertyName("orderID")]
         public string OrderId { get; set; }
     }
 }

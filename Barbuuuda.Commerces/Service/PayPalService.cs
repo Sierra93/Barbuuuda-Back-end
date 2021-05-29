@@ -6,6 +6,7 @@ using Barbuuuda.Commerces.Core;
 using Barbuuuda.Commerces.Data;
 using Barbuuuda.Commerces.Exceptions;
 using Barbuuuda.Commerces.Models.PayPal.Output;
+using Barbuuuda.Core.Interfaces;
 using PayPalCheckoutSdk.Orders;
 using PayPalHttp;
 
@@ -16,6 +17,13 @@ namespace Barbuuuda.Commerces.Service
     /// </summary>
     public sealed class PayPalService : IPayPalService
     {
+        private readonly IPaymentService _paymentService;
+
+        public PayPalService(IPaymentService paymentServic)
+        {
+            _paymentService = paymentServic;
+        }
+
         /// <summary>
         /// Метод настраивает транзакцию.
         /// </summary>
@@ -67,7 +75,16 @@ namespace Barbuuuda.Commerces.Service
                 Order capture = response.Result<Order>();
 
                 // TODO: Вынести статусы в константы!
-                return capture.Status.Equals("COMPLETED") ? response : throw new NotCaptureOrderByOrderId(orderId);
+                // Если статус не успешно, то ошибка создания заказа на оплату.
+                if (!capture.Status.Equals("COMPLETED"))
+                {
+                    throw new NotCaptureOrderByOrderId(orderId);
+                }
+
+                // Пополнит баланс счета пользователя сервиса.
+                //await _paymentService.RefillBalance();
+
+                return response;
             }
 
             catch (Exception ex)
@@ -92,105 +109,17 @@ namespace Barbuuuda.Commerces.Service
 
                 ApplicationContext = new ApplicationContext
                 {
-                    BrandName = "EXAMPLE INC",
-                    LandingPage = "BILLING",
+                    LandingPage = "BILLING",    // Тип целевой страницы, отображаемой на сайте PayPal для оплаты пользователем. Чтобы использовать целевую страницу, не относящуюся к учетной записи PayPal, установите значение Billing. Чтобы использовать целевую страницу входа в учетную запись PayPal, установите значение Login.
                     UserAction = "CONTINUE",
-                    ShippingPreference = "SET_PROVIDED_ADDRESS"
+                    ShippingPreference = "NO_SHIPPING"  // Не показывать поля адреса при оплате через кнопку PayPal.
                 },
                 PurchaseUnits = new List<PurchaseUnitRequest>
                 {
                   new PurchaseUnitRequest {
-                    ReferenceId =  "PUHF",
-                    Description = "Sporting Goods",
-                    CustomId = "CUST-HighFashions",
-                    SoftDescriptor = "HighFashions",
-                    AmountWithBreakdown = new AmountWithBreakdown
+                      AmountWithBreakdown = new AmountWithBreakdown
                     {
                       CurrencyCode = "RUB",
-                      Value = "230.00",
-                      AmountBreakdown = new AmountBreakdown
-                      {
-                        ItemTotal = new Money
-                        {
-                          CurrencyCode = "RUB",
-                          Value = "180.00"
-                        },
-                        Shipping = new Money
-                        {
-                          CurrencyCode = "RUB",
-                          Value = "30.00"
-                        },
-                        Handling = new Money
-                        {
-                          CurrencyCode = "RUB",
-                          Value = "10.00"
-                        },
-                        TaxTotal = new Money
-                        {
-                          CurrencyCode = "RUB",
-                          Value = "20.00"
-                        },
-                        ShippingDiscount = new Money
-                        {
-                          CurrencyCode = "RUB",
-                          Value = "10.00"
-                        }
-                      }
-                    },
-                    Items = new List<Item>
-                    {
-                      new Item
-                      {
-                        Name = "T-shirt",
-                        Description = "Green XL",
-                        Sku = "sku01",
-                        UnitAmount = new Money
-                        {
-                          CurrencyCode = "RUB",
-                          Value = "90.00"
-                        },
-                        Tax = new Money
-                        {
-                          CurrencyCode = "RUB",
-                          Value = "10.00"
-                        },
-                        Quantity = "1",
-                        Category = "PHYSICAL_GOODS"
-                      },
-                      new Item
-                      {
-                        Name = "Shoes",
-                        Description = "Running, Size 10.5",
-                        Sku = "sku02",
-                        UnitAmount = new Money
-                        {
-                          CurrencyCode = "RUB",
-                          Value = "45.00"
-                        },
-                        Tax = new Money
-                        {
-                          CurrencyCode = "RUB",
-                          Value = "5.00"
-                        },
-                        Quantity = "2",
-                        Category = "PHYSICAL_GOODS"
-                      }
-                    },
-                    ShippingDetail = new ShippingDetail()
-                    {
-                      Name = new Name
-                      {
-                        FullName = "John Doe"
-                      },
-                      AddressPortable = new AddressPortable
-                      {
-                        AddressLine1 = "123 Townsend St",
-                        AddressLine2 = "Floor 6",
-                        AdminArea2 = "San Francisco",
-                        AdminArea1 = "CA",
-                        PostalCode = "94107",
-                        CountryCode = "RU"
-                      }
+                      Value = "100"
                     }
                   }
                 }
