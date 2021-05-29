@@ -6,10 +6,10 @@ namespace Barbuuuda.Core.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Score",
-                schema: "dbo",
-                table: "ExecutorStatistic");
+            //migrationBuilder.DropColumn(
+            //    name: "Score",
+            //    schema: "dbo",
+            //    table: "ExecutorStatistic");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

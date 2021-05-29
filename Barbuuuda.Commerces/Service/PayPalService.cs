@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Barbuuuda.Commerces.Core;
@@ -80,6 +81,10 @@ namespace Barbuuuda.Commerces.Service
                 {
                     throw new NotCaptureOrderByOrderId(orderId);
                 }
+
+                //capture.Payer.Email
+                //capture.PurchaseUnits.FirstOrDefault().AmountWithBreakdown.Value
+                //capture.PurchaseUnits.FirstOrDefault().AmountWithBreakdown.CurrencyCode
 
                 // Пополнит баланс счета пользователя сервиса.
                 //await _paymentService.RefillBalance();

@@ -42,5 +42,11 @@ namespace Barbuuuda.Models.Entities.Payment
         public int? ScoreNumber { get; set; }
 
         public UserEntity User { get; set; }
+
+        /// <summary>
+        /// Адрес выставления счета.
+        /// </summary>
+        [Column("ScoreEmail", TypeName = "varchar(500)"), DefaultValue("")]
+        public string ScoreEmail { get; set; }
     }
 }

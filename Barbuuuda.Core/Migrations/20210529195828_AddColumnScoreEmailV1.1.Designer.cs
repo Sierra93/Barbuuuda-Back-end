@@ -6,15 +6,17 @@ using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Barbuuuda.Core.Migrations
 {
     [DbContext(typeof(PostgreDbContext))]
-    partial class PostgreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210529195828_AddColumnScoreEmailV1.1")]
+    partial class AddColumnScoreEmailV11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -298,10 +300,6 @@ namespace Barbuuuda.Core.Migrations
                     b.Property<decimal>("InvoiceAmount")
                         .HasColumnType("numeric(12,2)")
                         .HasColumnName("InvoiceAmount");
-
-                    b.Property<string>("ScoreEmail")
-                        .HasColumnType("varchar(500)")
-                        .HasColumnName("ScoreEmail");
 
                     b.Property<int?>("ScoreNumber")
                         .IsRequired()
