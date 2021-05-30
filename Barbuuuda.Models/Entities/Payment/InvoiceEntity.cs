@@ -38,7 +38,7 @@ namespace Barbuuuda.Models.Entities.Payment
         /// <summary>
         /// Номер счета, на который производятся выплаты и возвраты.
         /// </summary>
-        [Required, Column("ScoreNumber", TypeName = "int"), MinLength(20)]
+        [Column("ScoreNumber", TypeName = "int4"), MinLength(20)]
         public int? ScoreNumber { get; set; }
 
         public UserEntity User { get; set; }

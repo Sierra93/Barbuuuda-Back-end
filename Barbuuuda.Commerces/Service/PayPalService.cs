@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -84,7 +85,7 @@ namespace Barbuuuda.Commerces.Service
                 }
 
                 string scoreEmail = capture.Payer.Email;
-                decimal amount = Convert.ToDecimal(capture.PurchaseUnits.FirstOrDefault()?.AmountWithBreakdown.Value);
+                decimal amount = decimal.Parse(capture.PurchaseUnits.FirstOrDefault()?.AmountWithBreakdown.Value ?? string.Empty, CultureInfo.InvariantCulture);
                 string currency = capture.PurchaseUnits.FirstOrDefault()?.AmountWithBreakdown.CurrencyCode;
 
                 // Пополнит баланс счета пользователя сервиса.
@@ -116,7 +117,6 @@ namespace Barbuuuda.Commerces.Service
 
                 ApplicationContext = new ApplicationContext
                 {
-                    //BrandName = "EXAMPLE INC",
                     LandingPage = "BILLING",    // Тип целевой страницы, отображаемой на сайте PayPal для оплаты пользователем. Чтобы использовать целевую страницу, не относящуюся к учетной записи PayPal, установите значение Billing. Чтобы использовать целевую страницу входа в учетную запись PayPal, установите значение Login.
                     UserAction = "CONTINUE",
                     ShippingPreference = "NO_SHIPPING"  // Не показывать поля адреса при оплате через PayPal.
