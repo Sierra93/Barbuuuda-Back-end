@@ -541,5 +541,36 @@ namespace Barbuuuda.Services
                 throw new Exception(ex.Message.ToString());
             }
         }
+
+        /// <summary>
+        /// Метод находит последнего добавленного пользователя и берет его Id.
+        /// </summary>
+        /// <returns>Id последнего пользователя.</returns>
+        public async Task<string> GetLastUserAsync()
+        {
+            try
+            {
+                List<UserEntity> users = await _postgre.Users.ToListAsync();
+
+                if (users.Count <= 0)
+                {
+                    throw new EmptyTableUserException();
+                }
+
+                users.Reverse();
+                string userId = users.Select(u => u.Id).FirstOrDefault();
+
+                return userId;
+
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Logger _logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                _ = _logger.LogCritical();
+                throw;
+            }
+        }
     }
 }

@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Entities.Payment;
 
 namespace Barbuuuda.Controllers
 {
@@ -168,8 +169,6 @@ namespace Barbuuuda.Controllers
             {
                 IdentityResult errors = null;
 
-                //user.Score ??= 0;
-
                 // Ищет такой email в БД.
                 bool bErrorEmail = await IdentityUserEmail(user.Email);
 
@@ -187,15 +186,16 @@ namespace Barbuuuda.Controllers
                             .Replace("https://barbuuuda.online", "https://barbuuuda.ru");
 
                         // Отправит уведомление на email.
-                        await EmailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
+                        EmailService emailService = new EmailService(_db);
+                        await emailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
                             $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
                     }
 
                     // Если почта не существует.
                     catch (Exception ex)
                     {
-                        Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                        _ = _logger.LogCritical();
+                        Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                        _ = logger.LogCritical();
 
                         return BadRequest(ErrorValidate.EMAIL_NOT_ENTITY);
                     }
@@ -209,6 +209,20 @@ namespace Barbuuuda.Controllers
                     // Если регистрация успешна.
                     if (oAddedUser.Succeeded)
                     {
+                        // Находит добавленного пользователя и берет его Id.
+                        string userId = await _user.GetLastUserAsync();
+
+                        // Создаст счет пользователю (по дефолту в валюте RUB).
+                        await _postgre.AddAsync(new InvoiceEntity()
+                        {
+                            UserId = userId,
+                            InvoiceAmount = 0,
+                            Currency = CurrencyType.CURRENCY_RUB,
+                            ScoreNumber = null,
+                            ScoreEmail = string.Empty
+                        });
+                        await _postgre.SaveChangesAsync();
+
                         return Ok(oAddedUser);
                     }
                 }
