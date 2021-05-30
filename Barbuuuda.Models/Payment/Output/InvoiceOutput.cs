@@ -24,5 +24,10 @@
         /// Номер счета.
         /// </summary>
         public int? ScoreNumber { get; set; }
+
+        /// <summary>
+        /// Id пользователя, которому принадлежит счет.
+        /// </summary>
+        public string UserId { get; set; }
     }
 }

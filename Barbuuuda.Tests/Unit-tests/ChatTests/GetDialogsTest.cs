@@ -14,10 +14,8 @@ namespace Barbuuuda.Tests.Unit_tests.ChatTests
     /// </summary>
     /// <returns>Список диалогов.</returns>
     [TestClass]
-    public class GetDialogsTest
+    public class GetDialogsTest : BaseServiceTest
     {
-        private const string ACCOUNT = "lera";
-
         /// <summary>
         /// Метод тестирует получение диалогов. 
         /// </summary>

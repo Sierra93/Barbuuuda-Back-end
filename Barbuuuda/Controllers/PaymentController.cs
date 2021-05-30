@@ -2,9 +2,11 @@
 using Barbuuuda.Commerces.Core;
 using Barbuuuda.Commerces.Models.PayPal.Input;
 using Barbuuuda.Commerces.Models.PayPal.Output;
+using Barbuuuda.Core.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PayPalHttp;
 
 namespace Barbuuuda.Controllers
 {
@@ -16,10 +18,12 @@ namespace Barbuuuda.Controllers
     public class PaymentController : BaseController
     {
         private readonly IPayPalService _payPalService;
+        private readonly IPaymentService _paymentService;
 
-        public PaymentController(IPayPalService payService)
+        public PaymentController(IPayPalService payService, IPaymentService paymentService)
         {
             _payPalService = payService;
+            _paymentService = paymentService;
         }
 
         /// <summary>
@@ -41,11 +45,25 @@ namespace Barbuuuda.Controllers
         /// <param name="captureInput">Входная модель.</param>
         /// <returns>Данные от сбора транзакции.</returns>
         [HttpPost, Route("capture-transaction")]
+        [ProducesResponseType(200, Type = typeof(HttpResponse))]
         public async Task<IActionResult> CaptureTransactionAsync([FromBody] CaptureTransactionInput captureInput)
         {
-            var capture = await _payPalService.CaptureTransactionAsync(captureInput.OrderId, GetUserName());
+            HttpResponse capture = await _payPalService.CaptureTransactionAsync(captureInput.OrderId, GetUserName());
 
             return Ok(capture);
+        }
+
+        /// <summary>
+        /// Метод получает сумму средств на балансе текущего пользователя.
+        /// </summary>
+        /// <returns>Сумма баланса.</returns>
+        [HttpPost, Route("balance")]
+        [ProducesResponseType(200, Type = typeof(decimal))]
+        public async Task<IActionResult> GetBalanceAsync()
+        {
+            decimal balanceAmount = await _paymentService.GetBalanceAsync(GetUserName());
+
+            return Ok(balanceAmount);
         }
     }
 }

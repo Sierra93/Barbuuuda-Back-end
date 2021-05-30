@@ -81,5 +81,31 @@ namespace Barbuuuda.Services
                 throw;
             }
         }
+
+        /// <summary>
+        /// Метод получает сумму средств на балансе текущего пользователя.
+        /// </summary>
+        /// <param name="account">Логин текущего пользователя.</param>
+        /// <returns>Сумма баланса.</returns>
+        public async Task<decimal> GetBalanceAsync(string account)
+        {
+            try
+            {
+                string userId = await _user.GetUserIdByLogin(account);
+                decimal balanceAmount = await _postgre.Invoices
+                    .Where(a => a.UserId
+                    .Equals(userId))
+                    .Select(res => res.InvoiceAmount)
+                    .FirstOrDefaultAsync();
+
+                return balanceAmount;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
     }
 }
