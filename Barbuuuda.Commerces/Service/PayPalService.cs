@@ -8,6 +8,7 @@ using Barbuuuda.Commerces.Core;
 using Barbuuuda.Commerces.Data;
 using Barbuuuda.Commerces.Exceptions;
 using Barbuuuda.Commerces.Models.PayPal.Output;
+using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Interfaces;
 using PayPalCheckoutSdk.Orders;
 using PayPalHttp;
@@ -77,15 +78,14 @@ namespace Barbuuuda.Commerces.Service
                 HttpResponse response = await ClientConfigure.Client().Execute(request);
                 Order capture = response.Result<Order>();
 
-                // TODO: Вынести статусы в константы!
                 // Если статус не успешно, то ошибка создания заказа на оплату.
-                if (!capture.Status.Equals("COMPLETED"))
+                if (!capture.Status.Equals(CaptureStatus.STATUS_COMPLETED))
                 {
                     throw new NotCaptureOrderByOrderId(orderId);
                 }
 
                 string scoreEmail = capture.Payer.Email;
-                decimal amount = decimal.Parse(capture.PurchaseUnits.FirstOrDefault()?.AmountWithBreakdown.Value ?? string.Empty, CultureInfo.InvariantCulture);
+                decimal amount = decimal.Parse(capture.PurchaseUnits.FirstOrDefault()?.AmountWithBreakdown.Value ?? "0", CultureInfo.InvariantCulture);
                 string currency = capture.PurchaseUnits.FirstOrDefault()?.AmountWithBreakdown.CurrencyCode;
 
                 // Пополнит баланс счета пользователя сервиса.
@@ -110,16 +110,13 @@ namespace Barbuuuda.Commerces.Service
         {
             OrderRequest orderRequest = new OrderRequest()
             {
-                // TODO: Вынести CAPTURE и AUTHORIZE в константы!
-                // CAPTURE - зафиксировать платеж сразу.
-                // AUTHORIZE - авторизовать платеж и приостановить перевод средств после того, как покупатель произведет платеж.
-                CheckoutPaymentIntent = "CAPTURE",
+                CheckoutPaymentIntent = CheckoutPaymentIntentType.TYPE_CAPTURE,
 
                 ApplicationContext = new ApplicationContext
                 {
-                    LandingPage = "BILLING",    // Тип целевой страницы, отображаемой на сайте PayPal для оплаты пользователем. Чтобы использовать целевую страницу, не относящуюся к учетной записи PayPal, установите значение Billing. Чтобы использовать целевую страницу входа в учетную запись PayPal, установите значение Login.
-                    UserAction = "CONTINUE",
-                    ShippingPreference = "NO_SHIPPING"  // Не показывать поля адреса при оплате через PayPal.
+                    LandingPage = LandingPageType.TYPE_BILLING,
+                    UserAction = UserActionType.TYPE_CONTINUE,
+                    ShippingPreference = ShippingPreferenceType.TYPE_NO_SHOW
                 },
                 PurchaseUnits = new List<PurchaseUnitRequest>
                 {
@@ -153,8 +150,7 @@ namespace Barbuuuda.Commerces.Service
                     Email = "testmail@mail.ru",
                     PhoneWithType = new PhoneWithType()
                     {
-                        // TODO: Вынести в константы тип телефона!
-                        PhoneType = "MOBILE",
+                        PhoneType = PhoneType.TYPE_MOBILE,
                         PhoneNumber = new Phone()
                         {
                             NationalNumber = "89856838046"

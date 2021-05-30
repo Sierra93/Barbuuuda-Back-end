@@ -8,7 +8,7 @@ namespace Barbuuuda.Core.Interfaces
     public interface IPaymentService
     {
         /// <summary>
-        /// Метод полполнит счет на сервисе.
+        /// Метод пополнит счет пользователя на сервисе в переданной валюте, либо создаст новый счет в этой валюте.
         /// </summary>
         /// <param name="amount">Сумма пополнения.</param>
         /// <param name="currency">Валюта.</param>
