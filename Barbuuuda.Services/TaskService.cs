@@ -1,6 +1,5 @@
 ﻿using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Data;
-using Barbuuuda.Core.Enums;
 using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
@@ -931,6 +930,37 @@ namespace Barbuuuda.Services
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод проверит, оплачено ли задание заказчиком.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Флаг проверки оплаты.</returns>
+        public async Task<bool> IsPayAsync(long taskId)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                bool isPay = await _postgre.Tasks
+                    .Where(t => t.TaskId == taskId)
+                    .Select(res => res.IsPay)
+                    .FirstOrDefaultAsync();
+
+                return isPay;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await logger.LogCritical();
+                throw;
             }
         }
     }

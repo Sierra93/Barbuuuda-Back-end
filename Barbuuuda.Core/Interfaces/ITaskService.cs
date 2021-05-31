@@ -124,5 +124,12 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Список ставок.</returns>
         Task<GetRespondResultOutput> GetRespondsAsync(int taskId, string account);
+
+        /// <summary>
+        /// Метод проверит, оплачено ли задание заказчиком.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Флаг проверки оплаты.</returns>
+        Task<bool> IsPayAsync(long taskId);
     }
 }

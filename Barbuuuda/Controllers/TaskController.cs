@@ -223,5 +223,19 @@ namespace Barbuuuda.Controllers
 
             return Ok(respondsList);
         }
+
+        /// <summary>
+        /// Метод проверит, оплачено ли задание заказчиком.
+        /// </summary>
+        /// <param name="payInput">Входная модель.</param>
+        /// <returns>Флаг проверки оплаты.</returns>
+        [HttpPost, Route("is-pay")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> IsPayAsync([FromBody] CheckPayInput payInput)
+        {
+            bool isPay = await _task.IsPayAsync(payInput.TaskId);
+
+            return Ok(isPay);
+        }
     }
 }
