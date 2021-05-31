@@ -10,6 +10,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Barbuuuda.Services.AutofacModules;
 using Microsoft.OpenApi.Models;
 
 namespace Barbuuuda
@@ -94,6 +96,10 @@ namespace Barbuuuda
                     });
 
             services.AddSignalR();
+
+            ContainerBuilder builder = new ContainerBuilder();
+            builder.Populate(services);
+            builder.Build();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
@@ -135,6 +141,11 @@ namespace Barbuuuda
                 //endpoints.MapHub<ChatHub>("/chat");
                 endpoints.MapDefaultControllerRoute();
             });
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            ServicesModule.InitModules(builder);
         }
     }
 }
