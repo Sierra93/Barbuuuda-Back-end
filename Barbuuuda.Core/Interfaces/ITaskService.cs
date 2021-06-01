@@ -1,8 +1,8 @@
 ﻿using Barbuuuda.Models.Respond.Output;
-using Barbuuuda.Models.Task;
 using Barbuuuda.Models.Task.Output;
 using System.Collections;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Task;
 
 namespace Barbuuuda.Core.Interfaces
 {
@@ -126,10 +126,11 @@ namespace Barbuuuda.Core.Interfaces
         Task<GetRespondResultOutput> GetRespondsAsync(int taskId, string account);
 
         /// <summary>
-        /// Метод проверит, оплачено ли задание заказчиком.
+        /// Метод выберет исполнителя задания.
         /// </summary>
         /// <param name="taskId">Id задания.</param>
+        /// <param name="executorId">Id исполнителя, которого заказчик выбрал.</param>
         /// <returns>Флаг проверки оплаты.</returns>
-        Task<bool> IsPayAsync(long taskId);
+        Task<bool> SelectAsync(long taskId, string executorId);
     }
 }

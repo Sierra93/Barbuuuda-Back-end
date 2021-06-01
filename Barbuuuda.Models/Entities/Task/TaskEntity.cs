@@ -95,5 +95,10 @@ namespace Barbuuuda.Models.Task
         /// Флаг оплаты задания заказчиком.
         /// </summary>
         public bool IsPay { get; set; }
+
+        /// <summary>
+        /// Флаг подтверждения исполнителем взятия в работу задания.
+        /// </summary>
+        public bool IsWorkAccept { get; set; }
     }
 }

@@ -225,17 +225,17 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод проверит, оплачено ли задание заказчиком.
+        /// Метод выберет исполнителя задания.
         /// </summary>
         /// <param name="payInput">Входная модель.</param>
-        /// <returns>Флаг проверки оплаты.</returns>
-        [HttpPost, Route("is-pay")]
+        /// <returns>Результат выбора.</returns>
+        [HttpPost, Route("select")]
         [ProducesResponseType(200, Type = typeof(bool))]
-        public async Task<IActionResult> IsPayAsync([FromBody] CheckPayInput payInput)
+        public async Task<IActionResult> SelectAsync([FromBody] CheckPayInput payInput)
         {
-            bool isPay = await _task.IsPayAsync(payInput.TaskId);
+            bool result = await _task.SelectAsync(payInput.TaskId, payInput.ExecutorId);
 
-            return Ok(isPay);
+            return Ok(result);
         }
     }
 }

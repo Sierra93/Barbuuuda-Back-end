@@ -934,11 +934,12 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод проверит, оплачено ли задание заказчиком.
+        /// Метод выберет исполнителя задания.
         /// </summary>
         /// <param name="taskId">Id задания.</param>
+        /// <param name="executorId">Id исполнителя, которого заказчик выбрал.</param>
         /// <returns>Флаг проверки оплаты.</returns>
-        public async Task<bool> IsPayAsync(long taskId)
+        public async Task<bool> SelectAsync(long taskId, string executorId)
         {
             try
             {
@@ -947,12 +948,26 @@ namespace Barbuuuda.Services
                     throw new NullTaskIdException();
                 }
 
-                bool isPay = await _postgre.Tasks
+                if (string.IsNullOrEmpty(executorId))
+                {
+                    throw new EmptyExecutorIdException();
+                }
+
+                TaskEntity task = await _postgre.Tasks
                     .Where(t => t.TaskId == taskId)
-                    .Select(res => res.IsPay)
                     .FirstOrDefaultAsync();
 
-                return isPay;
+                // Если задание было оплаченно заказчиком.
+                if (task.IsPay)
+                {
+                    // Запишет исполнителя на задание.
+                    task.ExecutorId = executorId;
+                    await _postgre.SaveChangesAsync();
+
+                    return true;
+                }
+
+                return false;
             }
 
             catch (Exception ex)

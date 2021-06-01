@@ -9,5 +9,10 @@
         /// Id задания, оплату которого нужно проверить.
         /// </summary>
         public long TaskId { get; set; }
+
+        /// <summary>
+        /// Id исполнителя, которого заказчик выбрал.
+        /// </summary>
+        public string ExecutorId { get; set; }  
     }
 }
