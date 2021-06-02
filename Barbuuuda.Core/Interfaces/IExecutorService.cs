@@ -4,6 +4,7 @@ using Barbuuuda.Models.User;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Task.Output;
 
 namespace Barbuuuda.Core.Interfaces
 {
@@ -69,5 +70,12 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Статус проверки true/false.</returns>
         Task<bool> CheckRespondAsync(long? taskId, string account);
+
+        /// <summary>
+        /// Метод выгрузит список заданий, в которых был выбран исполнитель.
+        /// </summary>
+        /// <param name="account">Логин исполнителя.</param>
+        /// <returns>Список приглашений с данными заданий.</returns>
+        Task<GetResultInvite> InviteAsync(string account);
     }
 }

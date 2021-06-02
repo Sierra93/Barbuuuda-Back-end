@@ -1,0 +1,46 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Barbuuuda.Models.Task.Output
+{
+    /// <summary>
+    /// Класс выходной модели приглашений исполнителя.
+    /// </summary>
+    public class InviteOutput
+    {
+        /// <summary>
+        /// Id задания.
+        /// </summary>
+        [Required]
+        public long TaskId { get; set; }
+
+        /// <summary>
+        /// Заголовок задания.
+        /// </summary>
+        [Required, MaxLength(100)]
+        public string TaskTitle { get; set; }
+
+        /// <summary>
+        /// Описание задания.
+        /// </summary>
+        [Required, MaxLength(200)]
+        public string TaskDetail { get; set; }
+
+        /// <summary>
+        /// Дата сдачи задания.
+        /// </summary>
+        [Required]
+        public string TaskEndda { get; set; }
+
+        /// <summary>
+        /// Логин заказчика.
+        /// </summary>
+        [Required] 
+        public string OwnerLogin { get; set; }
+
+        /// <summary>
+        /// Цена задания.
+        /// </summary>
+        [Required]
+        public string TaskPrice { get; set; } = "По договоренности";
+    }
+}

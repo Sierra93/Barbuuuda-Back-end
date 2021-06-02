@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Task.Output;
 
 namespace Barbuuuda.Controllers
 {
@@ -125,6 +126,19 @@ namespace Barbuuuda.Controllers
             bool isCheck = await _executor.CheckRespondAsync(checkRespondInput.TaskId, GetUserName());
 
             return Ok(isCheck);
+        }
+
+        /// <summary>
+        /// Метод выгрузит список заданий, в которых был выбран исполнитель.
+        /// </summary>
+        /// <returns>Список приглашений с данными заданий.</returns>
+        [HttpPost, Route("invite")]
+        [ProducesResponseType(200, Type = typeof(GetResultInvite))]
+        public async Task<IActionResult> InviteAsync()
+        {
+            GetResultInvite invities = await _executor.InviteAsync(GetUserName());
+
+            return Ok(invities);
         }
     }
 }

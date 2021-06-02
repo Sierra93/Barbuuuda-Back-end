@@ -13,7 +13,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Task.Output;
 
 namespace Barbuuuda.Services
 {
@@ -378,6 +380,78 @@ namespace Barbuuuda.Services
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Метод выгрузит список заданий, в которых был выбран исполнитель.
+        /// </summary>
+        /// <param name="account">Логин исполнителя.</param>
+        /// <returns>Список приглашений с данными заданий.</returns>
+        public async Task<GetResultInvite> InviteAsync(string account)
+        {
+            try
+            {
+                GetResultInvite result = new GetResultInvite();
+
+                // Выберет Id текущего исполнителя по его логину.
+                string executorId = await _user.GetUserIdByLogin(account);
+
+                // Получит список заданий, в которых выбран исполнитель.
+                var invities = await _postgre.Tasks
+                    .Where(t => t.ExecutorId.Equals(executorId) 
+                                && t.StatusCode.Equals(StatusCode.CODE_AUCTION))
+                    .Select(res => new
+                    {
+                        res.TaskId,
+                        TaskEndda = string.Format("{0:f}", res.TaskEndda),
+                        res.TaskTitle,
+                        res.TaskDetail,
+                        TaskPrice = string.Format("{0:0,0}", res.TaskPrice),
+                        res.OwnerId
+                    })
+                    .ToListAsync();
+
+                // Если приглашений нет.
+                if (invities.Count <= 0)
+                {
+                    return result;
+                }
+
+                // Запишет логины заказчиков по их OwnerId.
+                invities.ForEach(async invite =>
+                {
+                    string jsonString = JsonSerializer.Serialize(invite);
+                    InviteOutput item = JsonSerializer.Deserialize<InviteOutput>(jsonString);
+
+                    // Запишет логин заказчика.
+                    if (item != null)
+                    {
+                        item.OwnerLogin = 
+
+                        // Возьмет первые 100 символов из заголовка задания.
+                        item.TaskTitle = item.TaskTitle.Length > 100
+                            ? string.Concat(item.TaskTitle.Substring(0, 100), "...")
+                            : item.TaskTitle;
+
+                        // Возьмет первые 200 символов из описания задания.
+                        item.TaskDetail = item.TaskDetail.Length > 200
+                            ? string.Concat(item.TaskDetail.Substring(0, 200), "...")
+                            : item.TaskDetail;
+                    }
+
+                    result.Invities.Add(item);
+                });
+
+                return result;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message, ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
         }
     }
 }
