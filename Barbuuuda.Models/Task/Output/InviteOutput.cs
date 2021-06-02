@@ -35,12 +35,37 @@ namespace Barbuuuda.Models.Task.Output
         /// Логин заказчика.
         /// </summary>
         [Required] 
-        public string OwnerLogin { get; set; }
+        public string UserName { get; set; }
 
         /// <summary>
         /// Цена задания.
         /// </summary>
         [Required]
         public string TaskPrice { get; set; } = "По договоренности";
+
+        /// <summary>
+        /// Кол-во ставок к заданию.
+        /// </summary>
+        public int CountOffers { get; set; }
+
+        /// <summary>
+        /// Кол-во просмотров задания.
+        /// </summary>
+        public int CountViews { get; set; }
+
+        /// <summary>
+        /// Для всех или для PRO.
+        /// </summary>
+        public string TypeCode { get; set; }
+
+        /// <summary>
+        /// Название статуса.
+        /// </summary>
+        public string StatusName { get; set; }
+
+        /// <summary>
+        /// Название категории задания.
+        /// </summary>
+        public string CategoryName { get; set; }
     }
 }

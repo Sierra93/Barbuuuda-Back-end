@@ -398,16 +398,24 @@ namespace Barbuuuda.Services
 
                 // Получит список заданий, в которых выбран исполнитель.
                 var invities = await _postgre.Tasks
-                    .Where(t => t.ExecutorId.Equals(executorId) 
-                                && t.StatusCode.Equals(StatusCode.CODE_AUCTION))
+                    .Where(t => t.ExecutorId.Equals(executorId))
+                    .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode, (t, tc) => new { Tasks = t, ParentTaskCategory = tc })
+                    .Join(_postgre.Users, ts => ts.Tasks.OwnerId, u => u.Id, (ts, u) => new 
+                        { TaskCategory = ts, User = u})
+                    .Join(_postgre.TaskStatuses, tcc => tcc.TaskCategory.Tasks.StatusCode, s => s.StatusCode, (tcc, s) => new { Result = tcc, TaskStatus = s })
                     .Select(res => new
                     {
-                        res.TaskId,
-                        TaskEndda = string.Format("{0:f}", res.TaskEndda),
-                        res.TaskTitle,
-                        res.TaskDetail,
-                        TaskPrice = string.Format("{0:0,0}", res.TaskPrice),
-                        res.OwnerId
+                        res.Result.TaskCategory.Tasks.TaskId,
+                        TaskEndda = string.Format("{0:f}", res.Result.TaskCategory.Tasks.TaskEndda),
+                        res.Result.TaskCategory.Tasks.TaskTitle,
+                        res.Result.TaskCategory.Tasks.TaskDetail,
+                        TaskPrice = string.Format("{0:0,0}", res.Result.TaskCategory.Tasks.TaskPrice),
+                        res.Result.TaskCategory.Tasks.CountOffers,
+                        res.Result.TaskCategory.Tasks.CountViews,
+                        res.Result.TaskCategory.Tasks.TypeCode,
+                        res.Result.User.UserName,
+                        res.Result.TaskCategory.ParentTaskCategory.CategoryName,
+                        res.TaskStatus.StatusName
                     })
                     .ToListAsync();
 
@@ -418,7 +426,7 @@ namespace Barbuuuda.Services
                 }
 
                 // Запишет логины заказчиков по их OwnerId.
-                invities.ForEach(async invite =>
+                invities.ForEach( invite =>
                 {
                     string jsonString = JsonSerializer.Serialize(invite);
                     InviteOutput item = JsonSerializer.Deserialize<InviteOutput>(jsonString);
@@ -426,7 +434,6 @@ namespace Barbuuuda.Services
                     // Запишет логин заказчика.
                     if (item != null)
                     {
-                        item.OwnerLogin = 
 
                         // Возьмет первые 100 символов из заголовка задания.
                         item.TaskTitle = item.TaskTitle.Length > 100

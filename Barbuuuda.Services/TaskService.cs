@@ -782,7 +782,6 @@ namespace Barbuuuda.Services
         /// <summary>
         /// Метод получает задания в статусе "В аукционе".
         /// </summary>
-        /// <param name="taskId"></param>
         /// <returns>Список заданий в аукционе.</returns>
         public async Task<GetTaskResultOutput> LoadAuctionTasks()
         {
