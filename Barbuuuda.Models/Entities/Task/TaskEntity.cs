@@ -100,5 +100,10 @@ namespace Barbuuuda.Models.Task
         /// Флаг подтверждения исполнителем взятия в работу задания.
         /// </summary>
         public bool IsWorkAccept { get; set; }
+
+        /// <summary>
+        /// Флаг отказа от выполнения задания.
+        /// </summary>
+        public bool IsWorkCancel { get; set; }
     }
 }

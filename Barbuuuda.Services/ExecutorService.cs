@@ -398,10 +398,12 @@ namespace Barbuuuda.Services
 
                 // Получит список заданий, в которых выбран исполнитель.
                 var invities = await _postgre.Tasks
-                    .Where(t => t.ExecutorId.Equals(executorId))
+                    .Where(t => t.ExecutorId.Equals(executorId)
+                    && t.IsWorkAccept.Equals(false)
+                    && t.IsWorkCancel.Equals(false))
                     .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode, (t, tc) => new { Tasks = t, ParentTaskCategory = tc })
-                    .Join(_postgre.Users, ts => ts.Tasks.OwnerId, u => u.Id, (ts, u) => new 
-                        { TaskCategory = ts, User = u})
+                    .Join(_postgre.Users, ts => ts.Tasks.OwnerId, u => u.Id, (ts, u) => new
+                    { TaskCategory = ts, User = u })
                     .Join(_postgre.TaskStatuses, tcc => tcc.TaskCategory.Tasks.StatusCode, s => s.StatusCode, (tcc, s) => new { Result = tcc, TaskStatus = s })
                     .Select(res => new
                     {
@@ -477,10 +479,11 @@ namespace Barbuuuda.Services
                 // Получит список заданий, в которых выбран исполнитель.
                 var invities = await _postgre.Tasks
                     .Where(t => t.ExecutorId.Equals(executorId)
-                    && t.IsWorkAccept.Equals(true))
+                    && t.IsWorkAccept.Equals(true)
+                    && t.IsWorkCancel.Equals(false))
                     .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode, (t, tc) => new { Tasks = t, ParentTaskCategory = tc })
                     .Join(_postgre.Users, ts => ts.Tasks.OwnerId, u => u.Id, (ts, u) => new
-                        { TaskCategory = ts, User = u })
+                    { TaskCategory = ts, User = u })
                     .Join(_postgre.TaskStatuses, tcc => tcc.TaskCategory.Tasks.StatusCode, s => s.StatusCode, (tcc, s) => new { Result = tcc, TaskStatus = s })
                     .Select(res => new
                     {
