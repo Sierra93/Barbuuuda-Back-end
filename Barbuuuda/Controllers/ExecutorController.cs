@@ -133,12 +133,51 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <returns>Список приглашений с данными заданий.</returns>
         [HttpPost, Route("invite")]
-        [ProducesResponseType(200, Type = typeof(GetResultInvite))]
+        [ProducesResponseType(200, Type = typeof(GetResultTask))]
         public async Task<IActionResult> InviteAsync()
         {
-            GetResultInvite invities = await _executor.InviteAsync(GetUserName());
+            GetResultTask result = await _executor.InviteAsync(GetUserName());
 
-            return Ok(invities);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод выгрузит список заданий, которые у исполнителя в работе.
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        [HttpPost, Route("my")]
+        [ProducesResponseType(200, Type = typeof(GetResultTask))]
+        public async Task<IActionResult> MyWorkTasksAsync()
+        {
+            GetResultTask result = await _executor.MyTasksAsync(GetUserName());
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод проставит согласие на выполнение задания.
+        /// </summary>
+        /// <returns>Флаг результата.</returns>
+        [HttpPost, Route("accept")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> AcceptTaskAsync([FromBody] AcceptOrCancelWorkTaskInput input)
+        {
+            bool result = await _executor.AcceptTaskAsync(input.TaskId);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод проставит отказ на выполнение задания.
+        /// </summary>
+        /// <returns>Флаг результата.</returns>
+        [HttpPost, Route("cancel")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> CancelTaskAsync([FromBody] AcceptOrCancelWorkTaskInput input)
+        {
+            bool result = await _executor.CancelTaskAsync(input.TaskId);
+
+            return Ok(result);
         }
     }
 }

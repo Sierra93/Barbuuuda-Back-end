@@ -387,11 +387,11 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="account">Логин исполнителя.</param>
         /// <returns>Список приглашений с данными заданий.</returns>
-        public async Task<GetResultInvite> InviteAsync(string account)
+        public async Task<GetResultTask> InviteAsync(string account)
         {
             try
             {
-                GetResultInvite result = new GetResultInvite();
+                GetResultTask result = new GetResultTask();
 
                 // Выберет Id текущего исполнителя по его логину.
                 string executorId = await _user.GetUserIdByLogin(account);
@@ -429,12 +429,11 @@ namespace Barbuuuda.Services
                 invities.ForEach( invite =>
                 {
                     string jsonString = JsonSerializer.Serialize(invite);
-                    InviteOutput item = JsonSerializer.Deserialize<InviteOutput>(jsonString);
+                    ResultTaskOutput item = JsonSerializer.Deserialize<ResultTaskOutput>(jsonString);
 
                     // Запишет логин заказчика.
                     if (item != null)
                     {
-
                         // Возьмет первые 100 символов из заголовка задания.
                         item.TaskTitle = item.TaskTitle.Length > 100
                             ? string.Concat(item.TaskTitle.Substring(0, 100), "...")
@@ -450,6 +449,148 @@ namespace Barbuuuda.Services
                 });
 
                 return result;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message, ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод выгрузит список заданий, которые у исполнителя в работе.
+        /// </summary>
+        /// <param name="account">Логин исполнителя.</param>
+        /// <returns>Список заданий.</returns>
+        public async Task<GetResultTask> MyTasksAsync(string account)
+        {
+            try
+            {
+                GetResultTask result = new GetResultTask();
+
+                // Выберет Id текущего исполнителя по его логину.
+                string executorId = await _user.GetUserIdByLogin(account);
+
+                // Получит список заданий, в которых выбран исполнитель.
+                var invities = await _postgre.Tasks
+                    .Where(t => t.ExecutorId.Equals(executorId)
+                    && t.IsWorkAccept.Equals(true))
+                    .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode, (t, tc) => new { Tasks = t, ParentTaskCategory = tc })
+                    .Join(_postgre.Users, ts => ts.Tasks.OwnerId, u => u.Id, (ts, u) => new
+                        { TaskCategory = ts, User = u })
+                    .Join(_postgre.TaskStatuses, tcc => tcc.TaskCategory.Tasks.StatusCode, s => s.StatusCode, (tcc, s) => new { Result = tcc, TaskStatus = s })
+                    .Select(res => new
+                    {
+                        res.Result.TaskCategory.Tasks.TaskId,
+                        TaskEndda = string.Format("{0:f}", res.Result.TaskCategory.Tasks.TaskEndda),
+                        res.Result.TaskCategory.Tasks.TaskTitle,
+                        res.Result.TaskCategory.Tasks.TaskDetail,
+                        TaskPrice = string.Format("{0:0,0}", res.Result.TaskCategory.Tasks.TaskPrice),
+                        res.Result.TaskCategory.Tasks.CountOffers,
+                        res.Result.TaskCategory.Tasks.CountViews,
+                        res.Result.TaskCategory.Tasks.TypeCode,
+                        res.Result.User.UserName,
+                        res.Result.TaskCategory.ParentTaskCategory.CategoryName,
+                        res.TaskStatus.StatusName
+                    })
+                    .ToListAsync();
+
+                // Если приглашений нет.
+                if (invities.Count <= 0)
+                {
+                    return result;
+                }
+
+                // Запишет логины заказчиков по их OwnerId.
+                invities.ForEach(invite =>
+                {
+                    string jsonString = JsonSerializer.Serialize(invite);
+                    ResultTaskOutput item = JsonSerializer.Deserialize<ResultTaskOutput>(jsonString);
+
+                    // Запишет логин заказчика.
+                    if (item != null)
+                    {
+                        // Возьмет первые 100 символов из заголовка задания.
+                        item.TaskTitle = item.TaskTitle.Length > 100
+                            ? string.Concat(item.TaskTitle.Substring(0, 100), "...")
+                            : item.TaskTitle;
+
+                        // Возьмет первые 200 символов из описания задания.
+                        item.TaskDetail = item.TaskDetail.Length > 200
+                            ? string.Concat(item.TaskDetail.Substring(0, 200), "...")
+                            : item.TaskDetail;
+                    }
+
+                    result.Invities.Add(item);
+                });
+
+                return result;
+
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message, ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод проставит согласие на выполнение задания.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Флаг результата.</returns>
+        public async Task<bool> AcceptTaskAsync(long taskId)
+        {
+            try
+            {
+                TaskEntity task = await _postgre.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId);
+
+                if (task == null)
+                {
+                    throw new NotFoundTaskIdException(taskId);
+                }
+
+                task.IsWorkAccept = true;
+                await _postgre.SaveChangesAsync();
+
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message, ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод проставит отказ на выполнение задания.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Флаг результата.</returns>
+        public async Task<bool> CancelTaskAsync(long taskId)
+        {
+            try
+            {
+                TaskEntity task = await _postgre.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId);
+
+                if (task == null)
+                {
+                    throw new NotFoundTaskIdException(taskId);
+                }
+
+                task.IsWorkAccept = false;
+                await _postgre.SaveChangesAsync();
+
+                return true;
             }
 
             catch (Exception ex)

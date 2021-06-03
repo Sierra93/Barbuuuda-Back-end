@@ -29,13 +29,13 @@ namespace Barbuuuda.Tests.Unit_tests.TaskTests
         /// Метод тестовых приглашений.
         /// </summary>
         /// <returns></returns>
-        private GetResultInvite GetInvities()
+        private GetResultTask GetInvities()
         {
-            GetResultInvite invities = new GetResultInvite()
+            GetResultTask invities = new GetResultTask()
             {
-                Invities = new List<InviteOutput>()
+                Invities = new List<ResultTaskOutput>()
                 {
-                    new InviteOutput()
+                    new ResultTaskOutput()
                     {
                         TaskId = 1
                     }

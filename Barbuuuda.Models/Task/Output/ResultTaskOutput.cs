@@ -3,9 +3,9 @@
 namespace Barbuuuda.Models.Task.Output
 {
     /// <summary>
-    /// Класс выходной модели приглашений исполнителя.
+    /// Класс выходной модели заданий исполнителя.
     /// </summary>
-    public class InviteOutput
+    public class ResultTaskOutput
     {
         /// <summary>
         /// Id задания.
