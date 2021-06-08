@@ -112,6 +112,14 @@ namespace Barbuuuda.Services
                 // Проверяет существование заказчика, который создал задание.
                 bool bCustomer = await IdentityCustomer(userName);
 
+                string ownerId = await _user.GetUserIdByLogin(userName);
+
+                // Запишет Id заказчика.
+                if (!string.IsNullOrEmpty(ownerId))
+                {
+                    oTask.OwnerId = ownerId;
+                }
+
                 // Проверяет, есть ли такая категория в БД.
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
 

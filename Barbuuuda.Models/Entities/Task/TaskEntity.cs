@@ -16,7 +16,7 @@ namespace Barbuuuda.Models.Task
         /// <summary>
         /// Id заказчика, который создал задание.
         /// </summary>
-        [Required, Column("OwnerId", TypeName = "varchar(150)")]
+        [Column("OwnerId", TypeName = "varchar(150)")]
         public string OwnerId { get; set; }
 
         /// <summary>
