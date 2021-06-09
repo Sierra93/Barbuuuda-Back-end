@@ -985,5 +985,40 @@ namespace Barbuuuda.Services
                 throw;
             }
         }
+
+        /// <summary>
+        /// Метод проверит оплату задания и выбран ли исполнитель.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Флаг проверки.</returns>
+        public async Task<bool> CheckSelectPayAsync(long taskId)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                var task = await _postgre.Tasks
+                    .Where(c => c.TaskId == taskId)
+                    .Select(res => new
+                    {
+                        IsPay = res.IsPay.Equals(true),
+                        ExecutorId = !string.IsNullOrEmpty(res.ExecutorId)
+                    })
+                    .FirstOrDefaultAsync();
+
+                return task.IsPay && task.ExecutorId;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
     }
 }

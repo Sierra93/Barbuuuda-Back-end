@@ -228,12 +228,26 @@ namespace Barbuuuda.Controllers
         /// Метод выберет исполнителя задания.
         /// </summary>
         /// <param name="payInput">Входная модель.</param>
-        /// <returns>Результат выбора.</returns>
+        /// <returns>Флаг выбора.</returns>
         [HttpPost, Route("select")]
         [ProducesResponseType(200, Type = typeof(bool))]
         public async Task<IActionResult> SelectAsync([FromBody] CheckPayInput payInput)
         {
             bool result = await _task.SelectAsync(payInput.TaskId, payInput.ExecutorId);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод проверит оплату задания и выбран ли исполнитель.
+        /// </summary>
+        /// <param name="payInput">Входная модель.</param>
+        /// <returns>Флаг проверки.</returns>
+        [HttpPost, Route("check-select-pay")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> CheckSelectPayAsync([FromBody] CheckPayInput payInput)
+        {
+            bool result = await _task.CheckSelectPayAsync(payInput.TaskId);
 
             return Ok(result);
         }
