@@ -447,7 +447,7 @@ namespace Barbuuuda.Services
                             : item.TaskDetail;
                     }
 
-                    result.Invities.Add(item);
+                    result.Tasks.Add(item);
                 });
 
                 return result;
@@ -463,7 +463,7 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод выгрузит список заданий, которые у исполнителя в работе.
+        /// Метод выгрузит список заданий, в которых был выбран текущий исполнитель.
         /// </summary>
         /// <param name="account">Логин исполнителя.</param>
         /// <returns>Список заданий.</returns>
@@ -502,7 +502,7 @@ namespace Barbuuuda.Services
                     .ToListAsync();
 
                 // Если приглашений нет.
-                if (invities.Count <= 0)
+                if (!invities.Any())
                 {
                     return result;
                 }
@@ -513,21 +513,17 @@ namespace Barbuuuda.Services
                     string jsonString = JsonSerializer.Serialize(invite);
                     ResultTaskOutput item = JsonSerializer.Deserialize<ResultTaskOutput>(jsonString);
 
-                    // Запишет логин заказчика.
-                    if (item != null)
-                    {
-                        // Возьмет первые 100 символов из заголовка задания.
-                        item.TaskTitle = item.TaskTitle.Length > 100
-                            ? string.Concat(item.TaskTitle.Substring(0, 100), "...")
-                            : item.TaskTitle;
+                    // Возьмет первые 100 символов из заголовка задания.
+                    item.TaskTitle = item.TaskTitle.Length > 100
+                        ? string.Concat(item.TaskTitle.Substring(0, 100), "...")
+                        : item.TaskTitle;
 
-                        // Возьмет первые 200 символов из описания задания.
-                        item.TaskDetail = item.TaskDetail.Length > 200
-                            ? string.Concat(item.TaskDetail.Substring(0, 200), "...")
-                            : item.TaskDetail;
-                    }
+                    // Возьмет первые 200 символов из описания задания.
+                    item.TaskDetail = item.TaskDetail.Length > 200
+                        ? string.Concat(item.TaskDetail.Substring(0, 200), "...")
+                        : item.TaskDetail;
 
-                    result.Invities.Add(item);
+                    result.Tasks.Add(item);
                 });
 
                 return result;
@@ -552,6 +548,12 @@ namespace Barbuuuda.Services
         {
             try
             {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                // Найдет задание.
                 TaskEntity task = await _postgre.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId);
 
                 if (task == null)
@@ -560,6 +562,16 @@ namespace Barbuuuda.Services
                 }
 
                 task.IsWorkAccept = true;
+
+                // Изменит статус задания на "В работе".
+                // Шаг 1. Выберет код статуса "В работе".
+                string code = await _postgre.TaskStatuses
+                    .Where(c => c.StatusName.Equals(StatusTask.IN_WORK))
+                    .Select(res => res.StatusCode)
+                    .FirstOrDefaultAsync();
+
+                // Шаг 2. Проставит статус заданию.
+                task.StatusCode = code;
                 await _postgre.SaveChangesAsync();
 
                 return true;
@@ -594,6 +606,86 @@ namespace Barbuuuda.Services
                 await _postgre.SaveChangesAsync();
 
                 return true;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message, ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит список заданий для вкладки "Мои задания". Т.е задания, работа над которыми начата текущим исполнителем.
+        /// <param name="account">Логин исполнителя.</param>
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        public async Task<GetResultTask> GetWorkTasksAsync(string account)
+        {
+            try
+            {
+                GetResultTask result = new GetResultTask();
+
+                string executorId = await _user.GetUserIdByLogin(account);
+
+                if (string.IsNullOrEmpty(executorId))
+                {
+                    throw new NotFoundUserException(account);
+                }
+
+                var tasks = await _postgre.Tasks
+                    .Where(t => t.ExecutorId.Equals(executorId)
+                                && t.IsWorkAccept.Equals(true)
+                                && t.IsWorkCancel.Equals(false)
+                                && t.IsPay.Equals(true))
+                    .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode, (t, tc) => new { Tasks = t, ParentTaskCategory = tc })
+                    .Join(_postgre.Users, ts => ts.Tasks.OwnerId, u => u.Id, (ts, u) => new
+                        { TaskCategory = ts, User = u })
+                    .Join(_postgre.TaskStatuses, tcc => tcc.TaskCategory.Tasks.StatusCode, s => s.StatusCode, (tcc, s) => new { Result = tcc, TaskStatus = s })
+                    .Select(res => new
+                    {
+                        res.Result.TaskCategory.Tasks.TaskId,
+                        TaskEndda = string.Format("{0:f}", res.Result.TaskCategory.Tasks.TaskEndda),
+                        res.Result.TaskCategory.Tasks.TaskTitle,
+                        res.Result.TaskCategory.Tasks.TaskDetail,
+                        TaskPrice = string.Format("{0:0,0}", res.Result.TaskCategory.Tasks.TaskPrice),
+                        res.Result.TaskCategory.Tasks.CountOffers,
+                        res.Result.TaskCategory.Tasks.CountViews,
+                        res.Result.TaskCategory.Tasks.TypeCode,
+                        res.Result.User.UserName,
+                        res.Result.TaskCategory.ParentTaskCategory.CategoryName,
+                        res.TaskStatus.StatusName
+                    })
+                    .ToListAsync();
+
+                // Если заданий нет.
+                if (!tasks.Any())
+                {
+                    return result;
+                }
+
+                // Запишет логины заказчиков по их OwnerId.
+                foreach (object task in tasks)
+                {
+                    string jsonString = JsonSerializer.Serialize(task);
+                    ResultTaskOutput item = JsonSerializer.Deserialize<ResultTaskOutput>(jsonString);
+
+                    // Возьмет первые 100 символов из заголовка задания.
+                    item.TaskTitle = item.TaskTitle.Length > 100
+                        ? string.Concat(item.TaskTitle.Substring(0, 100), "...")
+                        : item.TaskTitle;
+
+                    // Возьмет первые 200 символов из описания задания.
+                    item.TaskDetail = item.TaskDetail.Length > 200
+                        ? string.Concat(item.TaskDetail.Substring(0, 200), "...")
+                        : item.TaskDetail;
+
+                    result.Tasks.Add(item);
+                }
+
+                return result;
             }
 
             catch (Exception ex)

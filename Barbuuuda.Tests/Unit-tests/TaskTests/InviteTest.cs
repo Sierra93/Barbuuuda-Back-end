@@ -33,7 +33,7 @@ namespace Barbuuuda.Tests.Unit_tests.TaskTests
         {
             GetResultTask invities = new GetResultTask()
             {
-                Invities = new List<ResultTaskOutput>()
+                Tasks = new List<ResultTaskOutput>()
                 {
                     new ResultTaskOutput()
                     {

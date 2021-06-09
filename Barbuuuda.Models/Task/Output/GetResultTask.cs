@@ -10,11 +10,11 @@ namespace Barbuuuda.Models.Task.Output
         /// <summary>
         /// Список с заданиями.
         /// </summary>
-        public List<ResultTaskOutput> Invities { get; set; } = new List<ResultTaskOutput>();
+        public List<ResultTaskOutput> Tasks { get; set; } = new List<ResultTaskOutput>();
 
         /// <summary>
         /// Кол-во заданий.
         /// </summary>
-        public int Count => Invities.Count;
+        public int Count => Tasks.Count;
     }
 }

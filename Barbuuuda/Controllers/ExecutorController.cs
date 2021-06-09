@@ -142,7 +142,7 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод выгрузит список заданий, которые у исполнителя в работе.
+        /// Метод выгрузит список заданий, в которых был выбран текущий исполнитель.
         /// </summary>
         /// <returns>Список заданий.</returns>
         [HttpPost, Route("my")]
@@ -176,6 +176,19 @@ namespace Barbuuuda.Controllers
         public async Task<IActionResult> CancelTaskAsync([FromBody] AcceptOrCancelWorkTaskInput input)
         {
             bool result = await _executor.CancelTaskAsync(input.TaskId);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод получит список заданий для вкладки "Мои задания". Т.е задания, работа над которыми начата текущим исполнителем.
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        [HttpPost, Route("work")]
+        [ProducesResponseType(200, Type = typeof(GetResultTask))]
+        public async Task<IActionResult> GetWorkTasksAsync()
+        {
+            GetResultTask result = await _executor.GetWorkTasksAsync(GetUserName());
 
             return Ok(result);
         }

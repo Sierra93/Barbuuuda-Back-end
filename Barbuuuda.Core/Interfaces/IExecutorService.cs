@@ -79,7 +79,7 @@ namespace Barbuuuda.Core.Interfaces
         Task<GetResultTask> InviteAsync(string account);
 
         /// <summary>
-        /// Метод выгрузит список заданий, которые у исполнителя в работе.
+        /// Метод выгрузит список заданий, в которых был выбран текущий исполнитель.
         /// </summary>
         /// <param name="account">Логин исполнителя.</param>
         /// <returns>Список заданий.</returns>
@@ -98,5 +98,13 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="taskId">Id задания.</param>
         /// <returns>Флаг результата.</returns>
         Task<bool> CancelTaskAsync(long taskId);
+
+
+        /// <summary>
+        /// Метод получит список заданий для вкладки "Мои задания". Т.е задания, работа над которыми начата текущим исполнителем.
+        /// <param name="account">Логин исполнителя.</param>
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        Task<GetResultTask> GetWorkTasksAsync(string account);
     }
 }
