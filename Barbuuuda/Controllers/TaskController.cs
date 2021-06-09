@@ -251,5 +251,19 @@ namespace Barbuuuda.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Метод проверит, принял ли исполнитель в работу задание и не отказался ли от него.
+        /// </summary>
+        /// <param name="payInput">Входная модель.</param>
+        /// <returns>Если все хорошо, то вернет список ставок к заданию, в котором будет только ставка исполнителя, которого выбрали и который принял в работу задание.</returns>
+        [HttpPost, Route("check-accept-invite")]
+        [ProducesResponseType(200, Type = typeof(GetRespondResultOutput))]
+        public async Task<IActionResult> CheckAcceptAndNotCancelInviteTaskAsync([FromBody] CheckPayInput payInput)
+        {
+            GetRespondResultOutput result = await _task.CheckAcceptAndNotCancelInviteTaskAsync(payInput.TaskId, GetUserName());
+
+            return Ok(result);
+        }
     }
 }

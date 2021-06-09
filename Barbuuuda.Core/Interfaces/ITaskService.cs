@@ -123,7 +123,7 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Список ставок.</returns>
-        Task<GetRespondResultOutput> GetRespondsAsync(int taskId, string account);
+        Task<GetRespondResultOutput> GetRespondsAsync(long taskId, string account);
 
         /// <summary>
         /// Метод выберет исполнителя задания.
@@ -139,5 +139,13 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="taskId">Id задания.</param>
         /// <returns>Флаг проверки.</returns>
         Task<bool> CheckSelectPayAsync(long taskId);
+
+        /// <summary>
+        /// Метод проверит, принял ли исполнитель в работу задание и не отказался ли от него.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Если все хорошо, то вернет список ставок к заданию, в котором будет только ставка исполнителя, которого выбрали и который принял в работу задание.</returns>
+        Task<GetRespondResultOutput> CheckAcceptAndNotCancelInviteTaskAsync(long taskId, string account);
     }
 }

@@ -884,7 +884,7 @@ namespace Barbuuuda.Services
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Список ставок.</returns>
-        public async Task<GetRespondResultOutput> GetRespondsAsync(int taskId, string account)
+        public async Task<GetRespondResultOutput> GetRespondsAsync(long taskId, string account)
         {
             try
             {
@@ -893,21 +893,7 @@ namespace Barbuuuda.Services
                     throw new NullTaskIdException();
                 }
 
-                IEnumerable respondsList = await (_postgre.Responds.Where(t => t.TaskId == taskId)
-                    .Join(_postgre.Users, re => re.ExecutorId, u => u.Id, (re, u) => new { re, u })
-                    .Join(_postgre.Statistics, user => user.u.Id, st => st.ExecutorId, (user, st) => new { user, st })
-                    .Select(res => new {
-                        res.user.u.UserName,
-                        res.user.re.Comment,
-                        Price = string.Format("{0:0,0}", res.user.re.Price),
-                        res.st.CountPositive,
-                        res.st.CountNegative,
-                        res.st.CountTotalCompletedTask,
-                        res.st.Rating,
-                        UserIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO,
-                        res.st.ExecutorId
-                    })
-                    .ToListAsync());
+                IEnumerable respondsList = await GetRespondsListAsync(taskId);
 
                 GetRespondResultOutput result = new GetRespondResultOutput();
 
@@ -1000,6 +986,7 @@ namespace Barbuuuda.Services
                     throw new NullTaskIdException();
                 }
 
+                // Выберет задание. Должно быть оплачено и исполнитель должен быть проставлен.
                 var task = await _postgre.Tasks
                     .Where(c => c.TaskId == taskId)
                     .Select(res => new
@@ -1019,6 +1006,81 @@ namespace Barbuuuda.Services
                 await logger.LogCritical();
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Метод проверит, принял ли исполнитель в работу задание и не отказался ли от него.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Если все хорошо, то вернет список ставок к заданию, в котором будет только ставка исполнителя, которого выбрали и который принял в работу задание.</returns>
+        public async Task<GetRespondResultOutput> CheckAcceptAndNotCancelInviteTaskAsync(long taskId, string account)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                // Выберет задание. Задание должно быть принято в работу и не должно быть отказа.
+                var task = await _postgre.Tasks
+                    .Where(c => c.TaskId == taskId)
+                    .Select(res => new
+                    {
+                        IsAccept = res.IsWorkAccept.Equals(true),
+                        IsCancel = res.IsWorkCancel.Equals(false),
+                        res.ExecutorId
+                    })
+                    .FirstOrDefaultAsync();
+
+                // Получит список ставок к заданию.
+                GetRespondResultOutput responds = await GetRespondsAsync(taskId, account);
+
+                // Если задание принято в работу и не было отказа, то оставит только одну ставку выбранного исполнителя.
+                if (responds.Count > 0 && task.IsAccept && task.IsCancel)
+                {
+                    responds.Responds.RemoveAll(item => !item.ExecutorId.Equals(task.ExecutorId));
+
+                    return responds;
+                }
+
+                return null;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит список ставок исполнителей к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Список заданий.</returns>
+        private async Task<IEnumerable> GetRespondsListAsync(long taskId)
+        {
+            IEnumerable tasks = await (_postgre.Responds.Where(t => t.TaskId == taskId)
+                .Join(_postgre.Users, re => re.ExecutorId, u => u.Id, (re, u) => new { re, u })
+                .Join(_postgre.Statistics, user => user.u.Id, st => st.ExecutorId, (user, st) => new { user, st })
+                .Select(res => new {
+                    res.user.u.UserName,
+                    res.user.re.Comment,
+                    Price = string.Format("{0:0,0}", res.user.re.Price),
+                    res.st.CountPositive,
+                    res.st.CountNegative,
+                    res.st.CountTotalCompletedTask,
+                    res.st.Rating,
+                    UserIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO,
+                    res.st.ExecutorId
+                })
+                .ToListAsync());
+
+            return tasks;
         }
     }
 }
