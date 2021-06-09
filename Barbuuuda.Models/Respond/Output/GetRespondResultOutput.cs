@@ -16,5 +16,10 @@ namespace Barbuuuda.Models.Respond.Output
         /// Кол-во ставок.
         /// </summary>
         public int Count => Responds.Count;
+
+        /// <summary>
+        /// Флаг нахождения задания в работе.
+        /// </summary>
+        public bool IsWorkAccept { get; set; }
     }
 }

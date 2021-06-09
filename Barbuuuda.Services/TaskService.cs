@@ -1041,6 +1041,7 @@ namespace Barbuuuda.Services
                 if (responds.Count > 0 && task.IsAccept && task.IsCancel)
                 {
                     responds.Responds.RemoveAll(item => !item.ExecutorId.Equals(task.ExecutorId));
+                    responds.IsWorkAccept = true;
 
                     return responds;
                 }
