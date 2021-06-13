@@ -3,6 +3,7 @@ using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.Entities.Knowlege;
 using Barbuuuda.Models.Entities.Payment;
 using Barbuuuda.Models.Entities.Respond;
+using Barbuuuda.Models.Entities.Task;
 using Barbuuuda.Models.Entities.User;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
@@ -15,6 +16,8 @@ namespace Barbuuuda.Core.Data
     /// </summary>
     public class PostgreDbContext : DbContext
     {
+        private readonly DbContextOptions<PostgreDbContext> _options;
+
         /// <summary>
         /// Таблица пользователей.
         /// </summary>
@@ -105,7 +108,15 @@ namespace Barbuuuda.Core.Data
         /// </summary>
         public DbSet<InvoiceEntity> Invoices { get; set; }
 
-        public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options) { }
+        /// <summary>
+        /// Таблица отмененных приглашений.
+        /// </summary>
+        public DbSet<CanceledInviteEntity> CanceledInvities { get; set; }
+
+        public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options)
+        {
+            _options = options;
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) { }
     }

@@ -603,6 +603,7 @@ namespace Barbuuuda.Services
                 }
 
                 task.IsWorkAccept = false;
+                task.IsWorkCancel = true;
                 await _postgre.SaveChangesAsync();
 
                 return true;
