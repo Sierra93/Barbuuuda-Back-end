@@ -576,25 +576,13 @@ namespace Barbuuuda.Services
                 task.IsWorkAccept = true;
 
                 // Изменит статус задания на "В работе".
-                // Шаг 1. Выберет код статуса "В работе".
                 string code = await _postgre.TaskStatuses
                     .Where(c => c.StatusName.Equals(StatusTask.IN_WORK))
                     .Select(res => res.StatusCode)
                     .FirstOrDefaultAsync();
 
-                // Шаг 2. Проставит статус заданию.
                 task.StatusCode = code;
                 task.ExecutorId = executorId;
-                await _postgre.SaveChangesAsync();
-
-                // Актуализирует данные в приглашениях.
-                await _postgre.Invities.AddAsync(new InviteEntity
-                {
-                    TaskId = task.TaskId,
-                    ExecutorId = executorId,
-                    IsAccept = true,
-                    IsCancel = false
-                });
                 await _postgre.SaveChangesAsync();
 
                 return true;
