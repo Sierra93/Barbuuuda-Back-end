@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Entities.Task;
 
 namespace Barbuuuda.Services
 {
@@ -912,6 +913,25 @@ namespace Barbuuuda.Services
                         resultObject.IsVisibleButton = true;
                     }
 
+                    // Выберет приглашение.
+                    InviteEntity invite = await _postgre.Invities
+                        .Where(c => c.TaskId == taskId && c.ExecutorId.Equals(resultObject.ExecutorId))
+                        .FirstOrDefaultAsync();
+
+                    if (invite != null && !string.IsNullOrEmpty(invite.ExecutorId) && invite.TaskId > 0)
+                    {
+
+                        if (invite.IsAccept)
+                        {
+                            resultObject.IsSendInvite = true;
+                        }
+
+                        if (invite.IsCancel)
+                        {
+                            resultObject.IsCancelInvite = true;
+                        }
+                    }
+
                     result.Responds.Add(resultObject);
                 }
 
@@ -950,17 +970,23 @@ namespace Barbuuuda.Services
                     .Where(t => t.TaskId == taskId)
                     .FirstOrDefaultAsync();
 
-                // Если задание было оплаченно заказчиком.
-                if (task.IsPay)
+                // Если задание не было оплаченно заказчиком.
+                if (!task.IsPay)
                 {
-                    // Запишет исполнителя на задание.
-                    task.ExecutorId = executorId;
-                    await _postgre.SaveChangesAsync();
-
-                    return true;
+                    return false;
                 }
 
-                return false;
+                // Запишет исполнителя на задание и будет ждать ответа от исполнителя на приглашение.
+                await _postgre.Invities.AddAsync(new InviteEntity
+                {
+                    TaskId = task.TaskId,
+                    ExecutorId = executorId,
+                    IsAccept = true,
+                    OwnerId = task.OwnerId
+                });
+                await _postgre.SaveChangesAsync();
+
+                return true;
             }
 
             catch (Exception ex)
@@ -973,7 +999,7 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод проверит оплату задания и выбран ли исполнитель.
+        /// Метод проверит оплату задания.
         /// </summary>
         /// <param name="taskId">Id задания.</param>
         /// <returns>Флаг проверки.</returns>
@@ -991,12 +1017,11 @@ namespace Barbuuuda.Services
                     .Where(c => c.TaskId == taskId)
                     .Select(res => new
                     {
-                        IsPay = res.IsPay.Equals(true),
-                        ExecutorId = !string.IsNullOrEmpty(res.ExecutorId)
+                        IsPay = res.IsPay.Equals(true)
                     })
                     .FirstOrDefaultAsync();
 
-                return task.IsPay && task.ExecutorId;
+                return task.IsPay;
             }
 
             catch (Exception ex)
@@ -1023,30 +1048,29 @@ namespace Barbuuuda.Services
                     throw new NullTaskIdException();
                 }
 
-                // Выберет задание. Задание должно быть принято в работу и не должно быть отказа.
-                var task = await _postgre.Tasks
-                    .Where(c => c.TaskId == taskId)
-                    .Select(res => new
-                    {
-                        IsAccept = res.IsWorkAccept.Equals(true),
-                        IsCancel = res.IsWorkCancel.Equals(false),
-                        res.ExecutorId
-                    })
+                // Выберет задание. Задание должно быть принято в работу.
+                var task = await _postgre.Invities
+                    .Where(c => c.TaskId == taskId && c.IsAccept.Equals(true))
                     .FirstOrDefaultAsync();
+
+                if (task == null)
+                {
+                    return new GetRespondResultOutput();
+                }
 
                 // Получит список ставок к заданию.
                 GetRespondResultOutput responds = await GetRespondsAsync(taskId, account);
 
-                // Если задание принято в работу и не было отказа, то оставит только одну ставку выбранного исполнителя.
-                if (responds.Count > 0 && task.IsAccept && task.IsCancel)
+                // Если ставок нет.
+                if (!responds.Responds.Any())
                 {
-                    responds.Responds.RemoveAll(item => !item.ExecutorId.Equals(task.ExecutorId));
-                    responds.IsWorkAccept = true;
-
-                    return responds;
+                    return new GetRespondResultOutput();
                 }
 
-                return null;
+                // Оставит только ставку исполнителя, который принял задание в работу.
+                responds.Responds.RemoveAll(item => !item.ExecutorId.Equals(task.ExecutorId));
+
+                return responds;
             }
 
             catch (Exception ex)

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Entities.Task;
 using Barbuuuda.Models.Task.Output;
 
 namespace Barbuuuda.Services
@@ -398,26 +399,29 @@ namespace Barbuuuda.Services
 
                 // Получит список заданий, в которых выбран исполнитель.
                 var invities = await _postgre.Tasks
-                    .Where(t => t.ExecutorId.Equals(executorId)
-                    && t.IsWorkAccept.Equals(false)
-                    && t.IsWorkCancel.Equals(false))
                     .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode, (t, tc) => new { Tasks = t, ParentTaskCategory = tc })
                     .Join(_postgre.Users, ts => ts.Tasks.OwnerId, u => u.Id, (ts, u) => new
                     { TaskCategory = ts, User = u })
                     .Join(_postgre.TaskStatuses, tcc => tcc.TaskCategory.Tasks.StatusCode, s => s.StatusCode, (tcc, s) => new { Result = tcc, TaskStatus = s })
+                    .Join(_postgre.Invities,
+                        x => x.Result.TaskCategory.Tasks.TaskId,
+                        i => i.TaskId,
+                        (x, i) => new { ChildUser = x, Invite = i })
+                    .Where(c => c.Invite.ExecutorId.Equals(executorId) 
+                                && c.ChildUser.Result.TaskCategory.Tasks.StatusCode.Equals(StatusCode.CODE_AUCTION))
                     .Select(res => new
                     {
-                        res.Result.TaskCategory.Tasks.TaskId,
-                        TaskEndda = string.Format("{0:f}", res.Result.TaskCategory.Tasks.TaskEndda),
-                        res.Result.TaskCategory.Tasks.TaskTitle,
-                        res.Result.TaskCategory.Tasks.TaskDetail,
-                        TaskPrice = string.Format("{0:0,0}", res.Result.TaskCategory.Tasks.TaskPrice),
-                        res.Result.TaskCategory.Tasks.CountOffers,
-                        res.Result.TaskCategory.Tasks.CountViews,
-                        res.Result.TaskCategory.Tasks.TypeCode,
-                        res.Result.User.UserName,
-                        res.Result.TaskCategory.ParentTaskCategory.CategoryName,
-                        res.TaskStatus.StatusName
+                        res.ChildUser.Result.TaskCategory.Tasks.TaskId,
+                        TaskEndda = string.Format("{0:f}", res.ChildUser.Result.TaskCategory.Tasks.TaskEndda),
+                        res.ChildUser.Result.TaskCategory.Tasks.TaskTitle,
+                        res.ChildUser.Result.TaskCategory.Tasks.TaskDetail,
+                        TaskPrice = string.Format("{0:0,0}", res.ChildUser.Result.TaskCategory.Tasks.TaskPrice),
+                        res.ChildUser.Result.TaskCategory.Tasks.CountOffers,
+                        res.ChildUser.Result.TaskCategory.Tasks.CountViews,
+                        res.ChildUser.Result.TaskCategory.Tasks.TypeCode,
+                        res.ChildUser.Result.User.UserName,
+                        res.ChildUser.Result.TaskCategory.ParentTaskCategory.CategoryName,
+                        res.ChildUser.TaskStatus.StatusName
                     })
                     .ToListAsync();
 
@@ -467,84 +471,89 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="account">Логин исполнителя.</param>
         /// <returns>Список заданий.</returns>
-        public async Task<GetResultTask> MyTasksAsync(string account)
-        {
-            try
-            {
-                GetResultTask result = new GetResultTask();
+        //public async Task<GetResultTask> MyTasksAsync(string account)
+        //{
+        //    try
+        //    {
+        //        GetResultTask result = new GetResultTask();
 
-                // Выберет Id текущего исполнителя по его логину.
-                string executorId = await _user.GetUserIdByLogin(account);
+        //        // Выберет Id текущего исполнителя по его логину.
+        //        string executorId = await _user.GetUserIdByLogin(account);
 
-                // Получит список заданий, в которых выбран исполнитель.
-                var invities = await _postgre.Tasks
-                    .Where(t => t.ExecutorId.Equals(executorId)
-                    && t.IsWorkAccept.Equals(true)
-                    && t.IsWorkCancel.Equals(false))
-                    .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode, (t, tc) => new { Tasks = t, ParentTaskCategory = tc })
-                    .Join(_postgre.Users, ts => ts.Tasks.OwnerId, u => u.Id, (ts, u) => new
-                    { TaskCategory = ts, User = u })
-                    .Join(_postgre.TaskStatuses, tcc => tcc.TaskCategory.Tasks.StatusCode, s => s.StatusCode, (tcc, s) => new { Result = tcc, TaskStatus = s })
-                    .Select(res => new
-                    {
-                        res.Result.TaskCategory.Tasks.TaskId,
-                        TaskEndda = string.Format("{0:f}", res.Result.TaskCategory.Tasks.TaskEndda),
-                        res.Result.TaskCategory.Tasks.TaskTitle,
-                        res.Result.TaskCategory.Tasks.TaskDetail,
-                        TaskPrice = string.Format("{0:0,0}", res.Result.TaskCategory.Tasks.TaskPrice),
-                        res.Result.TaskCategory.Tasks.CountOffers,
-                        res.Result.TaskCategory.Tasks.CountViews,
-                        res.Result.TaskCategory.Tasks.TypeCode,
-                        res.Result.User.UserName,
-                        res.Result.TaskCategory.ParentTaskCategory.CategoryName,
-                        res.TaskStatus.StatusName
-                    })
-                    .ToListAsync();
+        //        // Получит список заданий, в которых выбран исполнитель.
+        //        var invities = await _postgre.Tasks
+        //            //.Where(t => t.ExecutorId.Equals(executorId))
+        //            .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode,
+        //                (t, tc) => new { Tasks = t, ParentTaskCategory = tc })
+        //            .Join(_postgre.Users, ts => ts.Tasks.OwnerId, u => u.Id, (ts, u) => new
+        //            { TaskCategory = ts, User = u })
+        //            .Join(_postgre.TaskStatuses, tcc => tcc.TaskCategory.Tasks.StatusCode, s => s.StatusCode,
+        //                (tcc, s) => new { Result = tcc, TaskStatus = s })
+        //            .Join(_postgre.Invities,
+        //                x => x.Result.TaskCategory.Tasks.TaskId,
+        //                i => i.TaskId,
+        //                (x, i) => new { ChildUser = x, Invite = i })
+        //            .Select(res => new
+        //            {
+        //                res.ChildUser.Result.TaskCategory.Tasks.TaskId,
+        //                TaskEndda = string.Format("{0:f}", res.ChildUser.Result.TaskCategory.Tasks.TaskEndda),
+        //                res.ChildUser.Result.TaskCategory.Tasks.TaskTitle,
+        //                res.ChildUser.Result.TaskCategory.Tasks.TaskDetail,
+        //                TaskPrice = string.Format("{0:0,0}", res.ChildUser.Result.TaskCategory.Tasks.TaskPrice),
+        //                res.ChildUser.Result.TaskCategory.Tasks.CountOffers,
+        //                res.ChildUser.Result.TaskCategory.Tasks.CountViews,
+        //                res.ChildUser.Result.TaskCategory.Tasks.TypeCode,
+        //                res.ChildUser.Result.User.UserName,
+        //                res.ChildUser.Result.TaskCategory.ParentTaskCategory.CategoryName,
+        //                res.ChildUser.TaskStatus.StatusName
+        //            })
+        //            .ToListAsync();
 
-                // Если приглашений нет.
-                if (!invities.Any())
-                {
-                    return result;
-                }
+        //        // Если приглашений нет.
+        //        if (!invities.Any())
+        //        {
+        //            return result;
+        //        }
 
-                // Запишет логины заказчиков по их OwnerId.
-                invities.ForEach(invite =>
-                {
-                    string jsonString = JsonSerializer.Serialize(invite);
-                    ResultTaskOutput item = JsonSerializer.Deserialize<ResultTaskOutput>(jsonString);
+        //        //// Запишет логины заказчиков по их OwnerId.
+        //        invities.ForEach(invite =>
+        //        {
+        //            string jsonString = JsonSerializer.Serialize(invite);
+        //            ResultTaskOutput item = JsonSerializer.Deserialize<ResultTaskOutput>(jsonString);
 
-                    // Возьмет первые 100 символов из заголовка задания.
-                    item.TaskTitle = item.TaskTitle.Length > 100
-                        ? string.Concat(item.TaskTitle.Substring(0, 100), "...")
-                        : item.TaskTitle;
+        //            // Возьмет первые 100 символов из заголовка задания.
+        //            item.TaskTitle = item.TaskTitle.Length > 100
+        //                ? string.Concat(item.TaskTitle.Substring(0, 100), "...")
+        //                : item.TaskTitle;
 
-                    // Возьмет первые 200 символов из описания задания.
-                    item.TaskDetail = item.TaskDetail.Length > 200
-                        ? string.Concat(item.TaskDetail.Substring(0, 200), "...")
-                        : item.TaskDetail;
+        //            // Возьмет первые 200 символов из описания задания.
+        //            item.TaskDetail = item.TaskDetail.Length > 200
+        //                ? string.Concat(item.TaskDetail.Substring(0, 200), "...")
+        //                : item.TaskDetail;
 
-                    result.Tasks.Add(item);
-                });
+        //            result.Tasks.Add(item);
+        //        });
 
-                return result;
+        //        return result;
 
-            }
+        //    }
 
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message, ex.StackTrace);
-                await logger.LogCritical();
-                throw;
-            }
-        }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex);
+        //        Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message, ex.StackTrace);
+        //        await logger.LogCritical();
+        //        throw;
+        //    }
+        //}
 
         /// <summary>
         /// Метод проставит согласие на выполнение задания.
         /// </summary>
         /// <param name="taskId">Id задания.</param>
+        /// <param name="account">Логин исполнителя.</param>
         /// <returns>Флаг результата.</returns>
-        public async Task<bool> AcceptTaskAsync(long taskId)
+        public async Task<bool> AcceptTaskAsync(long taskId, string account)
         {
             try
             {
@@ -555,6 +564,9 @@ namespace Barbuuuda.Services
 
                 // Найдет задание.
                 TaskEntity task = await _postgre.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId);
+
+                // Найдет Id исполнителя.
+                string executorId = await _user.GetUserIdByLogin(account);
 
                 if (task == null)
                 {
@@ -572,6 +584,17 @@ namespace Barbuuuda.Services
 
                 // Шаг 2. Проставит статус заданию.
                 task.StatusCode = code;
+                task.ExecutorId = executorId;
+                await _postgre.SaveChangesAsync();
+
+                // Актуализирует данные в приглашениях.
+                await _postgre.Invities.AddAsync(new InviteEntity
+                {
+                    TaskId = task.TaskId,
+                    ExecutorId = executorId,
+                    IsAccept = true,
+                    IsCancel = false
+                });
                 await _postgre.SaveChangesAsync();
 
                 return true;
@@ -590,8 +613,9 @@ namespace Barbuuuda.Services
         /// Метод проставит отказ на выполнение задания.
         /// </summary>
         /// <param name="taskId">Id задания.</param>
+        /// <param name="account">Логин исполнителя.</param>
         /// <returns>Флаг результата.</returns>
-        public async Task<bool> CancelTaskAsync(long taskId)
+        public async Task<bool> CancelTaskAsync(long taskId, string account)
         {
             try
             {
@@ -602,8 +626,43 @@ namespace Barbuuuda.Services
                     throw new NotFoundTaskIdException(taskId);
                 }
 
+                // Найдет Id исполнителя.
+                string executorId = await _user.GetUserIdByLogin(account);
+
+                // Добавит в таблицу отказов приглашений.
+                if (string.IsNullOrEmpty(executorId))
+                {
+                    throw new NotFoundExecutorIdException(account);
+                }
+
+                // Ищет такое приглашение.
+                InviteEntity canceledInvite = await _postgre.Invities
+                    .Where(c => c.TaskId == taskId && c.ExecutorId.Equals(executorId))
+                    .FirstOrDefaultAsync();
+
+                if (canceledInvite != null)
+                {
+                     _postgre.Remove(canceledInvite);
+                     await _postgre.SaveChangesAsync();
+                }
+
+                // Изменит статус задания на "В аукционе".
+                string code = await _postgre.TaskStatuses
+                    .Where(c => c.StatusName.Equals(StatusTask.AUCTION))
+                    .Select(res => res.StatusCode)
+                    .FirstOrDefaultAsync();
+
                 task.IsWorkAccept = false;
-                task.IsWorkCancel = true;
+                task.StatusCode = code;
+                await _postgre.SaveChangesAsync();
+
+                await _postgre.Invities.AddAsync(new InviteEntity
+                {
+                    TaskId = task.TaskId,
+                    ExecutorId = executorId,
+                    IsAccept = false,
+                    IsCancel = true
+                });
                 await _postgre.SaveChangesAsync();
 
                 return true;
@@ -637,27 +696,33 @@ namespace Barbuuuda.Services
                 }
 
                 var tasks = await _postgre.Tasks
-                    .Where(t => t.ExecutorId.Equals(executorId)
-                                && t.IsWorkAccept.Equals(true)
-                                && t.IsWorkCancel.Equals(false)
-                                && t.IsPay.Equals(true))
-                    .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode, (t, tc) => new { Tasks = t, ParentTaskCategory = tc })
+                    .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode,
+                        (t, tc) => new {Tasks = t, ParentTaskCategory = tc})
                     .Join(_postgre.Users, ts => ts.Tasks.OwnerId, u => u.Id, (ts, u) => new
-                        { TaskCategory = ts, User = u })
-                    .Join(_postgre.TaskStatuses, tcc => tcc.TaskCategory.Tasks.StatusCode, s => s.StatusCode, (tcc, s) => new { Result = tcc, TaskStatus = s })
+                        {TaskCategory = ts, User = u})
+                    .Join(_postgre.TaskStatuses, tcc => tcc.TaskCategory.Tasks.StatusCode, s => s.StatusCode,
+                        (tcc, s) => new {Result = tcc, TaskStatus = s})
+                    .Join(_postgre.Invities,
+                        x => x.Result.TaskCategory.Tasks.TaskId,
+                        i => i.TaskId,
+                        (x, i) => new {ChildUser = x, Invite = i})
+                    .Where(c => c.Invite.IsAccept.Equals(true)
+                                && c.ChildUser.TaskStatus.StatusCode.Equals(StatusCode.CODE_WORK)
+                                && c.ChildUser.Result.TaskCategory.Tasks.ExecutorId.Equals(executorId)
+                                && c.ChildUser.Result.TaskCategory.Tasks.IsPay.Equals(true))
                     .Select(res => new
                     {
-                        res.Result.TaskCategory.Tasks.TaskId,
-                        TaskEndda = string.Format("{0:f}", res.Result.TaskCategory.Tasks.TaskEndda),
-                        res.Result.TaskCategory.Tasks.TaskTitle,
-                        res.Result.TaskCategory.Tasks.TaskDetail,
-                        TaskPrice = string.Format("{0:0,0}", res.Result.TaskCategory.Tasks.TaskPrice),
-                        res.Result.TaskCategory.Tasks.CountOffers,
-                        res.Result.TaskCategory.Tasks.CountViews,
-                        res.Result.TaskCategory.Tasks.TypeCode,
-                        res.Result.User.UserName,
-                        res.Result.TaskCategory.ParentTaskCategory.CategoryName,
-                        res.TaskStatus.StatusName
+                        res.ChildUser.Result.TaskCategory.Tasks.TaskId,
+                        TaskEndda = string.Format("{0:f}", res.ChildUser.Result.TaskCategory.Tasks.TaskEndda),
+                        res.ChildUser.Result.TaskCategory.Tasks.TaskTitle,
+                        res.ChildUser.Result.TaskCategory.Tasks.TaskDetail,
+                        TaskPrice = string.Format("{0:0,0}", res.ChildUser.Result.TaskCategory.Tasks.TaskPrice),
+                        res.ChildUser.Result.TaskCategory.Tasks.CountOffers,
+                        res.ChildUser.Result.TaskCategory.Tasks.CountViews,
+                        res.ChildUser.Result.TaskCategory.Tasks.TypeCode,
+                        res.ChildUser.Result.User.UserName,
+                        res.ChildUser.Result.TaskCategory.ParentTaskCategory.CategoryName,
+                        res.ChildUser.TaskStatus.StatusName
                     })
                     .ToListAsync();
 

@@ -239,7 +239,7 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод проверит оплату задания и выбран ли исполнитель.
+        /// Метод проверит оплату заданияь.
         /// </summary>
         /// <param name="payInput">Входная модель.</param>
         /// <returns>Флаг проверки.</returns>

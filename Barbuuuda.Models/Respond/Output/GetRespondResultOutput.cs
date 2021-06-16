@@ -20,6 +20,6 @@ namespace Barbuuuda.Models.Respond.Output
         /// <summary>
         /// Флаг нахождения задания в работе.
         /// </summary>
-        public bool IsWorkAccept { get; set; }
+        public bool? IsWorkAccept { get; set; }
     }
 }

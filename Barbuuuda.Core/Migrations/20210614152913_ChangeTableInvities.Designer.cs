@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Barbuuuda.Core.Migrations
 {
     [DbContext(typeof(PostgreDbContext))]
-    [Migration("20210613224740_AddTableCanceledInvities2")]
-    partial class AddTableCanceledInvities2
+    [Migration("20210614152913_ChangeTableInvities")]
+    partial class ChangeTableInvities
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -374,15 +374,21 @@ namespace Barbuuuda.Core.Migrations
                     b.ToTable("RespondTemplates", "dbo");
                 });
 
-            modelBuilder.Entity("Barbuuuda.Models.Entities.Task.CanceledInviteEntity", b =>
+            modelBuilder.Entity("Barbuuuda.Models.Entities.Task.InviteEntity", b =>
                 {
-                    b.Property<long>("CanceledInviteId")
+                    b.Property<long>("InviteId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .UseIdentityByDefaultColumn();
 
                     b.Property<string>("ExecutorId")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsAccept")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsCancel")
+                        .HasColumnType("boolean");
 
                     b.Property<long>("TaskId")
                         .HasColumnType("bigint");
@@ -393,13 +399,13 @@ namespace Barbuuuda.Core.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
-                    b.HasKey("CanceledInviteId");
+                    b.HasKey("InviteId");
 
                     b.HasIndex("TaskId1");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CanceledInvities", "dbo");
+                    b.ToTable("Invities", "dbo");
                 });
 
             modelBuilder.Entity("Barbuuuda.Models.Entities.User.StateEntity", b =>
@@ -748,7 +754,7 @@ namespace Barbuuuda.Core.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Barbuuuda.Models.Entities.Task.CanceledInviteEntity", b =>
+            modelBuilder.Entity("Barbuuuda.Models.Entities.Task.InviteEntity", b =>
                 {
                     b.HasOne("Barbuuuda.Models.Task.TaskEntity", "Task")
                         .WithMany()

@@ -111,7 +111,7 @@ namespace Barbuuuda.Core.Data
         /// <summary>
         /// Таблица отмененных приглашений.
         /// </summary>
-        public DbSet<CanceledInviteEntity> CanceledInvities { get; set; }
+        public DbSet<InviteEntity> Invities { get; set; }
 
         public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options)
         {

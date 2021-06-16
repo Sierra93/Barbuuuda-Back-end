@@ -145,14 +145,14 @@ namespace Barbuuuda.Controllers
         /// Метод выгрузит список заданий, в которых был выбран текущий исполнитель.
         /// </summary>
         /// <returns>Список заданий.</returns>
-        [HttpPost, Route("my")]
-        [ProducesResponseType(200, Type = typeof(GetResultTask))]
-        public async Task<IActionResult> MyWorkTasksAsync()
-        {
-            GetResultTask result = await _executor.MyTasksAsync(GetUserName());
+        //[HttpPost, Route("my")]
+        //[ProducesResponseType(200, Type = typeof(GetResultTask))]
+        //public async Task<IActionResult> MyWorkTasksAsync()
+        //{
+        //    GetResultTask result = await _executor.MyTasksAsync(GetUserName());
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         /// <summary>
         /// Метод проставит согласие на выполнение задания.
@@ -162,7 +162,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(bool))]
         public async Task<IActionResult> AcceptTaskAsync([FromBody] AcceptOrCancelWorkTaskInput input)
         {
-            bool result = await _executor.AcceptTaskAsync(input.TaskId);
+            bool result = await _executor.AcceptTaskAsync(input.TaskId, GetUserName());
 
             return Ok(result);
         }
@@ -175,7 +175,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(bool))]
         public async Task<IActionResult> CancelTaskAsync([FromBody] AcceptOrCancelWorkTaskInput input)
         {
-            bool result = await _executor.CancelTaskAsync(input.TaskId);
+            bool result = await _executor.CancelTaskAsync(input.TaskId, GetUserName());
 
             return Ok(result);
         }

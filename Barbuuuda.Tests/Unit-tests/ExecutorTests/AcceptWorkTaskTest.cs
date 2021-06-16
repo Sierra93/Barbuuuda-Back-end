@@ -15,7 +15,7 @@ namespace Barbuuuda.Tests.Unit_tests.ExecutorTests
         public async Task AcceptWorkTaskTestAsync()
         {
             Mock<IExecutorService> mock = new Mock<IExecutorService>();
-            mock.Setup(a => a.AcceptTaskAsync(1000001)).Returns(Task.FromResult(true));
+            mock.Setup(a => a.AcceptTaskAsync(1000001, "executor1")).Returns(Task.FromResult(true));
             ExecutorController controller = new ExecutorController(mock.Object);
             var result = await controller.AcceptTaskAsync(new AcceptOrCancelWorkTaskInput() {TaskId = 1000001 }) as OkObjectResult; 
 

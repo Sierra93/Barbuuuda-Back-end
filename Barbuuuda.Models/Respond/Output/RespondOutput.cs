@@ -54,5 +54,20 @@
         /// Id исполнителя.
         /// </summary>
         public string ExecutorId { get; set; }
+
+        /// <summary>
+        /// Вычисляемый флаг, отправленно ли приглашение исполнителю.
+        /// </summary>
+        public bool IsSendInvite { get; set; }
+
+        /// <summary>
+        /// Вычисляемый флаг, принял ли предложение исполнитель.
+        /// </summary>
+        public bool IsAcceptInvite { get; set; }
+
+        /// <summary>
+        /// Вычисляемый флаг, отказался ли исполнитель от выполнения задания.
+        /// </summary>
+        public bool IsCancelInvite { get; set; }
     }
 }

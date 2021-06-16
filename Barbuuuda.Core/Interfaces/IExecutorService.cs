@@ -83,21 +83,23 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="account">Логин исполнителя.</param>
         /// <returns>Список заданий.</returns>
-        Task<GetResultTask> MyTasksAsync(string account);
+        //Task<GetResultTask> MyTasksAsync(string account);
 
         /// <summary>
         /// Метод проставит согласие на выполнение задания.
         /// </summary>
         /// <param name="taskId">Id задания.</param>
+        /// <param name="account">Логин исполнителя.</param>
         /// <returns>Флаг результата.</returns>
-        Task<bool> AcceptTaskAsync(long taskId);
+        Task<bool> AcceptTaskAsync(long taskId, string account);
 
         /// <summary>
         /// Метод проставит отказ на выполнение задания.
         /// </summary>
         /// <param name="taskId">Id задания.</param>
+        /// <param name="account">Логин исполнителя.</param>
         /// <returns>Флаг результата.</returns>
-        Task<bool> CancelTaskAsync(long taskId);
+        Task<bool> CancelTaskAsync(long taskId, string account);
 
 
         /// <summary>

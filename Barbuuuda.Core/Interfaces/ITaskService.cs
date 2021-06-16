@@ -134,7 +134,7 @@ namespace Barbuuuda.Core.Interfaces
         Task<bool> SelectAsync(long taskId, string executorId);
 
         /// <summary>
-        /// Метод проверит оплату задания и выбран ли исполнитель.
+        /// Метод проверит оплату задания.
         /// </summary>
         /// <param name="taskId">Id задания.</param>
         /// <returns>Флаг проверки.</returns>
