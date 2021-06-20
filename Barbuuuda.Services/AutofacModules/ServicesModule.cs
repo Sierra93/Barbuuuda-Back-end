@@ -1,6 +1,4 @@
 ﻿using Autofac;
-using Barbuuuda.Commerces.Core;
-using Barbuuuda.Commerces.Service;
 using Barbuuuda.Core.Interfaces;
 
 namespace Barbuuuda.Services.AutofacModules
@@ -35,9 +33,6 @@ namespace Barbuuuda.Services.AutofacModules
 
             // Платежная система.
             builder.RegisterType<PaymentService>().As<IPaymentService>();
-
-            // Сервис PayPal.
-            builder.RegisterType<PayPalService>().As<IPayPalService>();
         }
     }
 }

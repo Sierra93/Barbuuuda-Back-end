@@ -18,7 +18,7 @@ namespace Barbuuuda.Tests.Unit_tests.Payment
         {
             Mock<IPaymentService> mock = new Mock<IPaymentService>();
             mock.Setup(a => a.GetBalanceAsync(ACCOUNT)).Returns(Task.FromResult(GetBalance()));
-            PaymentController controller = new PaymentController(null, mock.Object);
+            PaymentController controller = new PaymentController(mock.Object);
             OkObjectResult viewResult = await controller.GetBalanceAsync() as OkObjectResult;
 
             Assert.AreEqual(viewResult?.StatusCode, 200);
