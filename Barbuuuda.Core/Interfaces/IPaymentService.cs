@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Barbuuuda.Models.Payment.Output;
 
 namespace Barbuuuda.Core.Interfaces
 {
@@ -22,5 +23,11 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="account">Логин текущего пользователя.</param>
         /// <returns>Сумма баланса.</returns>
         Task<decimal> GetBalanceAsync(string account);
+
+        /// <summary>
+        /// Метод инициализирует конфигурацию платежный виджет фронта данными.
+        /// </summary>
+        /// <returns>Объект с данными конфигурации виджета.</returns>
+        Task<PaymentWidgetOutput> InitPaymentAsync();
     }
 }

@@ -5,6 +5,7 @@ using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Entities.Payment;
+using Barbuuuda.Models.Payment.Output;
 using Microsoft.EntityFrameworkCore;
 
 namespace Barbuuuda.Services
@@ -99,6 +100,32 @@ namespace Barbuuuda.Services
                     .FirstOrDefaultAsync();
 
                 return balanceAmount;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод инициализирует конфигурацию платежный виджет фронта данными.
+        /// </summary>
+        /// <returns>Объект с данными конфигурации виджета.</returns>
+        public async Task<PaymentWidgetOutput> InitPaymentAsync()
+        {
+            try
+            {
+                PaymentWidgetOutput result = new PaymentWidgetOutput
+                {
+                    Element = "arsenalpay-widget",
+                    Widget = 8036,
+                    Destination = "111",
+                    Amount = 1000
+                };
+
+                return await Task.FromResult(result);
             }
 
             catch (Exception e)

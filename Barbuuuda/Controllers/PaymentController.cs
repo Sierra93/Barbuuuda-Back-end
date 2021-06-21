@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Barbuuuda.Core.Interfaces;
+using Barbuuuda.Models.Payment.Output;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,19 @@ namespace Barbuuuda.Controllers
             decimal balanceAmount = await _paymentService.GetBalanceAsync(GetUserName());
 
             return Ok(balanceAmount);
+        }
+
+        /// <summary>
+        /// Метод инициализирует конфигурацию платежный виджет фронта данными.
+        /// </summary>
+        /// <returns>Объект с данными конфигурации виджета.</returns>
+        [HttpPost, Route("init")]
+        [ProducesResponseType(200, Type = typeof(PaymentWidgetOutput))]
+        public async Task<IActionResult> InitPaymentAsync()
+        {
+            PaymentWidgetOutput result = await _paymentService.InitPaymentAsync();
+
+            return Ok(result);
         }
     }
 }
