@@ -13,9 +13,9 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="amount">Сумма пополнения.</param>
         /// <param name="currency">Валюта.</param>
-        /// <param name="scoreEmail">Адрес выставления счета.</param>
         /// <param name="account">Логин пользователя.</param>
-        Task RefillBalance(decimal amount, string currency, string scoreEmail, string account);
+        /// <returns>Флаг успеха пополнения счета.</returns>
+        Task<bool> RefillBalanceAsync(decimal amount, string currency, string account);
 
         /// <summary>
         /// Метод получает сумму средств на балансе текущего пользователя.

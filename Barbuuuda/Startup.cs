@@ -102,7 +102,7 @@ namespace Barbuuuda
             builder.Build();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCors("ApiCorsPolicy");
 

@@ -29,9 +29,9 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="amount">Сумма пополнения.</param>
         /// <param name="currency">Валюта.</param>
-        /// <param name="scoreEmail">Адрес выставления счета.</param>
         /// <param name="account">Логин пользователя.</param>
-        public async Task RefillBalance(decimal amount, string currency, string scoreEmail, string account)
+        /// <returns>Флаг успеха пополнения счета.</returns>
+        public async Task<bool> RefillBalanceAsync(decimal amount, string currency, string account)
         {
             try
             {
@@ -74,6 +74,8 @@ namespace Barbuuuda.Services
                         await _postgre.SaveChangesAsync();
                     }
                 }
+
+                return true;
             }
 
             catch (Exception ex)
@@ -110,6 +112,7 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
+        /// TODO: Подумать, нужен ли метод RefillBalanceAsync ведь этот можно доработать!!! Но это не точно!!!
         /// Метод инициализирует конфигурацию платежный виджет фронта данными.
         /// </summary>
         /// <returns>Объект с данными конфигурации виджета.</returns>
@@ -121,8 +124,8 @@ namespace Barbuuuda.Services
                 {
                     Element = "arsenalpay-widget",
                     Widget = 8036,
-                    Destination = "111",
-                    Amount = 1000
+                    Destination = "111",    //TODO: доработать под динамику!!!
+                    Amount = 1000   //TODO: доработать под динамику!!!
                 };
 
                 return await Task.FromResult(result);
