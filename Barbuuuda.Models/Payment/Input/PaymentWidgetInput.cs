@@ -14,5 +14,10 @@
         /// Валюта.
         /// </summary>
         public string Currency { get; set; }
+
+        /// <summary>
+        /// Id задания.
+        /// </summary>
+        public long? TaskId { get; set; }
     }
 }

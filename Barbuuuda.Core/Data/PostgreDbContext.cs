@@ -1,4 +1,5 @@
 ﻿using Barbuuuda.Models.Entities.Chat;
+using Barbuuuda.Models.Entities.Customer;
 using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.Entities.Knowlege;
 using Barbuuuda.Models.Entities.Payment;
@@ -112,6 +113,11 @@ namespace Barbuuuda.Core.Data
         /// Таблица отмененных приглашений.
         /// </summary>
         public DbSet<InviteEntity> Invities { get; set; }
+
+        /// <summary>
+        /// Таблица заказов.
+        /// </summary>
+        public DbSet<OrderEntity> Orders { get; set; }
 
         public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options)
         {

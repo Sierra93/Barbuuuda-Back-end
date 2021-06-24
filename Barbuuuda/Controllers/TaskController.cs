@@ -69,19 +69,18 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// TODO убрать.
         /// Метод выгружает список специализаций заданий.
         /// </summary>
         /// <returns>Коллекцию специализаций.</returns>
-        [HttpPost, Route("get-specializations")]
-        public Task<IActionResult> GetSpecializations()
-        {
-            //ITask _task = new TaskService(_db, _postgre);
-            //IList aSpecializations = await _task.GetTaskSpecializations();
+        //[HttpPost, Route("get-specializations")]
+        //public Task<IActionResult> GetSpecializations()
+        //{
+        //    //ITask _task = new TaskService(_db, _postgre);
+        //    //IList aSpecializations = await _task.GetTaskSpecializations();
 
-            //return Ok(aSpecializations);
-            throw new NotImplementedException();
-        }
+        //    //return Ok(aSpecializations);
+        //    throw new NotImplementedException();
+        //}
 
         /// <summary>
         /// Метод получает список заданий заказчика или конкретное задание.

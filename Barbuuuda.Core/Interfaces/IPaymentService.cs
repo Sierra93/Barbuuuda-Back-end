@@ -9,15 +9,6 @@ namespace Barbuuuda.Core.Interfaces
     public interface IPaymentService
     {
         /// <summary>
-        /// Метод пополнит счет пользователя на сервисе в переданной валюте, либо создаст новый счет в этой валюте.
-        /// </summary>
-        /// <param name="amount">Сумма пополнения.</param>
-        /// <param name="currency">Валюта.</param>
-        /// <param name="account">Логин пользователя.</param>
-        /// <returns>Флаг успеха пополнения счета.</returns>
-        Task<bool> RefillBalanceAsync(decimal amount, string currency, string account);
-
-        /// <summary>
         /// Метод получает сумму средств на балансе текущего пользователя.
         /// </summary>
         /// <param name="account">Логин текущего пользователя.</param>
@@ -27,7 +18,11 @@ namespace Barbuuuda.Core.Interfaces
         /// <summary>
         /// Метод инициализирует конфигурацию платежный виджет фронта данными.
         /// </summary>
+        /// <param name="amount">Сумма.</param>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="currency">Валюта.</param>
+        /// <param name="account">Логин пользователя.</param>
         /// <returns>Объект с данными конфигурации виджета.</returns>
-        Task<PaymentWidgetOutput> InitPaymentAsync();
+        Task<PaymentWidgetOutput> InitPaymentAsync(decimal amount, long? taskId, string currency, string account);
     }
 }
