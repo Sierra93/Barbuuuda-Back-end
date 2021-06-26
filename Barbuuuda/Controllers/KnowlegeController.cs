@@ -3,6 +3,7 @@ using Barbuuuda.Models.Entities.Knowlege;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Barbuuuda.Controllers
 {
@@ -37,8 +38,9 @@ namespace Barbuuuda.Controllers
         public async Task<IActionResult> GetPopularArticlesAsync()
         {
             IEnumerable<PopularArticleEntity> populArticlesList = await _knowlege.GetPopularArticlesAsync();
-
-            return Ok(populArticlesList);
+            IEnumerable<PopularArticleEntity> descendedPopulArticlesList = populArticlesList.OrderByDescending(x => x.HelpfulCount);
+            
+            return Ok(descendedPopulArticlesList);
         }
 
         /// <summary>
