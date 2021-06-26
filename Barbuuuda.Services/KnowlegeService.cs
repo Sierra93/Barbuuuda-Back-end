@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Barbuuuda.Services
 {
@@ -56,13 +57,14 @@ namespace Barbuuuda.Services
 
         /// <summary>
         /// Метод выгружает список популярных статей.
-        /// </summary>
+        /// </summary>  
         /// <returns>Список статей.</returns>
         public async Task<IEnumerable<PopularArticleEntity>> GetPopularArticlesAsync()
         {
             try
             {
-                return await _postgre.PopularArticles.ToListAsync();
+                var arcticles = _postgre.PopularArticles.OrderByDescending(a => a.HelpfulCount);              
+                return await arcticles .ToListAsync();
             }
 
             catch (Exception ex)
