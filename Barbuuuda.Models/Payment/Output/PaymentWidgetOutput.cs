@@ -1,28 +1,28 @@
 ﻿namespace Barbuuuda.Models.Payment.Output
 {
     /// <summary>
-    /// Класс выходной модели конфигурации платежного виджета фронта.
+    /// Класс выходной модели для шаблона виджета при оплате задания.
     /// </summary>
     public class PaymentWidgetOutput
     {
         /// <summary>
-        /// Название элемента.
+        /// Версия.
         /// </summary>
-        public string Element { get; set; }
+        public string Version { get; set; }
 
         /// <summary>
-        /// Идентификатор виджета.
+        /// Вложенная секция invoice.
         /// </summary>
-        public int Widget { get; set; }
+        public Invoice Invoice { get; set; }
 
         /// <summary>
-        /// Номер заказа.
+        /// Вложенная секция paymentForm.
         /// </summary>
-        public string Destination { get; set; }
+        public PaymentForm PaymentForm { get; set; }
 
         /// <summary>
-        /// Сумма.
+        /// Вложенная секция payment.
         /// </summary>
-        public decimal Amount { get; set; }
+        public Payment Payment { get; set; }
     }
 }

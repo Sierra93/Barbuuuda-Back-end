@@ -44,8 +44,21 @@ namespace Barbuuuda.Controllers
         public async Task<IActionResult> InitPaymentAsync([FromBody] PaymentWidgetInput input)
         {
             PaymentWidgetOutput result = await _paymentService.InitPaymentAsync(input.Amount, input.TaskId, input.Currency, GetUserName());
-
+            
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод действий после успешной оплаты.
+        /// Запишет данные транзакции в БД в таблицу заказов или таблицу счетов.
+        /// </summary>
+        /// <param name="form">Данные транзакции, которые вернула платежная система.</param>
+        /// <returns>Вернет роут по success url.</returns>
+        [AllowAnonymous]
+        [HttpPost, Route("check")]
+        public async Task<IActionResult> CheckPaymentTestAsync([FromForm] PaymentSuccessInput paymentSuccessInput)
+        {
+            return Ok();
         }
     }
 }
