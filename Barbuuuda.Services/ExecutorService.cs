@@ -585,6 +585,34 @@ namespace Barbuuuda.Services
                 task.ExecutorId = executorId;
                 await _postgre.SaveChangesAsync();
 
+                // Снимет оплату за задание со счета заказчика.
+                // Найдет счет заказчика.
+                var invoice = await (from inv in _postgre.Invoices
+                                     where inv.UserId.Equals(task.OwnerId)
+                                     select inv)
+                    .FirstOrDefaultAsync();
+
+                if (invoice == null)
+                {
+                    throw new NotFoundInvoiceException();
+                }
+
+                // Найдент ставку исполнителя, чтобы проставить сумму, которую нужно вычесть со счета заказчика.
+                var subtractionAmount = await (from respond in _postgre.Responds
+                                               where executorId.Equals(respond.ExecutorId)
+                                                   && respond.TaskId == task.TaskId
+                                               select respond.Price)
+                    .FirstOrDefaultAsync();
+
+                // Проверит необходимую сумму на счете заказчика. Если не хватает, то вернет false.
+                if (invoice.InvoiceAmount < subtractionAmount)
+                {
+                    return false;
+                }
+
+                invoice.InvoiceAmount -= Convert.ToDecimal(subtractionAmount);
+                await _postgre.SaveChangesAsync();
+
                 return true;
             }
 

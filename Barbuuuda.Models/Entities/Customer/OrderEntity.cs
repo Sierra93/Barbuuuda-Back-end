@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Barbuuuda.Models.User;
 
 namespace Barbuuuda.Models.Entities.Customer
 {
     /// <summary>
-    /// Класс сопоставляется с таблицей заказов. Заказ представляет собой оплату заданий.
+    /// Класс сопоставляется с таблицей заказов. Заказ представляет собой оплату заданий или пополнение счета.
     /// </summary>
     [Table("Orders", Schema = "dbo")]
     public class OrderEntity
@@ -44,5 +45,10 @@ namespace Barbuuuda.Models.Entities.Customer
 
         //[ForeignKey("TaskId")]
         //public TaskEntity Task { get; set; }
+
+        /// <summary>
+        /// Дата и время создания заказа.
+        /// </summary>
+        public DateTime DateCreate { get; set; }
     }
 }
