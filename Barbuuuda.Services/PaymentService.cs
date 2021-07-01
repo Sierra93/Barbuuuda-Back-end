@@ -100,7 +100,8 @@ namespace Barbuuuda.Services
                     {
                         Id = userId,
                         Amount = decimal.Parse(paymentSuccessInput.LMI_PAYMENT_AMOUNT, formatter),
-                        Currency = paymentSuccessInput.LMI_CURRENCY
+                        Currency = paymentSuccessInput.LMI_CURRENCY,
+                        DateCreate = DateTime.Now
                     };
                 }
 
@@ -110,7 +111,8 @@ namespace Barbuuuda.Services
                     Id = userId,
                     Amount = decimal.Parse(paymentSuccessInput.LMI_PAYMENT_AMOUNT, formatter),
                     TaskId = paymentSuccessInput.TaskId,
-                    Currency = paymentSuccessInput.LMI_CURRENCY
+                    Currency = paymentSuccessInput.LMI_CURRENCY,
+                    DateCreate = DateTime.Now
                 };
 
                 // Запишет заказ пользователя в таблицу заказов.
