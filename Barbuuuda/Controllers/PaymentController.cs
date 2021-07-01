@@ -52,13 +52,16 @@ namespace Barbuuuda.Controllers
         /// Метод действий после успешной оплаты.
         /// Запишет данные транзакции в БД в таблицу заказов или таблицу счетов.
         /// </summary>
-        /// <param name="form">Данные транзакции, которые вернула платежная система.</param>
+        /// <param name="paymentSuccessInput">Данные транзакции, которые вернула платежная система.</param>
         /// <returns>Вернет роут по success url.</returns>
         [AllowAnonymous]
         [HttpPost, Route("check")]
         public async Task<IActionResult> CheckPaymentTestAsync([FromForm] PaymentSuccessInput paymentSuccessInput)
         {
-            return Ok();
+            await _paymentService.RefillBalanceAsync(paymentSuccessInput);
+
+            // TODO: Менять при тесте на http://localhost:8080/home или для прода https://barbuuuda.ru
+            return new RedirectResult("http://localhost:8080/home");
         }
     }
 }
