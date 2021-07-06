@@ -43,7 +43,7 @@ namespace Barbuuuda.Services
         {
             try
             {
-                OrderEntity order = default;
+                OrderEntity order;
                 IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
 
                 // Найдет Id пользователя по его логину.
@@ -106,14 +106,17 @@ namespace Barbuuuda.Services
                 }
 
                 // Если идет оплата задания.
-                order = new OrderEntity
+                else
                 {
-                    Id = userId,
-                    Amount = decimal.Parse(paymentSuccessInput.LMI_PAYMENT_AMOUNT, formatter),
-                    TaskId = paymentSuccessInput.TaskId,
-                    Currency = paymentSuccessInput.LMI_CURRENCY,
-                    DateCreate = DateTime.Now
-                };
+                    order = new OrderEntity
+                    {
+                        Id = userId,
+                        Amount = decimal.Parse(paymentSuccessInput.LMI_PAYMENT_AMOUNT, formatter),
+                        TaskId = paymentSuccessInput.TaskId,
+                        Currency = paymentSuccessInput.LMI_CURRENCY,
+                        DateCreate = DateTime.Now
+                    };
+                }
 
                 // Запишет заказ пользователя в таблицу заказов.
                 await _postgre.Orders.AddAsync(order);

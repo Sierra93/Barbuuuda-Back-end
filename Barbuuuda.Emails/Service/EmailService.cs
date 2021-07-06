@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Logger;
 
-namespace Barbuuuda.Emails
+namespace Barbuuuda.Emails.Service
 {
     /// <summary>
     /// Класс реализует методы Email-рассылок.
@@ -37,10 +37,10 @@ namespace Barbuuuda.Emails
                 {
                     Text = message
                 };
-
+                
                 using var client = new SmtpClient();
                 await client.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-                await client.AuthenticateAsync("info.barbuuuda@gmail.com", "13467kvm");
+                await client.AuthenticateAsync("info.barbuuuda@gmail.com", "13467982DdddDdddDddd");
                 await client.SendAsync(emailMessage);
                 await client.DisconnectAsync(true);
             }

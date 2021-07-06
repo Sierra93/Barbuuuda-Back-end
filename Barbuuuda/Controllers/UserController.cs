@@ -3,7 +3,6 @@ using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Extensions.User;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
-using Barbuuuda.Emails;
 using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Barbuuuda.Emails.Service;
 using Barbuuuda.Models.Entities.Payment;
 
 namespace Barbuuuda.Controllers
