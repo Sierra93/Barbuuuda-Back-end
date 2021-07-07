@@ -3,6 +3,7 @@ using Barbuuuda.Models.MainPage;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Entities.MainPage.Output;
 
 namespace Barbuuuda.Controllers
 {
@@ -12,14 +13,12 @@ namespace Barbuuuda.Controllers
     [ApiController, Route("main")]
     public class MainPageController : BaseController
     {
-        public static string Module => "Barbuuuda.Main";
-
         /// <summary>
         /// Сервис стартовой страницы.
         /// </summary>
-        private readonly IMainPage _mainPage;
+        private readonly IMainPageService _mainPage;
 
-        public MainPageController(IMainPage mainPage) : base(Module)
+        public MainPageController(IMainPageService mainPage)
         {
             _mainPage = mainPage;
         }
@@ -109,6 +108,19 @@ namespace Barbuuuda.Controllers
             IEnumerable aLastTasks = await _mainPage.GetLastTasksAsync();
 
             return Ok(aLastTasks);
+        }
+
+        /// <summary>
+        /// Метод получит контактные данные сервиса.
+        /// </summary>
+        /// <returns>Контактная информация.</returns>
+        [HttpPost, Route("contacts")]
+        [ProducesResponseType(200, Type = typeof(ContactOutput))]
+        public async Task<IActionResult> GetContactsAsync()
+        {
+            ContactOutput contact = await _mainPage.GetContactsAsync();
+
+            return Ok(contact);
         }
     }
 }

@@ -7,7 +7,7 @@ using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
-using Barbuuuda.Models.User.Outpoot;
+using Barbuuuda.Models.User.Output;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -23,7 +23,7 @@ namespace Barbuuuda.Services
     /// <summary>
     /// Сервис реализует методы пользователя.
     /// </summary>
-    public sealed class UserService : IUser
+    public sealed class UserService : IUserService
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
@@ -51,8 +51,7 @@ namespace Barbuuuda.Services
                 bool isContinue = false;
 
                 // Проверит, логин передан или email.
-                CustomValidatorExtension validatorExtension = new CustomValidatorExtension(_postgre);
-                bool isEmail = validatorExtension.CheckIsEmail(user.UserName);
+                bool isEmail = CustomValidatorExtension.CheckIsEmail(user.UserName);
 
                 // Если нужно проверять по логину.
                 if (!isEmail)
@@ -286,7 +285,7 @@ namespace Barbuuuda.Services
                         up.Patronymic,
                         up.UserIcon,
                         dateRegister = string.Format("{0:f}", up.DateRegister),
-                        scoreMoney = string.Format("{0:0,0}", up.Score),
+                        //scoreMoney = string.Format("{0:0,0}", up.Score),
                         up.AboutInfo,
                         up.Plan,
                         up.City,
@@ -469,16 +468,17 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userId">Id пользователя.</param>
         /// <returns>Фамилия, имя, фото профиля пользователя.</returns>
-        public async Task<UserOutpoot> GetUserInitialsByIdAsync(string userId)
+        public async Task<UserOutput> GetUserInitialsByIdAsync(string userId)
         {
-            UserOutpoot user = await _postgre.Users
+            UserOutput user = await _postgre.Users
                 .Where(u => u.Id
                 .Equals(userId))
-                .Select(res => new UserOutpoot { 
+                .Select(res => new UserOutput { 
                     FirstName = res.FirstName, 
                     LastName = res.LastName,
                     UserIcon = res.UserIcon,
-                    UserRole = res.UserRole
+                    UserRole = res.UserRole,
+                    UserName = res.UserName
                 })
                 .FirstOrDefaultAsync();
 
@@ -490,7 +490,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="taskId">Id задания.</param>
         /// <returns>Данные заказчика.</returns>
-        public async Task<CustomerOutpoot> GetCustomerLoginByTaskId(int? taskId)
+        public async Task<CustomerOutput> GetCustomerLoginByTaskId(int? taskId)
         {
             try
             {
@@ -511,10 +511,10 @@ namespace Barbuuuda.Services
                     throw new NotFoundTaskCustomerIdException(customerId);
                 }
 
-                // Найдет логин и иконку профиля заказчика задания и мапит к типу CustomerOutpoot.
-                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, CustomerOutpoot>());
+                // Найдет логин и иконку профиля заказчика задания и мапит к типу CustomerOutput.
+                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, CustomerOutput>());
                 Mapper mapper = new Mapper(config);
-                CustomerOutpoot customer = mapper.Map<CustomerOutpoot>(await _postgre.Users
+                CustomerOutput customer = mapper.Map<CustomerOutput>(await _postgre.Users
                     .Where(u => u.Id
                     .Equals(customerId))
                     .FirstOrDefaultAsync());
@@ -539,6 +539,37 @@ namespace Barbuuuda.Services
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 _ = _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод находит последнего добавленного пользователя и берет его Id.
+        /// </summary>
+        /// <returns>Id последнего пользователя.</returns>
+        public async Task<string> GetLastUserAsync()
+        {
+            try
+            {
+                List<UserEntity> users = await _postgre.Users.ToListAsync();
+
+                if (users.Count <= 0)
+                {
+                    throw new EmptyTableUserException();
+                }
+
+                users.Reverse();
+                string userId = users.Select(u => u.Id).FirstOrDefault();
+
+                return userId;
+
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Logger _logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                _ = _logger.LogCritical();
+                throw;
             }
         }
     }

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Barbuuuda.Models.Task.Input;
-using Barbuuuda.Models.Respond.Outpoot;
-using Barbuuuda.Models.Task.Outpoot;
+using Barbuuuda.Models.Respond.Output;
+using Barbuuuda.Models.Task.Output;
 
 namespace Barbuuuda.Controllers
 {
@@ -19,14 +19,12 @@ namespace Barbuuuda.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TaskController : BaseController
     {
-        public static string Module => "Barbuuuda.Task";
-
         /// <summary>
         /// Сервис заданий.
         /// </summary>
-        private readonly ITask _task;
+        private readonly ITaskService _task;
 
-        public TaskController(ITask task) : base(Module)
+        public TaskController(ITaskService task)
         {
             _task = task;
         }
@@ -71,19 +69,18 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// TODO убрать.
         /// Метод выгружает список специализаций заданий.
         /// </summary>
         /// <returns>Коллекцию специализаций.</returns>
-        [HttpPost, Route("get-specializations")]
-        public Task<IActionResult> GetSpecializations()
-        {
-            //ITask _task = new TaskService(_db, _postgre);
-            //IList aSpecializations = await _task.GetTaskSpecializations();
+        //[HttpPost, Route("get-specializations")]
+        //public Task<IActionResult> GetSpecializations()
+        //{
+        //    //ITask _task = new TaskService(_db, _postgre);
+        //    //IList aSpecializations = await _task.GetTaskSpecializations();
 
-            //return Ok(aSpecializations);
-            throw new NotImplementedException();
-        }
+        //    //return Ok(aSpecializations);
+        //    throw new NotImplementedException();
+        //}
 
         /// <summary>
         /// Метод получает список заданий заказчика или конкретное задание.
@@ -103,7 +100,7 @@ namespace Barbuuuda.Controllers
         /// Метод удаляет задание.
         /// </summary>
         /// <param name="taskId">Id задачи.</param>
-        [HttpGet, Route("delete/{taskId}")]
+        [HttpGet, Route("delete/{taskId:int}")]
         public async Task<IActionResult> DeleteTask([FromRoute] int taskId)
         {
             await _task.DeleteTask(taskId);
@@ -204,10 +201,10 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <returns>Список заданий.</returns>
         [HttpPost, Route("auction")]
-        [ProducesResponseType(200, Type = typeof(GetTaskResultOutpoot))]
+        [ProducesResponseType(200, Type = typeof(GetTaskResultOutput))]
         public async Task<IActionResult> LoadAuctionTasks()
         {
-            GetTaskResultOutpoot auctionTasks = await _task.LoadAuctionTasks();
+            GetTaskResultOutput auctionTasks = await _task.LoadAuctionTasks();
 
             return Ok(auctionTasks);
         }
@@ -218,12 +215,54 @@ namespace Barbuuuda.Controllers
         /// <param name="getRespondInput">Id задания, для которого нужно получить список ставок.</param>
         /// <returns>Список ставок.</returns>
         [HttpPost, Route("get-responds")]
-        [ProducesResponseType(200, Type = typeof(GetRespondResultOutpoot))]
+        [ProducesResponseType(200, Type = typeof(GetRespondResultOutput))]
         public async Task<IActionResult> GetRespondsAsync([FromBody] GetRespondInput getRespondInput)
         {
-            GetRespondResultOutpoot respondsList = await _task.GetRespondsAsync(getRespondInput.TaskId, GetUserName());
+            GetRespondResultOutput respondsList = await _task.GetRespondsAsync(getRespondInput.TaskId, GetUserName());
 
             return Ok(respondsList);
+        }
+
+        /// <summary>
+        /// Метод выберет исполнителя задания.
+        /// </summary>
+        /// <param name="payInput">Входная модель.</param>
+        /// <returns>Флаг выбора.</returns>
+        [HttpPost, Route("select")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> SelectAsync([FromBody] CheckPayInput payInput)
+        {
+            bool result = await _task.SelectAsync(payInput.TaskId, payInput.ExecutorId);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод проверит оплату заданияь.
+        /// </summary>
+        /// <param name="payInput">Входная модель.</param>
+        /// <returns>Флаг проверки.</returns>
+        [HttpPost, Route("check-select-pay")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> CheckSelectPayAsync([FromBody] CheckPayInput payInput)
+        {
+            bool result = await _task.CheckSelectPayAsync(payInput.TaskId);
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод проверит, принял ли исполнитель в работу задание и не отказался ли от него.
+        /// </summary>
+        /// <param name="payInput">Входная модель.</param>
+        /// <returns>Если все хорошо, то вернет список ставок к заданию, в котором будет только ставка исполнителя, которого выбрали и который принял в работу задание.</returns>
+        [HttpPost, Route("check-accept-invite")]
+        [ProducesResponseType(200, Type = typeof(GetRespondResultOutput))]
+        public async Task<IActionResult> CheckAcceptAndNotCancelInviteTaskAsync([FromBody] CheckPayInput payInput)
+        {
+            GetRespondResultOutput result = await _task.CheckAcceptAndNotCancelInviteTaskAsync(payInput.TaskId, GetUserName());
+
+            return Ok(result);
         }
     }
 }

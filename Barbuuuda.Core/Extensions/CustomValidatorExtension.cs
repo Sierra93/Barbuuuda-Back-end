@@ -120,7 +120,7 @@ namespace Barbuuuda.Core.Extensions.User
         /// </summary>
         /// <param name="inputParam">Входной параметр.</param>
         /// <returns>Статус проверки: true - если передан email, false - если передан логин.</returns>
-        public bool CheckIsEmail(string inputParam)
+        public static bool CheckIsEmail(string inputParam)
         {
             if (string.IsNullOrEmpty(inputParam))
             {

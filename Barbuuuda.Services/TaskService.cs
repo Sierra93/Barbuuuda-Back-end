@@ -1,14 +1,13 @@
 ﻿using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Data;
-using Barbuuuda.Core.Enums;
 using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
-using Barbuuuda.Models.Respond.Outpoot;
+using Barbuuuda.Models.Respond.Output;
 using Barbuuuda.Models.Task;
-using Barbuuuda.Models.Task.Outpoot;
+using Barbuuuda.Models.Task.Output;
 using Barbuuuda.Models.User;
-using Barbuuuda.Models.User.Outpoot;
+using Barbuuuda.Models.User.Output;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
@@ -16,19 +15,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Entities.Task;
 
 namespace Barbuuuda.Services
 {
     /// <summary>
     /// Сервис реализует методы заданий.
     /// </summary>
-    public sealed class TaskService : ITask
+    public sealed class TaskService : ITaskService
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IUser _user;
+        private readonly IUserService _user;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUser user)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUserService user)
         {
             _db = db;
             _postgre = postgre;
@@ -112,6 +112,14 @@ namespace Barbuuuda.Services
 
                 // Проверяет существование заказчика, который создал задание.
                 bool bCustomer = await IdentityCustomer(userName);
+
+                string ownerId = await _user.GetUserIdByLogin(userName);
+
+                // Запишет Id заказчика.
+                if (!string.IsNullOrEmpty(ownerId))
+                {
+                    oTask.OwnerId = ownerId;
+                }
 
                 // Проверяет, есть ли такая категория в БД.
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
@@ -330,7 +338,7 @@ namespace Barbuuuda.Services
             }
 
             // Получит логин и иконку профиля заказчика задания.
-            CustomerOutpoot customer = await _user.GetCustomerLoginByTaskId(taskId);
+            CustomerOutput customer = await _user.GetCustomerLoginByTaskId(taskId);
 
             // TODO: отрефачить этот метод, чтоб не обращаться два раза к БД за получением задания.            
             var oTask = await (from tasks in _postgre.Tasks
@@ -783,13 +791,12 @@ namespace Barbuuuda.Services
         /// <summary>
         /// Метод получает задания в статусе "В аукционе".
         /// </summary>
-        /// <param name="taskId"></param>
         /// <returns>Список заданий в аукционе.</returns>
-        public async Task<GetTaskResultOutpoot> LoadAuctionTasks()
+        public async Task<GetTaskResultOutput> LoadAuctionTasks()
         {
             try
             {
-                GetTaskResultOutpoot resultTasks = new GetTaskResultOutpoot();
+                GetTaskResultOutput resultTasks = new GetTaskResultOutput();
                 IEnumerable auctionTasks = await (from tasks in _postgre.Tasks
                                                   join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                                   join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
@@ -817,11 +824,11 @@ namespace Barbuuuda.Services
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
 
-                // Приводит к типу коллекции GetTaskResultOutpoot.
+                // Приводит к типу коллекции GetTaskResultOutput.
                 foreach (object task in auctionTasks)
                 {
                     string jsonString = JsonSerializer.Serialize(task);
-                    TaskOutpoot result = JsonSerializer.Deserialize<TaskOutpoot>(jsonString);
+                    TaskOutput result = JsonSerializer.Deserialize<TaskOutput>(jsonString);
 
                     // Считает кол-во ставок к заданию, либо проставит 0.
                     int countResponds = await _postgre.Responds
@@ -878,7 +885,7 @@ namespace Barbuuuda.Services
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Список ставок.</returns>
-        public async Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId, string account)
+        public async Task<GetRespondResultOutput> GetRespondsAsync(long taskId, string account)
         {
             try
             {
@@ -887,37 +894,42 @@ namespace Barbuuuda.Services
                     throw new NullTaskIdException();
                 }
 
-                IEnumerable respondsList = await (_postgre.Responds.Where(t => t.TaskId == taskId)
-                    .Join(_postgre.Users, re => re.ExecutorId, u => u.Id, (re, u) => new { re, u })
-                    .Join(_postgre.Statistics, user => user.u.Id, st => st.ExecutorId, (user, st) => new { user, st })
-                    .Select(res => new {
-                        res.user.u.UserName,
-                        res.user.re.Comment,
-                        Price = string.Format("{0:0,0}", res.user.re.Price),
-                        res.st.CountPositive,
-                        res.st.CountNegative,
-                        res.st.CountTotalCompletedTask,
-                        res.st.Rating,
-                        UserIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO,
-                        res.st.ExecutorId
-                    })
-                    .ToListAsync());
+                IEnumerable respondsList = await GetRespondsListAsync(taskId);
 
-                GetRespondResultOutpoot result = new GetRespondResultOutpoot();
+                GetRespondResultOutput result = new GetRespondResultOutput();
 
                 // Находит Id исполнителя.
                 string userId = await _user.GetUserIdByLogin(account);
 
-                // Приведет к типу коллекции GetRespondResultOutpoot.
+                // Приведет к типу коллекции GetRespondResultOutput.
                 foreach (object respond in respondsList)
                 {
                     string jsonString = JsonSerializer.Serialize(respond);
-                    RespondOutpoot resultObject = JsonSerializer.Deserialize<RespondOutpoot>(jsonString);
+                    RespondOutput resultObject = JsonSerializer.Deserialize<RespondOutput>(jsonString);
 
                     // Если исполнитель оставлял ставку к данному заданию, то проставит флаг видимости кнопки "ИЗМЕНИТЬ СТАВКУ", иначе скроет ее.
                     if (resultObject.ExecutorId.Equals(userId))
                     {
                         resultObject.IsVisibleButton = true;
+                    }
+
+                    // Выберет приглашение.
+                    InviteEntity invite = await _postgre.Invities
+                        .Where(c => c.TaskId == taskId && c.ExecutorId.Equals(resultObject.ExecutorId))
+                        .FirstOrDefaultAsync();
+
+                    if (invite != null && !string.IsNullOrEmpty(invite.ExecutorId) && invite.TaskId > 0)
+                    {
+
+                        if (invite.IsAccept)
+                        {
+                            resultObject.IsSendInvite = true;
+                        }
+
+                        if (invite.IsCancel)
+                        {
+                            resultObject.IsCancelInvite = true;
+                        }
                     }
 
                     result.Responds.Add(resultObject);
@@ -932,6 +944,168 @@ namespace Barbuuuda.Services
                 await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
+        }
+
+        /// <summary>
+        /// Метод выберет исполнителя задания.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="executorId">Id исполнителя, которого заказчик выбрал.</param>
+        /// <returns>Флаг проверки оплаты.</returns>
+        public async Task<bool> SelectAsync(long taskId, string executorId)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                if (string.IsNullOrEmpty(executorId))
+                {
+                    throw new EmptyExecutorIdException();
+                }
+
+                TaskEntity task = await _postgre.Tasks
+                    .Where(t => t.TaskId == taskId)
+                    .FirstOrDefaultAsync();
+
+                // Если задание не было оплаченно заказчиком.
+                if (!task.IsPay)
+                {
+                    return false;
+                }
+
+                // Запишет исполнителя на задание и будет ждать ответа от исполнителя на приглашение.
+                await _postgre.Invities.AddAsync(new InviteEntity
+                {
+                    TaskId = task.TaskId,
+                    ExecutorId = executorId,
+                    IsAccept = true,
+                    OwnerId = task.OwnerId
+                });
+                await _postgre.SaveChangesAsync();
+
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод проверит оплату задания.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Флаг проверки.</returns>
+        public async Task<bool> CheckSelectPayAsync(long taskId)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                // Выберет задание. Должно быть оплачено и исполнитель должен быть проставлен.
+                var task = await _postgre.Tasks
+                    .Where(c => c.TaskId == taskId)
+                    .Select(res => new
+                    {
+                        IsPay = res.IsPay.Equals(true)
+                    })
+                    .FirstOrDefaultAsync();
+
+                return task.IsPay;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод проверит, принял ли исполнитель в работу задание и не отказался ли от него.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Если все хорошо, то вернет список ставок к заданию, в котором будет только ставка исполнителя, которого выбрали и который принял в работу задание.</returns>
+        public async Task<GetRespondResultOutput> CheckAcceptAndNotCancelInviteTaskAsync(long taskId, string account)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                // Выберет задание. Задание должно быть принято в работу.
+                var task = await _postgre.Invities
+                    .Where(c => c.TaskId == taskId && c.IsAccept.Equals(true))
+                    .FirstOrDefaultAsync();
+
+                if (task == null)
+                {
+                    return new GetRespondResultOutput();
+                }
+
+                // Получит список ставок к заданию.
+                GetRespondResultOutput responds = await GetRespondsAsync(taskId, account);
+
+                // Если ставок нет.
+                if (!responds.Responds.Any())
+                {
+                    return new GetRespondResultOutput();
+                }
+
+                // Оставит только ставку исполнителя, который принял задание в работу.
+                responds.Responds.RemoveAll(item => !item.ExecutorId.Equals(task.ExecutorId));
+
+                return responds;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит список ставок исполнителей к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Список заданий.</returns>
+        private async Task<IEnumerable> GetRespondsListAsync(long taskId)
+        {
+            IEnumerable tasks = await (_postgre.Responds.Where(t => t.TaskId == taskId)
+                .Join(_postgre.Users, re => re.ExecutorId, u => u.Id, (re, u) => new { re, u })
+                .Join(_postgre.Statistics, user => user.u.Id, st => st.ExecutorId, (user, st) => new { user, st })
+                .Select(res => new {
+                    res.user.u.UserName,
+                    res.user.re.Comment,
+                    Price = string.Format("{0:0,0}", res.user.re.Price),
+                    res.st.CountPositive,
+                    res.st.CountNegative,
+                    res.st.CountTotalCompletedTask,
+                    res.st.Rating,
+                    UserIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO,
+                    res.st.ExecutorId
+                })
+                .ToListAsync());
+
+            return tasks;
         }
     }
 }

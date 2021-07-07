@@ -1,6 +1,6 @@
 ﻿using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
-using Barbuuuda.Models.Pagination.Outpoot;
+using Barbuuuda.Models.Pagination.Output;
 using Barbuuuda.Models.User;
 using System.Threading.Tasks;
 using System.Linq;
@@ -10,12 +10,12 @@ using Barbuuuda.Core.Consts;
 
 namespace Barbuuuda.Services
 {
-    public sealed class PaginationService : IPagination
+    public sealed class PaginationService : IPaginationService
     {
         private readonly PostgreDbContext _postgre;
-        private readonly IUser _user;
+        private readonly IUserService _user;
 
-        public PaginationService(PostgreDbContext postgre, IUser user)
+        public PaginationService(PostgreDbContext postgre, IUserService user)
         {
             _postgre = postgre;
             _user = user;
@@ -27,7 +27,7 @@ namespace Barbuuuda.Services
         /// <param name="pageIdx">Номер страницы.</param>
         /// <param name="userName">Имя юзера.</param>
         /// <returns>Данные пагинации.</returns>
-        public async Task<IndexOutpoot> GetPaginationTasks(int pageIdx, string userName)
+        public async Task<IndexOutput> GetPaginationTasks(int pageIdx, string userName)
         {
             try
             {
@@ -64,8 +64,8 @@ namespace Barbuuuda.Services
                     int count = await aTasks.CountAsync();
                     var items = await aTasks.Skip((pageIdx - 1) * countTasksPage).Take(countTasksPage).ToListAsync();
 
-                    PaginationOutpoot pageData = new PaginationOutpoot(count, pageIdx, countTasksPage);
-                    IndexOutpoot paginationData = new IndexOutpoot
+                    PaginationOutput pageData = new PaginationOutput(count, pageIdx, countTasksPage);
+                    IndexOutput paginationData = new IndexOutput
                     {
                         PageData = pageData,
                         Tasks = items
@@ -88,7 +88,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="pageIdx"></param>
         /// <returns>Данные пагинации.</returns>
-        public async Task<IndexOutpoot> GetPaginationAuction(int pageIdx)
+        public async Task<IndexOutput> GetPaginationAuction(int pageIdx)
         {
             try
             {
@@ -122,8 +122,8 @@ namespace Barbuuuda.Services
                 int count = await aAuctionTasks.CountAsync();
                 var items = await aAuctionTasks.Skip((pageIdx - 1) * countTasksPage).Take(countTasksPage).ToListAsync();
 
-                PaginationOutpoot pageData = new PaginationOutpoot(count, pageIdx, countTasksPage);
-                IndexOutpoot paginationData = new IndexOutpoot
+                PaginationOutput pageData = new PaginationOutput(count, pageIdx, countTasksPage);
+                IndexOutput paginationData = new IndexOutput
                 {
                     PageData = pageData,
                     Tasks = items

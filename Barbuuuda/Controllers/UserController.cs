@@ -3,18 +3,18 @@ using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Extensions.User;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
-using Barbuuuda.Emails;
 using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Barbuuuda.Emails.Service;
+using Barbuuuda.Models.Entities.Payment;
 
 namespace Barbuuuda.Controllers
 {
@@ -28,14 +28,13 @@ namespace Barbuuuda.Controllers
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly UserManager<UserEntity> _userManager;
-        public static string Module => "Barbuuuda.User";
 
         /// <summary>
         /// Сервис работы с юзерами.
         /// </summary>
-        private readonly IUser _user;
+        private readonly IUserService _user;
 
-        public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUser user) : base(Module)
+        public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUserService user)
         {
             _userManager = userManager;
             _user = user;
@@ -61,9 +60,9 @@ namespace Barbuuuda.Controllers
 
             catch (Exception ex)
             {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                _ = _logger.LogCritical();
-                throw new Exception(ex.Message.ToString());
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = logger.LogCritical();
+                throw new Exception(ex.Message);
             }
         }
 
@@ -79,7 +78,7 @@ namespace Barbuuuda.Controllers
                     .Equals(email))
                     .FirstOrDefaultAsync();
 
-            return oUser != null ? true : false;
+            return oUser != null;
         }
 
         /// <summary>
@@ -154,7 +153,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("token")]
         public async Task<IActionResult> RefreshToken([FromQuery] string userName)
         {
-            string sToken = await _user.GenerateToken(userName ?? GetUserName() ?? null);
+            string sToken = await _user.GenerateToken(userName ?? GetUserName());
 
             return Ok(sToken);
         }
@@ -170,11 +169,6 @@ namespace Barbuuuda.Controllers
             {
                 IdentityResult errors = null;
 
-                if (user.Score == null)
-                {
-                    user.Score = 0;
-                }
-
                 // Ищет такой email в БД.
                 bool bErrorEmail = await IdentityUserEmail(user.Email);
 
@@ -184,19 +178,24 @@ namespace Barbuuuda.Controllers
                     {
                         // Генерит временный токен для пользователя.
                         string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                        // Готовит ссылку, которая будет отображена в письме.
                         string callbackUrl = Url.Action("ConfirmAsync", "User", new { userId = user.Id, code = code },
-                            protocol: HttpContext.Request.Scheme);
+                            protocol: HttpContext.Request.Scheme)
+                            .Replace("http://localhost:58822", "https://barbuuuda.ru")
+                            .Replace("https://barbuuuda.online", "https://barbuuuda.ru");
 
                         // Отправит уведомление на email.
-                        await EmailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
+                        EmailService emailService = new EmailService(_db);
+                        await emailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
                             $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
                     }
 
                     // Если почта не существует.
                     catch (Exception ex)
                     {
-                        Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                        _ = _logger.LogCritical();
+                        Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                        _ = logger.LogCritical();
 
                         return BadRequest(ErrorValidate.EMAIL_NOT_ENTITY);
                     }
@@ -210,6 +209,20 @@ namespace Barbuuuda.Controllers
                     // Если регистрация успешна.
                     if (oAddedUser.Succeeded)
                     {
+                        // Находит добавленного пользователя и берет его Id.
+                        string userId = await _user.GetLastUserAsync();
+
+                        // Создаст счет пользователю (по дефолту в валюте RUB).
+                        await _postgre.AddAsync(new InvoiceEntity()
+                        {
+                            UserId = userId,
+                            InvoiceAmount = 0,
+                            Currency = CurrencyType.CURRENCY_RUB,
+                            ScoreNumber = null,
+                            ScoreEmail = string.Empty
+                        });
+                        await _postgre.SaveChangesAsync();
+
                         return Ok(oAddedUser);
                     }
                 }
@@ -228,7 +241,7 @@ namespace Barbuuuda.Controllers
             {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 _ = _logger.LogCritical();
-                throw new Exception(ex.Message.ToString());
+                throw new Exception(ex.Message);
             }
         }
     }

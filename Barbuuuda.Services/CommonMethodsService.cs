@@ -7,8 +7,8 @@ namespace Barbuuuda.Services
     /// </summary>
     public class CommonMethodsService
     {
-        ApplicationDbContext _db;
-        PostgreDbContext _postgre;
+        private readonly ApplicationDbContext _db;
+        private readonly PostgreDbContext _postgre;
 
         public CommonMethodsService(ApplicationDbContext db, PostgreDbContext postgre)
         {
@@ -26,6 +26,16 @@ namespace Barbuuuda.Services
             str = str.Trim();
 
             return str;
+        }
+
+        /// <summary>
+        /// Функция оставит в строке тольк опервую букву с точкой.
+        /// </summary>
+        /// <param name="lastName">Фамилия.</param>
+        /// <returns>ИЗмененную строку.</returns>
+        public static string SubstringLastName(string lastName)
+        {
+            return string.Concat(lastName.Substring(0, 1), ".");
         }
     }
 }

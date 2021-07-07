@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Task.Output;
 
 namespace Barbuuuda.Controllers
 {
@@ -18,14 +19,12 @@ namespace Barbuuuda.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ExecutorController : BaseController
     {
-        public static string Module => "Barbuuuda.Executor";
-
         /// <summary>
         /// Сервис исполнителя.
         /// </summary>
-        private readonly IExecutor _executor;
+        private readonly IExecutorService _executor;
 
-        public ExecutorController(IExecutor executor) : base(Module)
+        public ExecutorController(IExecutorService executor)
         {
             _executor = executor;
         }
@@ -127,6 +126,71 @@ namespace Barbuuuda.Controllers
             bool isCheck = await _executor.CheckRespondAsync(checkRespondInput.TaskId, GetUserName());
 
             return Ok(isCheck);
+        }
+
+        /// <summary>
+        /// Метод выгрузит список заданий, в которых был выбран исполнитель.
+        /// </summary>
+        /// <returns>Список приглашений с данными заданий.</returns>
+        [HttpPost, Route("invite")]
+        [ProducesResponseType(200, Type = typeof(GetResultTask))]
+        public async Task<IActionResult> InviteAsync()
+        {
+            GetResultTask result = await _executor.InviteAsync(GetUserName());
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод выгрузит список заданий, в которых был выбран текущий исполнитель.
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        //[HttpPost, Route("my")]
+        //[ProducesResponseType(200, Type = typeof(GetResultTask))]
+        //public async Task<IActionResult> MyWorkTasksAsync()
+        //{
+        //    GetResultTask result = await _executor.MyTasksAsync(GetUserName());
+
+        //    return Ok(result);
+        //}
+
+        /// <summary>
+        /// Метод проставит согласие на выполнение задания.
+        /// </summary>
+        /// <returns>Флаг результата.</returns>
+        [HttpPost, Route("accept")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> AcceptTaskAsync([FromBody] AcceptOrCancelWorkTaskInput input)
+        {
+            bool result = await _executor.AcceptTaskAsync(input.TaskId, GetUserName());
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод проставит отказ на выполнение задания.
+        /// </summary>
+        /// <returns>Флаг результата.</returns>
+        [HttpPost, Route("cancel")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> CancelTaskAsync([FromBody] AcceptOrCancelWorkTaskInput input)
+        {
+            bool result = await _executor.CancelTaskAsync(input.TaskId, GetUserName());
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод получит список заданий для вкладки "Мои задания". Т.е задания, работа над которыми начата текущим исполнителем.
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        [HttpPost, Route("work")]
+        [ProducesResponseType(200, Type = typeof(GetResultTask))]
+        public async Task<IActionResult> GetWorkTasksAsync()
+        {
+            GetResultTask result = await _executor.GetWorkTasksAsync(GetUserName());
+
+            return Ok(result);
         }
     }
 }

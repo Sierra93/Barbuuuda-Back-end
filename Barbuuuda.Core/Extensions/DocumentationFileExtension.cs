@@ -8,7 +8,7 @@ namespace Barbuuuda.Core.Extensions
     /// <summary>
     /// Класс расширения динамической записи xml-файла при запуске приложения.
     /// </summary>
-    public class DocumentationFileExtension
+    public static class DocumentationFileExtension
     {
         /// <summary>
         /// Метод запишет путь для xml-файла swagger при запуске приложения.

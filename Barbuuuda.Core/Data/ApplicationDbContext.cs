@@ -1,4 +1,4 @@
-﻿using Barbuuuda.Models.Entities.Knowlege;
+﻿using Barbuuuda.Models.Entities.MainPage;
 using Barbuuuda.Models.Logger;
 using Barbuuuda.Models.MainPage;
 using Barbuuuda.Models.Task;
@@ -32,7 +32,12 @@ namespace Barbuuuda.Core.Data
 
         public DbSet<HeaderTypeEntity> Headers { get; set; }   // Таблица полей хидера.
 
-        public DbSet<HopeEntity> Hopes { get; set; }  // Таблица НАДЕЕМСЯ НА ДОЛГОЕ СОТРУДНИЧЕСТВО.       
+        public DbSet<HopeEntity> Hopes { get; set; }  // Таблица НАДЕЕМСЯ НА ДОЛГОЕ СОТРУДНИЧЕСТВО.
+
+        /// <summary>
+        /// Таблица контактов.
+        /// </summary>
+        public DbSet<ContactEntity> Contacts { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 

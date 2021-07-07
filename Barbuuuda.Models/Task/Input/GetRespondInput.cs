@@ -8,6 +8,6 @@ namespace Barbuuuda.Models.Task.Input
     public class GetRespondInput
     {
         [Required(ErrorMessage = "TaskId задания не может быть пустым")]
-        public int TaskId { get; set; }
+        public long TaskId { get; set; }
     }
 }
