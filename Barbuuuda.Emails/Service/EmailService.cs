@@ -48,8 +48,8 @@ namespace Barbuuuda.Emails.Service
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                Logger _logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
-                _ = _logger.LogCritical();
+                Logger logger = new Logger(_db, e.GetType().FullName, e.Message, e.StackTrace);
+                _ = logger.LogCritical();
                 throw;
             }
         }

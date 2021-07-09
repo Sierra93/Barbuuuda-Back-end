@@ -239,8 +239,8 @@ namespace Barbuuuda.Controllers
 
             catch (Exception ex)
             {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                _ = _logger.LogCritical();
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await logger.LogCritical();
                 throw new Exception(ex.Message);
             }
         }

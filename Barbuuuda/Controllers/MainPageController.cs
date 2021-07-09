@@ -78,7 +78,7 @@ namespace Barbuuuda.Controllers
         /// Метод выгружает список категорий заданий.
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Route("category-list")]
+        [HttpPost, Route("category-list")]
         public async Task<IActionResult> GetCategoryList()
         {
             IList aCategories = await _mainPage.GetCategoryList();
@@ -90,7 +90,7 @@ namespace Barbuuuda.Controllers
         /// Метод полчает данные долгосрочного сотрудничества.
         /// </summary>
         /// <returns>ОБъект с данными.</returns>
-        [HttpGet, Route("get-hope")]
+        [HttpPost, Route("get-hope")]
         public async Task<IActionResult> GetHopeContent()
         {
             HopeEntity oHope = await _mainPage.GetHopeContent();
@@ -102,7 +102,7 @@ namespace Barbuuuda.Controllers
         /// Метод выгружает 5 последних заданий. Не важно, чьи они.
         /// </summary>
         /// <returns>Список с 5 заданиями.</returns>
-        [HttpGet, Route("last")]
+        [HttpPost, Route("last")]
         public async Task<IActionResult> GetLastTasksAsync()
         {
             IEnumerable aLastTasks = await _mainPage.GetLastTasksAsync();
