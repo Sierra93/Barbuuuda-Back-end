@@ -572,5 +572,37 @@ namespace Barbuuuda.Services
                 throw;
             }
         }
+
+        /// <summary>
+        /// Метод получит роль пользователя по его логину.
+        /// </summary>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Роль пользователя.</returns>
+        public async Task<string> GetUserRoleByLoginAsync(string account)
+        {
+            try
+            {
+                var role = await (from u in _postgre.Users
+                                  where u.UserName.Equals(account)
+                                  select u.UserRole)
+                    .FirstOrDefaultAsync();
+
+                // Если нет роли, значит назначить гостя.
+                if (string.IsNullOrEmpty(role))
+                {
+                    role = "G";
+                }
+
+                return role;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message, e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
     }
 }

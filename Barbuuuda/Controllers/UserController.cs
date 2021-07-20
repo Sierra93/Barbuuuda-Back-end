@@ -28,10 +28,6 @@ namespace Barbuuuda.Controllers
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly UserManager<UserEntity> _userManager;
-
-        /// <summary>
-        /// Сервис работы с юзерами.
-        /// </summary>
         private readonly IUserService _user;
 
         public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUserService user)
@@ -41,7 +37,6 @@ namespace Barbuuuda.Controllers
             _postgre = postgre;
             _db = db;
         }
-
 
         /// <summary>
         /// Метод создает нового пользователя.
@@ -53,7 +48,7 @@ namespace Barbuuuda.Controllers
         {
             try
             {
-                IActionResult result = await CreateUser(user);
+                var result = await CreateUser(user);
 
                 return result;
             }
@@ -73,7 +68,7 @@ namespace Barbuuuda.Controllers
         /// <returns>true - если существует, иначе false.</returns>
         private async Task<bool> IdentityUserEmail(string email)
         {
-            UserEntity oUser = await _postgre.Users
+            var oUser = await _postgre.Users
                     .Where(u => u.Email
                     .Equals(email))
                     .FirstOrDefaultAsync();
@@ -89,7 +84,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, AllowAnonymous]
         public async Task<IActionResult> ConfirmAsync(string userId, string code)
         {
-            UserEntity user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
             await _userManager.ConfirmEmailAsync(user, code);
 
             return new RedirectResult("https://barbuuuda.ru");
@@ -103,12 +98,12 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("login")]
         public async Task<IActionResult> LoginUserAsync([FromBody] UserInput user)
         {
-            object oAuth = await _user.LoginAsync(user);
+            var oAuth = await _user.LoginAsync(user);
 
             return Ok(oAuth);
         }
+
         /// <summary>
-        /// TODO: нужно убрать этот метод, так как авторизация переделана на основе токенов и доступ и так будет отваливаться когда токен протухнет.
         /// Метод проверяет, авторизован ли юзер.
         /// </summary>
         /// <returns>Объект с данными авторизованного юзера.</returns>       
@@ -116,7 +111,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("authorize")]
         public async Task<IActionResult> GetUserAuthorize([FromQuery] string userName)
         {
-            object oAuthorize = await _user.GetUserAuthorize(GetUserName() ?? userName);
+            var oAuthorize = await _user.GetUserAuthorize(GetUserName() ?? userName);
 
             return Ok(oAuthorize);
         }
@@ -128,7 +123,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("profile")]
         public async Task<IActionResult> GetProfileInfoAsync()
         {
-            object oUser = await _user.GetProfileInfo(GetUserName());
+            var oUser = await _user.GetProfileInfo(GetUserName());
 
             return Ok(oUser);
         }
@@ -243,6 +238,19 @@ namespace Barbuuuda.Controllers
                 await logger.LogCritical();
                 throw new Exception(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Метод получит роль пользователя по его логину.
+        /// </summary>
+        /// <returns>Роль пользователя.</returns>
+        [HttpGet, Route("role")]
+        [ProducesResponseType(200, Type = typeof(string))]
+        public async Task<IActionResult> GetUserRoleByLoginAsync()
+        {
+            var role = await _user.GetUserRoleByLoginAsync(GetUserName());
+
+            return Ok(role);
         }
     }
 }

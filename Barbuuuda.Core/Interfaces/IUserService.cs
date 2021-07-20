@@ -92,5 +92,12 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <returns>Id последнего пользователя.</returns>
         Task<string> GetLastUserAsync();
+
+        /// <summary>
+        /// Метод получит роль пользователя по его логину.
+        /// </summary>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Роль пользователя.</returns>
+        Task<string> GetUserRoleByLoginAsync(string account);
     }
 }
