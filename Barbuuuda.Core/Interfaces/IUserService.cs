@@ -98,6 +98,6 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Роль пользователя.</returns>
-        Task<string> GetUserRoleByLoginAsync(string account);
+        Task<UserOutput> GetUserRoleByLoginAsync(string account);
     }
 }

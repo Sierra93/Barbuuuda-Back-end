@@ -578,7 +578,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Роль пользователя.</returns>
-        public async Task<string> GetUserRoleByLoginAsync(string account)
+        public async Task<UserOutput> GetUserRoleByLoginAsync(string account)
         {
             try
             {
@@ -593,7 +593,12 @@ namespace Barbuuuda.Services
                     role = "G";
                 }
 
-                return role;
+                var result = new UserOutput
+                {
+                    UserRole = role
+                };
+
+                return result;
             }
 
             catch (Exception e)

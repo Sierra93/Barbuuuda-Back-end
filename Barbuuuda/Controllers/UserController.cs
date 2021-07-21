@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Barbuuuda.Emails.Service;
 using Barbuuuda.Models.Entities.Payment;
+using Barbuuuda.Models.User.Output;
 
 namespace Barbuuuda.Controllers
 {
@@ -244,8 +245,8 @@ namespace Barbuuuda.Controllers
         /// Метод получит роль пользователя по его логину.
         /// </summary>
         /// <returns>Роль пользователя.</returns>
-        [HttpGet, Route("role")]
-        [ProducesResponseType(200, Type = typeof(string))]
+        [HttpPost, Route("role")]
+        [ProducesResponseType(200, Type = typeof(UserOutput))]
         public async Task<IActionResult> GetUserRoleByLoginAsync()
         {
             var role = await _user.GetUserRoleByLoginAsync(GetUserName());
