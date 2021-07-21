@@ -377,15 +377,15 @@ namespace Barbuuuda.Services
         /// <summary>
         /// Метод обновит токен юзеру.
         /// </summary>
-        /// <param name="claimsIdentity">Объект полномочий.</param>
-        /// <returns>Строку токена.</returns>
-        public Task<string> GenerateToken(string userName)
+        /// <param name="userName">Логин пользователя.</param>
+        /// <returns>Обновленный токен.</returns>
+        public Task<UserOutput> GenerateToken(string userName)
         {
             try
             {
                 if (string.IsNullOrEmpty(userName))
                 {
-                    throw new ArgumentNullException();
+                    throw new UserMessageException("Не передан логин пользователя");
                 }
 
                 var now = DateTime.UtcNow;
@@ -398,7 +398,12 @@ namespace Barbuuuda.Services
                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                return Task.FromResult(encodedJwt);
+                var result = new UserOutput
+                {
+                    UserToken = encodedJwt
+                };
+
+                return Task.FromResult(result);
             }
 
             catch (ArgumentNullException ex)

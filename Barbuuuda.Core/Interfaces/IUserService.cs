@@ -1,7 +1,6 @@
 ﻿using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
 using Barbuuuda.Models.User.Output;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -48,9 +47,9 @@ namespace Barbuuuda.Core.Interfaces
         /// <summary>
         /// Метод обновит токен юзеру.
         /// </summary>
-        /// <param name="claimsIdentity">Объект полномочий.</param>
-        /// <returns>Строку токена.</returns>
-        Task<string> GenerateToken(string userName);
+        /// <param name="userName">Логин пользователя.</param>
+        /// <returns>Обновленный токен.</returns>
+        Task<UserOutput> GenerateToken(string userName);
 
         /// <summary>
         /// Метод находит юзера по его логину.

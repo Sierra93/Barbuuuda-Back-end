@@ -49,5 +49,10 @@
         /// Логин пользователя.
         /// </summary>
         public string UserName { get; set; }
+
+        /// <summary>
+        /// Токен пользователя.
+        /// </summary>
+        public string UserToken { get; set; }
     }
 }
