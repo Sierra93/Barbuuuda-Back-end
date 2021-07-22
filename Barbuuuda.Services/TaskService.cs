@@ -758,7 +758,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userName">Login пользователя.</param>
         /// <returns></returns>
-        public async Task<int?> GetTotalCountTasks(string userName)
+        public async Task<TaskOutput> GetTotalCountTasks(string userName)
         {
             try
             {
@@ -767,17 +767,24 @@ namespace Barbuuuda.Services
                     return null;
                 }
 
-                UserEntity user = await _user.GetUserByLogin(userName);
+                var user = await _user.GetUserByLogin(userName);
 
                 if (user.Id == null)
                 {
                     throw new NotFoundUserException(userName);
                 }
 
-                return await _postgre.Tasks
+                var count = await _postgre.Tasks
                     .Where(t => t.OwnerId
                     .Equals(user.Id))
                     .CountAsync();
+
+                var result = new TaskOutput
+                {
+                    CountTotalTasks = count
+                };
+
+                return result;
             }
 
             catch (Exception ex)

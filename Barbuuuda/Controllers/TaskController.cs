@@ -1,7 +1,6 @@
 ﻿using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Task;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -189,9 +188,10 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <returns>Кол-во заданий.</returns>
         [HttpGet, Route("total")]
+        [ProducesResponseType(200, Type = typeof(TaskOutput))]
         public async Task<IActionResult> GetTotalCountTasks()
         {
-            int? countTasks = await _task.GetTotalCountTasks(GetUserName());
+            var countTasks = await _task.GetTotalCountTasks(GetUserName());
 
             return Ok(countTasks);
         }

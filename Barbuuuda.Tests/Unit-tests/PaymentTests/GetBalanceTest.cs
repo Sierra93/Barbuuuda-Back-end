@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Barbuuuda.Controllers;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Payment.Output;
+using Barbuuuda.Models.User.Input;
+using Barbuuuda.Models.User.Output;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -19,12 +21,12 @@ namespace Barbuuuda.Tests.Unit_tests.Payment
             Mock<IPaymentService> mock = new Mock<IPaymentService>();
             mock.Setup(a => a.GetBalanceAsync(ACCOUNT)).Returns(Task.FromResult(GetBalance()));
             PaymentController controller = new PaymentController(mock.Object);
-            OkObjectResult viewResult = await controller.GetBalanceAsync() as OkObjectResult;
+            OkObjectResult viewResult = await controller.GetBalanceAsync(new UserInput { UserName = "petya"}) as OkObjectResult;
 
             Assert.AreEqual(viewResult?.StatusCode, 200);
         }
 
-        private decimal GetBalance()
+        private UserOutput GetBalance()
         {
             List<InvoiceOutput> invoices = new List<InvoiceOutput>()
             {
@@ -50,13 +52,18 @@ namespace Barbuuuda.Tests.Unit_tests.Payment
                 }
             };
 
-            decimal balanceAmount = invoices
+            var balanceAmount = invoices
                 .Where(i => i.UserId
                 .Equals(USER_ID))
                 .Select(res => res.InvoiceAmount)
                 .FirstOrDefault();
 
-            return balanceAmount;
+            var result = new UserOutput
+            {
+                Amount = balanceAmount
+            };
+
+            return result;
         }
     }
 }

@@ -88,5 +88,10 @@
         /// Логин пользователя.
         /// </summary>
         public string UserName { get; set; }
+
+        /// <summary>
+        /// Кол-во заданий всего.
+        /// </summary>
+        public long CountTotalTasks { get; set; }
     }
 }
