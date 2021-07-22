@@ -12,6 +12,7 @@ using Barbuuuda.Models.Entities.Customer;
 using Barbuuuda.Models.Entities.Payment;
 using Barbuuuda.Models.Payment.Input;
 using Barbuuuda.Models.Payment.Output;
+using Barbuuuda.Models.User.Output;
 using Microsoft.EntityFrameworkCore;
 
 namespace Barbuuuda.Services
@@ -139,18 +140,23 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="account">Логин текущего пользователя.</param>
         /// <returns>Сумма баланса.</returns>
-        public async Task<decimal> GetBalanceAsync(string account)
+        public async Task<UserOutput> GetBalanceAsync(string account)
         {
             try
             {
-                string userId = await _user.GetUserIdByLogin(account);
-                decimal balanceAmount = await _postgre.Invoices
+                var userId = await _user.GetUserIdByLogin(account);
+                var balanceAmount = await _postgre.Invoices
                     .Where(a => a.UserId
                     .Equals(userId))
                     .Select(res => res.InvoiceAmount)
                     .FirstOrDefaultAsync();
 
-                return balanceAmount;
+                var result = new UserOutput
+                {
+                    Amount = balanceAmount
+                };
+
+                return result;
             }
 
             catch (Exception e)

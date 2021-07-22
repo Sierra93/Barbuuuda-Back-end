@@ -188,21 +188,15 @@ namespace Barbuuuda.Services
                 {
                     throw new ArgumentNullException();
                 }
-                string userId = string.Empty;
 
                 // Выбирает юзера по логину.
-                UserEntity oUser = await _postgre.Users
+                var oUser = await _postgre.Users
                     .Where(u => u.UserName
                     .Equals(username))
                     .FirstOrDefaultAsync();
 
                 // В зависимости от роли юзера формирует хидер.
-                IList<HeaderTypeEntity> aHeaderFields = await GetHeader(oUser.UserRole);
-
-                if (oUser != null)
-                {
-                    userId = oUser.Id;
-                }
+                var aHeaderFields = await GetHeader(oUser.UserRole);
 
                 return new { aHeaderFields };
             }
@@ -379,7 +373,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userName">Логин пользователя.</param>
         /// <returns>Обновленный токен.</returns>
-        public Task<UserOutput> GenerateToken(string userName)
+        public async Task<UserOutput> GenerateToken(string userName)
         {
             try
             {
@@ -387,6 +381,11 @@ namespace Barbuuuda.Services
                 {
                     throw new UserMessageException("Не передан логин пользователя");
                 }
+
+                var userRole = await _postgre.Users
+                    .Where(u => u.UserName.Equals(userName))
+                    .Select(res => res.UserRole)
+                    .FirstOrDefaultAsync();
 
                 var now = DateTime.UtcNow;
                 var jwt = new JwtSecurityToken(
@@ -400,10 +399,11 @@ namespace Barbuuuda.Services
 
                 var result = new UserOutput
                 {
-                    UserToken = encodedJwt
+                    UserToken = encodedJwt,
+                    UserRole = userRole
                 };
 
-                return Task.FromResult(result);
+                return result;
             }
 
             catch (ArgumentNullException ex)

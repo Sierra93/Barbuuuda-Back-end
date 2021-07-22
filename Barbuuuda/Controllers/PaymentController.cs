@@ -2,6 +2,8 @@
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Payment.Input;
 using Barbuuuda.Models.Payment.Output;
+using Barbuuuda.Models.User.Input;
+using Barbuuuda.Models.User.Output;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,10 +29,10 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <returns>Сумма баланса.</returns>
         [HttpPost, Route("balance")]
-        [ProducesResponseType(200, Type = typeof(decimal))]
-        public async Task<IActionResult> GetBalanceAsync()
+        [ProducesResponseType(200, Type = typeof(UserOutput))]
+        public async Task<IActionResult> GetBalanceAsync([FromBody] UserInput user)
         {
-            decimal balanceAmount = await _paymentService.GetBalanceAsync(GetUserName());
+            var balanceAmount = await _paymentService.GetBalanceAsync(user.UserName);
 
             return Ok(balanceAmount);
         }

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Barbuuuda.Models.Payment.Input;
 using Barbuuuda.Models.Payment.Output;
+using Barbuuuda.Models.User.Output;
 
 namespace Barbuuuda.Core.Interfaces
 {
@@ -10,11 +11,11 @@ namespace Barbuuuda.Core.Interfaces
     public interface IPaymentService
     {
         /// <summary>
-        /// Метод получает сумму средств на балансе текущего пользователя.
+        /// Метод получает сумму средств на бал`ансе текущего пользователя.
         /// </summary>
         /// <param name="account">Логин текущего пользователя.</param>
         /// <returns>Сумма баланса.</returns>
-        Task<decimal> GetBalanceAsync(string account);
+        Task<UserOutput> GetBalanceAsync(string account);
 
         /// <summary>
         /// Метод инициализирует конфигурацию платежный виджет фронта данными.

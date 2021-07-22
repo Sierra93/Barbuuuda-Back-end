@@ -54,5 +54,10 @@
         /// Токен пользователя.
         /// </summary>
         public string UserToken { get; set; }
+
+        /// <summary>
+        /// Сумма баланса.
+        /// </summary>
+        public decimal Amount { get; set; }
     }
 }

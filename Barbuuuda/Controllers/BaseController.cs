@@ -14,7 +14,7 @@ namespace Barbuuuda.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         protected string GetUserName()
         {
-            return HttpContext?.User?.Identity?.Name ?? "executor1";
+            return HttpContext?.User?.Identity?.Name;
         }
     }
 }
