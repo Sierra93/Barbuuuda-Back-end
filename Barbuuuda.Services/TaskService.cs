@@ -660,6 +660,7 @@ namespace Barbuuuda.Services
                 int countComplete = await GetStatusName(StatusTask.COMPLETE);
                 int countPerechet = await GetStatusName(StatusTask.PERECHET);
                 int countDraft = await GetStatusName(StatusTask.DRAFT);
+                int total = await GetStatusName(StatusTask.TOTAL);
 
                 return new
                 {
@@ -668,7 +669,8 @@ namespace Barbuuuda.Services
                     garant = countGarant,
                     complete = countComplete,
                     perechet = countPerechet,
-                    draft = countDraft
+                    draft = countDraft,
+                    total
                 };
             }
 
@@ -687,14 +689,31 @@ namespace Barbuuuda.Services
         /// <returns></returns>
         async Task<int> GetStatusName(string status)
         {
-            return await _postgre.Tasks
-                .Join(_postgre.TaskStatuses,
-                t => t.StatusCode,
-                s => s.StatusCode,
-                (t, s) => new { s.StatusName })
-                .Where(s => s.StatusName
-                .Equals(status))
-                .CountAsync();
+            int tasksCount = 0;
+
+            if (status.Equals(StatusTask.TOTAL))
+            {
+                tasksCount = await _postgre.Tasks
+                    .Join(_postgre.TaskStatuses,
+                        t => t.StatusCode,
+                        s => s.StatusCode,
+                        (t, s) => new { s.StatusName })
+                    .CountAsync();
+            }
+
+            else
+            {
+                tasksCount = await _postgre.Tasks
+                    .Join(_postgre.TaskStatuses,
+                        t => t.StatusCode,
+                        s => s.StatusCode,
+                        (t, s) => new { s.StatusName })
+                    .Where(s => s.StatusName
+                        .Equals(status))
+                    .CountAsync();
+            }
+
+            return tasksCount;
         }
 
         /// <summary>
@@ -743,48 +762,6 @@ namespace Barbuuuda.Services
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogError();
                 throw new ArgumentNullException($"Не передан статус {ex.Message}");
-            }
-
-            catch (Exception ex)
-            {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                await _logger.LogCritical();
-                throw new Exception(ex.Message.ToString());
-            }
-        }
-
-        /// <summary>
-        /// Метод получает кол-во заданий всего.
-        /// </summary>
-        /// <param name="userName">Login пользователя.</param>
-        /// <returns></returns>
-        public async Task<TaskOutput> GetTotalCountTasks(string userName)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(userName))
-                {
-                    return null;
-                }
-
-                var user = await _user.GetUserByLogin(userName);
-
-                if (user.Id == null)
-                {
-                    throw new NotFoundUserException(userName);
-                }
-
-                var count = await _postgre.Tasks
-                    .Where(t => t.OwnerId
-                    .Equals(user.Id))
-                    .CountAsync();
-
-                var result = new TaskOutput
-                {
-                    CountTotalTasks = count
-                };
-
-                return result;
             }
 
             catch (Exception ex)

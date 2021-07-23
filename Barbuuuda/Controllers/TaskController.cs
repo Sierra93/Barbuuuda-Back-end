@@ -184,19 +184,6 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод получает кол-во заданий всего.
-        /// </summary>
-        /// <returns>Кол-во заданий.</returns>
-        [HttpGet, Route("total")]
-        [ProducesResponseType(200, Type = typeof(TaskOutput))]
-        public async Task<IActionResult> GetTotalCountTasks()
-        {
-            var countTasks = await _task.GetTotalCountTasks(GetUserName());
-
-            return Ok(countTasks);
-        }
-
-        /// <summary>
         /// Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".
         /// </summary>
         /// <returns>Список заданий.</returns>
