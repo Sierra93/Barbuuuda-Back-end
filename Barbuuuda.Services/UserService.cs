@@ -167,7 +167,8 @@ namespace Barbuuuda.Services
         private ClaimsIdentity GetClaim(string username)
         {
             var claims = new List<Claim> {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, username)
+                    //new Claim(ClaimsIdentity.DefaultNameClaimType, username)
+                    new Claim(JwtRegisteredClaimNames.UniqueName, username)
                 };
 
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
@@ -194,6 +195,11 @@ namespace Barbuuuda.Services
                     .Where(u => u.UserName
                     .Equals(username))
                     .FirstOrDefaultAsync();
+
+                if (oUser == null)
+                {
+                    return null;
+                }
 
                 // В зависимости от роли юзера формирует хидер.
                 var aHeaderFields = await GetHeader(oUser.UserRole);
