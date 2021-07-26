@@ -501,7 +501,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="taskId">Id задания.</param>
         /// <returns>Данные заказчика.</returns>
-        public async Task<CustomerOutput> GetCustomerLoginByTaskId(int? taskId)
+        public async Task<CustomerOutput> GetCustomerLoginByTaskId(long? taskId)
         {
             try
             {

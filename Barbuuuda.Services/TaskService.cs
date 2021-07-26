@@ -241,12 +241,10 @@ namespace Barbuuuda.Services
         /// <param name="type">Параметр получения заданий либо все либо одно.</param>
         /// <param name="taskId">TaskId задания, которое нужно получить.</param>
         /// <returns>Коллекция заданий.</returns>
-        public async Task<IList> GetTasksList(string userName, int? taskId, string type)
+        public async Task<IList> GetTasksList(string userName, long? taskId, string type)
         {
             try
             {
-                IList aResultTaskObj = null;
-
                 if (string.IsNullOrEmpty(userName))
                 {
                     throw new ArgumentNullException();
@@ -258,9 +256,9 @@ namespace Barbuuuda.Services
                 }
 
                 // Вернет либо все задания либо одно.
-                return aResultTaskObj = type.Equals(TaskType.ALL)
-                    ? aResultTaskObj = await GetAllTasks(userName)
-                    : aResultTaskObj = await GetSingleTask(userName, taskId);
+                return type.Equals(TaskType.ALL)
+                    ? await GetAllTasks(userName)
+                    : await GetSingleTask(userName, taskId);
             }
 
             catch (ArgumentNullException ex)
@@ -316,7 +314,7 @@ namespace Barbuuuda.Services
         /// <param name="userName">Логин юзера.</param>
         /// <param name="taskId">Id задачи. Может быть null.</param>
         /// <returns>Коллекцию заданий.</returns>
-        async Task<IList> GetSingleTask(string userName, int? taskId)
+        async Task<IList> GetSingleTask(string userName, long? taskId)
         {
             // Выбирает объект задачи, который нужно редактировать.
             TaskEntity oEditTask = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();

@@ -84,7 +84,7 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="taskId">Id задания.</param>
         /// <returns>Данные заказчика.</returns>
-        Task<CustomerOutput> GetCustomerLoginByTaskId(int? taskId);
+        Task<CustomerOutput> GetCustomerLoginByTaskId(long? taskId);
 
         /// <summary>
         /// Метод находит последнего добавленного пользователя и берет его Id.
