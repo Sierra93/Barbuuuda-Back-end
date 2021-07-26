@@ -119,6 +119,11 @@ namespace Barbuuuda.Core.Data
         /// </summary>
         public DbSet<OrderEntity> Orders { get; set; }
 
+        /// <summary>
+        /// Таблица переходов.
+        /// </summary>
+        public DbSet<TransitionEntity> Transitions { get; set; }
+
         public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options)
         {
             _options = options;

@@ -16,11 +16,11 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Сервис стартовой страницы.
         /// </summary>
-        private readonly IMainPageService _mainPage;
+        private readonly IMainPageService _mainPageService;
 
-        public MainPageController(IMainPageService mainPage)
+        public MainPageController(IMainPageService mainPageService)
         {
-            _mainPage = mainPage;
+            _mainPageService = mainPageService;
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-fon")]
         public async Task<IActionResult> GetFonContent()
         {
-            return Ok(await _mainPage.GetFonContent());
+            return Ok(await _mainPageService.GetFonContent());
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-why")]
         public async Task<IActionResult> GetWhyContent()
         {
-            return Ok(await _mainPage.GetWhyContent());
+            return Ok(await _mainPageService.GetWhyContent());
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-work")]
         public async Task<IActionResult> GetWorkContent()
         {
-            return Ok(await _mainPage.GetWorkContent());
+            return Ok(await _mainPageService.GetWorkContent());
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-privilege")]
         public async Task<IActionResult> GetPrivilegeContent()
         {
-            return Ok(await _mainPage.GetPrivilegeContent());
+            return Ok(await _mainPageService.GetPrivilegeContent());
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-advantage")]
         public async Task<IActionResult> GetAdvantageContent()
         {
-            return Ok(await _mainPage.GetAdvantageContent());
+            return Ok(await _mainPageService.GetAdvantageContent());
         }
 
 
@@ -81,7 +81,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("category-list")]
         public async Task<IActionResult> GetCategoryList()
         {
-            IList aCategories = await _mainPage.GetCategoryList();
+            IList aCategories = await _mainPageService.GetCategoryList();
 
             return Ok(aCategories);
         }
@@ -93,7 +93,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-hope")]
         public async Task<IActionResult> GetHopeContent()
         {
-            HopeEntity oHope = await _mainPage.GetHopeContent();
+            HopeEntity oHope = await _mainPageService.GetHopeContent();
 
             return Ok(oHope);
         }
@@ -105,7 +105,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("last")]
         public async Task<IActionResult> GetLastTasksAsync()
         {
-            IEnumerable aLastTasks = await _mainPage.GetLastTasksAsync();
+            IEnumerable aLastTasks = await _mainPageService.GetLastTasksAsync();
 
             return Ok(aLastTasks);
         }
@@ -118,7 +118,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(ContactOutput))]
         public async Task<IActionResult> GetContactsAsync()
         {
-            ContactOutput contact = await _mainPage.GetContactsAsync();
+            ContactOutput contact = await _mainPageService.GetContactsAsync();
 
             return Ok(contact);
         }

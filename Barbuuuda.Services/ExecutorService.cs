@@ -27,13 +27,13 @@ namespace Barbuuuda.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IUserService _user;
+        private readonly IUserService _userService;
 
-        public ExecutorService(ApplicationDbContext db, PostgreDbContext postgre, IUserService user)
+        public ExecutorService(ApplicationDbContext db, PostgreDbContext postgre, IUserService userService)
         {
             _db = db;
             _postgre = postgre;
-            _user = user;
+            _userService = userService;
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Barbuuuda.Services
                     return false;
                 }
 
-                UserEntity user = await _user.GetUserByLogin(userName);
+                UserEntity user = await _userService.GetUserByLogin(userName);
                 user.IsSuccessedTest = true;
                 await _postgre.SaveChangesAsync();
 
@@ -262,7 +262,7 @@ namespace Barbuuuda.Services
         {
             try
             {
-                UserEntity user = await _user.GetUserByLogin(userName);
+                UserEntity user = await _userService.GetUserByLogin(userName);
 
                 return await (from tasks in _postgre.Tasks
                               join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
@@ -328,7 +328,7 @@ namespace Barbuuuda.Services
                 }
 
                 // Находит Id исполнителя, который делает ставку к заданию.
-                UserEntity user = await _user.GetUserByLogin(userName);                      
+                UserEntity user = await _userService.GetUserByLogin(userName);                      
 
                 // Добавит новую ставку.
                 await _postgre.Responds.AddAsync(new RespondEntity() { 
@@ -366,7 +366,7 @@ namespace Barbuuuda.Services
             if (responds != null)
             {
                 // Находит пользователя по логину.
-                UserEntity user = await _user.GetUserByLogin(account);
+                UserEntity user = await _userService.GetUserByLogin(account);
 
                 if (user != null)
                 {
@@ -395,7 +395,7 @@ namespace Barbuuuda.Services
                 GetResultTask result = new GetResultTask();
 
                 // Выберет Id текущего исполнителя по его логину.
-                string executorId = await _user.GetUserIdByLogin(account);
+                string executorId = await _userService.GetUserIdByLogin(account);
 
                 // Получит список заданий, в которых выбран исполнитель.
                 var invities = await _postgre.Tasks
@@ -478,7 +478,7 @@ namespace Barbuuuda.Services
         //        GetResultTask result = new GetResultTask();
 
         //        // Выберет Id текущего исполнителя по его логину.
-        //        string executorId = await _user.GetUserIdByLogin(account);
+        //        string executorId = await _userService.GetUserIdByLogin(account);
 
         //        // Получит список заданий, в которых выбран исполнитель.
         //        var invities = await _postgre.Tasks
@@ -566,7 +566,7 @@ namespace Barbuuuda.Services
                 TaskEntity task = await _postgre.Tasks.FirstOrDefaultAsync(t => t.TaskId == taskId);
 
                 // Найдет Id исполнителя.
-                string executorId = await _user.GetUserIdByLogin(account);
+                string executorId = await _userService.GetUserIdByLogin(account);
 
                 if (task == null)
                 {
@@ -643,7 +643,7 @@ namespace Barbuuuda.Services
                 }
 
                 // Найдет Id исполнителя.
-                string executorId = await _user.GetUserIdByLogin(account);
+                string executorId = await _userService.GetUserIdByLogin(account);
 
                 // Добавит в таблицу отказов приглашений.
                 if (string.IsNullOrEmpty(executorId))
@@ -704,7 +704,7 @@ namespace Barbuuuda.Services
             {
                 GetResultTask result = new GetResultTask();
 
-                string executorId = await _user.GetUserIdByLogin(account);
+                string executorId = await _userService.GetUserIdByLogin(account);
 
                 if (string.IsNullOrEmpty(executorId))
                 {

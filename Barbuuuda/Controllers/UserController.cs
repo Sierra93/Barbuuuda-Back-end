@@ -29,12 +29,12 @@ namespace Barbuuuda.Controllers
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly UserManager<UserEntity> _userManager;
-        private readonly IUserService _user;
+        private readonly IUserService _userService;
 
-        public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUserService user)
+        public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUserService userService)
         {
             _userManager = userManager;
-            _user = user;
+            _userService = userService;
             _postgre = postgre;
             _db = db;
         }
@@ -99,7 +99,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("login")]
         public async Task<IActionResult> LoginUserAsync([FromBody] UserInput user)
         {
-            var oAuth = await _user.LoginAsync(user);
+            var oAuth = await _userService.LoginAsync(user);
 
             return Ok(oAuth);
         }
@@ -112,7 +112,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("authorize")]
         public async Task<IActionResult> GetUserAuthorize([FromQuery] string userName)
         {
-            var oAuthorize = await _user.GetUserAuthorize(GetUserName() ?? userName);
+            var oAuthorize = await _userService.GetUserAuthorize(GetUserName() ?? userName);
 
             return Ok(oAuthorize);
         }
@@ -124,7 +124,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("profile")]
         public async Task<IActionResult> GetProfileInfoAsync()
         {
-            var oUser = await _user.GetProfileInfo(GetUserName());
+            var oUser = await _userService.GetProfileInfo(GetUserName());
 
             return Ok(oUser);
         }
@@ -136,7 +136,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("save-data")]
         public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserInput user)
         {
-            await _user.SaveProfileData(user, GetUserName());
+            await _userService.SaveProfileData(user, GetUserName());
 
             return Ok();
         }
@@ -151,7 +151,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(UserOutput))]
         public async Task<IActionResult> RefreshToken([FromQuery] string userName)
         {
-            var refreshData = await _user.GenerateToken(userName ?? GetUserName());
+            var refreshData = await _userService.GenerateToken(userName ?? GetUserName());
 
             return Ok(refreshData);
         }
@@ -208,7 +208,7 @@ namespace Barbuuuda.Controllers
                     if (oAddedUser.Succeeded)
                     {
                         // Находит добавленного пользователя и берет его Id.
-                        string userId = await _user.GetLastUserAsync();
+                        string userId = await _userService.GetLastUserAsync();
 
                         // Создаст счет пользователю (по дефолту в валюте RUB).
                         await _postgre.AddAsync(new InvoiceEntity()
@@ -251,7 +251,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(UserOutput))]
         public async Task<IActionResult> GetUserRoleByLoginAsync()
         {
-            var role = await _user.GetUserRoleByLoginAsync(GetUserName());
+            var role = await _userService.GetUserRoleByLoginAsync(GetUserName());
 
             return Ok(role);
         }

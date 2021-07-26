@@ -26,13 +26,13 @@ namespace Barbuuuda.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IUserService _user;
+        private readonly IUserService _userService;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUserService user)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUserService userService)
         {
             _db = db;
             _postgre = postgre;
-            _user = user;
+            _userService = userService;
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Barbuuuda.Services
                 // Проверяет существование заказчика, который создал задание.
                 bool bCustomer = await IdentityCustomer(userName);
 
-                string ownerId = await _user.GetUserIdByLogin(userName);
+                string ownerId = await _userService.GetUserIdByLogin(userName);
 
                 // Запишет Id заказчика.
                 if (!string.IsNullOrEmpty(ownerId))
@@ -336,7 +336,7 @@ namespace Barbuuuda.Services
             }
 
             // Получит логин и иконку профиля заказчика задания.
-            CustomerOutput customer = await _user.GetCustomerLoginByTaskId(taskId);
+            CustomerOutput customer = await _userService.GetCustomerLoginByTaskId(taskId);
 
             // TODO: отрефачить этот метод, чтоб не обращаться два раза к БД за получением задания.            
             var oTask = await (from tasks in _postgre.Tasks
@@ -881,7 +881,7 @@ namespace Barbuuuda.Services
                 GetRespondResultOutput result = new GetRespondResultOutput();
 
                 // Находит Id исполнителя.
-                string userId = await _user.GetUserIdByLogin(account);
+                string userId = await _userService.GetUserIdByLogin(account);
 
                 // Приведет к типу коллекции GetRespondResultOutput.
                 foreach (object respond in respondsList)

@@ -29,13 +29,13 @@ namespace Barbuuuda.Services
         /// <summary>
         /// Абстракция пользователя.
         /// </summary>
-        private readonly IUserService _user;
+        private readonly IUserService _userService;
 
-        public ChatService(ApplicationDbContext db, PostgreDbContext postgre, IUserService user)
+        public ChatService(ApplicationDbContext db, PostgreDbContext postgre, IUserService userService)
         {
             _db = db;
             _postgre = postgre;
-            _user = user;
+            _userService = userService;
         }
 
 
@@ -59,7 +59,7 @@ namespace Barbuuuda.Services
                 }
 
                 // Найдет Id пользователя.
-                string userId = await _user.GetUserIdByLogin(account);
+                string userId = await _userService.GetUserIdByLogin(account);
 
                 // Проверит существование диалога.
                 bool isDialog = await _postgre.MainInfoDialogs
@@ -147,13 +147,13 @@ namespace Barbuuuda.Services
                 }
 
                 // Найдет Id текущего пользователя.
-                string userId = await _user.GetUserIdByLogin(account);
+                string userId = await _userService.GetUserIdByLogin(account);
 
                 // Если передан флаг кнопки "Ответить", значит нужно поискать существующий диалог с исполнителем или создать новый.
                 if (isWriteBtn)
                 {
                     // Есть ли роль заказчика.
-                    UserOutput user = await _user.GetUserInitialsByIdAsync(userId);
+                    UserOutput user = await _userService.GetUserInitialsByIdAsync(userId);
 
                     // Пытается найти существующий диалог заказчика с исполнителем.
                     if (user.UserRole.Equals(UserRole.CUSTOMER) && !string.IsNullOrEmpty(executorId))
@@ -273,7 +273,7 @@ namespace Barbuuuda.Services
                 }
 
                 string id = membersIds.FirstOrDefault(i => !i.Equals(userId));
-                UserOutput otherUser = await _user.GetUserInitialsByIdAsync(id);
+                UserOutput otherUser = await _userService.GetUserInitialsByIdAsync(id);
 
                 // Запишет имя и фамилию пользователя, диалог с которым открыт.
                 if (!string.IsNullOrEmpty(otherUser.FirstName) && !string.IsNullOrEmpty(otherUser.LastName))
@@ -314,7 +314,7 @@ namespace Barbuuuda.Services
                 // Находит Id пользователя, для которого подтянуть список диалогов и мапит к типу UserOutput.
                 MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, UserOutput>());
                 Mapper mapper = new Mapper(config);
-                UserOutput user = mapper.Map<UserOutput>(await _user.GetUserByLogin(account));
+                UserOutput user = mapper.Map<UserOutput>(await _userService.GetUserByLogin(account));
 
                 if (string.IsNullOrEmpty(user.Id))
                 {
@@ -427,10 +427,10 @@ namespace Barbuuuda.Services
                     // Запишет логин собеседника.
                     foreach (string id in membersIds.Where(id => !id.Equals(user.Id)))
                     {
-                        resultDialog.UserName = await _user.FindUserIdByLogin(id);
+                        resultDialog.UserName = await _userService.FindUserIdByLogin(id);
 
                         // Запишет имя и фамилию, если они заполнены, иначе фронт будет использовать логин собеседника.
-                        UserOutput userInitial = await _user.GetUserInitialsByIdAsync(id);
+                        UserOutput userInitial = await _userService.GetUserInitialsByIdAsync(id);
 
                         if (string.IsNullOrEmpty(userInitial.FirstName) || string.IsNullOrEmpty(userInitial.LastName))
                         {

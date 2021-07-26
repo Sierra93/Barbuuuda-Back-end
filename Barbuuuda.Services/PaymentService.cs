@@ -24,13 +24,13 @@ namespace Barbuuuda.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IUserService _user;
+        private readonly IUserService _userService;
 
-        public PaymentService(ApplicationDbContext db, PostgreDbContext postgre, IUserService user)
+        public PaymentService(ApplicationDbContext db, PostgreDbContext postgre, IUserService userService)
         {
             _db = db;
             _postgre = postgre;
-            _user = user;
+            _userService = userService;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Barbuuuda.Services
                 IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
 
                 // Найдет Id пользователя по его логину.
-                string userId = await _user.GetUserIdByLogin(paymentSuccessInput.Account);
+                string userId = await _userService.GetUserIdByLogin(paymentSuccessInput.Account);
 
                 if (string.IsNullOrEmpty(userId))
                 {
@@ -144,7 +144,7 @@ namespace Barbuuuda.Services
         {
             try
             {
-                var userId = await _user.GetUserIdByLogin(account);
+                var userId = await _userService.GetUserIdByLogin(account);
                 var balanceAmount = await _postgre.Invoices
                     .Where(a => a.UserId
                     .Equals(userId))

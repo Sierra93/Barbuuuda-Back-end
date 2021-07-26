@@ -21,11 +21,11 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Сервис заданий.
         /// </summary>
-        private readonly ITaskService _task;
+        private readonly ITaskService _taskService;
 
-        public TaskController(ITaskService task)
+        public TaskController(ITaskService taskService)
         {
-            _task = task;
+            _taskService = taskService;
         }
 
 
@@ -37,7 +37,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("create")]
         public async Task<IActionResult> CreateTask([FromBody] TaskEntity oTask)
         {
-            TaskEntity oResultTask = await _task.CreateTask(oTask, GetUserName());
+            TaskEntity oResultTask = await _taskService.CreateTask(oTask, GetUserName());
 
             return Ok(oResultTask);
         }
@@ -50,7 +50,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("edit")]
         public async Task<IActionResult> EditTask([FromBody] TaskEntity oTask)
         {
-            TaskEntity oResultTask = await _task.EditTask(oTask, GetUserName());
+            TaskEntity oResultTask = await _taskService.EditTask(oTask, GetUserName());
 
             return Ok(oResultTask);
         }
@@ -62,7 +62,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("get-categories")]
         public async Task<IActionResult> GetCategories()
         {
-            IList aCategories = await _task.GetTaskCategories();
+            IList aCategories = await _taskService.GetTaskCategories();
 
             return Ok(aCategories);
         }
@@ -74,8 +74,8 @@ namespace Barbuuuda.Controllers
         //[HttpPost, Route("get-specializations")]
         //public Task<IActionResult> GetSpecializations()
         //{
-        //    //ITask _task = new TaskService(_db, _postgre);
-        //    //IList aSpecializations = await _task.GetTaskSpecializations();
+        //    //ITask _taskService = new TaskService(_db, _postgre);
+        //    //IList aSpecializations = await _taskService.GetTaskSpecializations();
 
         //    //return Ok(aSpecializations);
         //    throw new NotImplementedException();
@@ -89,7 +89,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("tasks-list")]
         public async Task<IActionResult> GetTasksList([FromBody] TaskInput taskInput)
         {
-            var aCustomerTasks = await _task.GetTasksList(GetUserName(), taskInput.TaskId, taskInput.Type);
+            var aCustomerTasks = await _taskService.GetTasksList(GetUserName(), taskInput.TaskId, taskInput.Type);
 
             return Ok(aCustomerTasks);
         }
@@ -101,7 +101,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("delete/{taskId}")]
         public async Task<IActionResult> DeleteTask([FromRoute] long taskId)
         {
-            await _task.DeleteTask(taskId);
+            await _taskService.DeleteTask(taskId);
 
             return Ok();
         }
@@ -114,7 +114,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("filter")]
         public async Task<IActionResult> FilterTask([FromQuery] string query)
         {
-            IList aTasks = await _task.FilterTask(query);
+            IList aTasks = await _taskService.FilterTask(query);
 
             return Ok(aTasks);
         }
@@ -127,7 +127,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("search")]
         public async Task<IActionResult> SearchTask([FromQuery] string param)
         {
-            IList aTasks = await _task.SearchTask(param);
+            IList aTasks = await _taskService.SearchTask(param);
 
             return Ok(aTasks);
         }
@@ -140,7 +140,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("concretely-date")]
         public async Task<IActionResult> GetSearchTaskDate([FromQuery] string date)
         {
-            IList aTasks = await _task.GetSearchTaskDate(date);
+            IList aTasks = await _taskService.GetSearchTaskDate(date);
 
             return Ok(aTasks);
         }
@@ -152,7 +152,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("active")]
         public async Task<IActionResult> LoadActiveTasks()
         {
-            IList aTasks = await _task.LoadActiveTasks(GetUserName());
+            IList aTasks = await _taskService.LoadActiveTasks(GetUserName());
 
             return Ok(aTasks);
         }
@@ -164,7 +164,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("count-status")]
         public async Task<IActionResult> GetCountTaskStatuses()
         {
-            object countTask = await _task.GetCountTaskStatuses();
+            object countTask = await _taskService.GetCountTaskStatuses();
 
             return Ok(countTask);
         }
@@ -177,7 +177,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("task-status")]
         public async Task<IActionResult> GetStatusTasks([FromQuery] string status)
         {
-            IList aTasks = await _task.GetStatusTasks(status, GetUserName());
+            IList aTasks = await _taskService.GetStatusTasks(status, GetUserName());
 
             return Ok(aTasks);
         }
@@ -190,7 +190,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(GetTaskResultOutput))]
         public async Task<IActionResult> LoadAuctionTasks()
         {
-            GetTaskResultOutput auctionTasks = await _task.LoadAuctionTasks();
+            GetTaskResultOutput auctionTasks = await _taskService.LoadAuctionTasks();
 
             return Ok(auctionTasks);
         }
@@ -204,7 +204,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(GetRespondResultOutput))]
         public async Task<IActionResult> GetRespondsAsync([FromBody] GetRespondInput getRespondInput)
         {
-            GetRespondResultOutput respondsList = await _task.GetRespondsAsync(getRespondInput.TaskId, GetUserName());
+            GetRespondResultOutput respondsList = await _taskService.GetRespondsAsync(getRespondInput.TaskId, GetUserName());
 
             return Ok(respondsList);
         }
@@ -218,7 +218,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(bool))]
         public async Task<IActionResult> SelectAsync([FromBody] CheckPayInput payInput)
         {
-            bool result = await _task.SelectAsync(payInput.TaskId, payInput.ExecutorId);
+            bool result = await _taskService.SelectAsync(payInput.TaskId, payInput.ExecutorId);
 
             return Ok(result);
         }
@@ -232,7 +232,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(bool))]
         public async Task<IActionResult> CheckSelectPayAsync([FromBody] CheckPayInput payInput)
         {
-            bool result = await _task.CheckSelectPayAsync(payInput.TaskId);
+            bool result = await _taskService.CheckSelectPayAsync(payInput.TaskId);
 
             return Ok(result);
         }
@@ -246,7 +246,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(GetRespondResultOutput))]
         public async Task<IActionResult> CheckAcceptAndNotCancelInviteTaskAsync([FromBody] CheckPayInput payInput)
         {
-            GetRespondResultOutput result = await _task.CheckAcceptAndNotCancelInviteTaskAsync(payInput.TaskId, GetUserName());
+            GetRespondResultOutput result = await _taskService.CheckAcceptAndNotCancelInviteTaskAsync(payInput.TaskId, GetUserName());
 
             return Ok(result);
         }

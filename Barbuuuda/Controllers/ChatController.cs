@@ -18,11 +18,11 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Абстракция чата.
         /// </summary>
-        private readonly IChatService _chat;
+        private readonly IChatService _chatService;
 
-        public ChatController(IChatService chat)
+        public ChatController(IChatService chatService)
         {
-            _chat = chat;
+            _chatService = chatService;
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(GetResultMessageOutput))]
         public async Task<IActionResult> SendAsync([FromBody] ChatInput chatInput)
         {
-            GetResultMessageOutput messages = await _chat.SendAsync(chatInput.Message, GetUserName(), chatInput.DialogId);
+            GetResultMessageOutput messages = await _chatService.SendAsync(chatInput.Message, GetUserName(), chatInput.DialogId);
 
             return Ok(messages);
         }
@@ -48,7 +48,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(GetResultMessageOutput))]
         public async Task<IActionResult> GetDialogAsync([FromBody] DialogInput dialogInput)
         {
-            GetResultMessageOutput messages = await _chat.GetDialogAsync(dialogInput.DialogId, GetUserName(), dialogInput.ExecutorId, dialogInput.IsWriteBtn);
+            GetResultMessageOutput messages = await _chatService.GetDialogAsync(dialogInput.DialogId, GetUserName(), dialogInput.ExecutorId, dialogInput.IsWriteBtn);
 
             return Ok(messages);
         }
@@ -61,7 +61,7 @@ namespace Barbuuuda.Controllers
         [ProducesResponseType(200, Type = typeof(GetResultDialogOutput))]
         public async Task<IActionResult> GetDialogsAsync()
         {
-            GetResultDialogOutput dialogs = await _chat.GetDialogsAsync(GetUserName());
+            GetResultDialogOutput dialogs = await _chatService.GetDialogsAsync(GetUserName());
 
             return Ok(dialogs);
         }
