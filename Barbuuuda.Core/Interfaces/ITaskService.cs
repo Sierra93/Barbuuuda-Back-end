@@ -45,7 +45,7 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод удаляет задание.
         /// </summary>
         /// <param name="taskId">Id задачи.</param>
-        Task DeleteTask(int taskId);
+        Task DeleteTask(long taskId);
 
         /// <summary>
         /// Метод фильтрует задания заказчика по параметру.

@@ -375,7 +375,7 @@ namespace Barbuuuda.Services
         /// Метод удаляет задание.
         /// </summary>
         /// <param name="taskId">Id задачи.</param>
-        public async Task DeleteTask(int taskId)
+        public async Task DeleteTask(long taskId)
         {
             try
             {
