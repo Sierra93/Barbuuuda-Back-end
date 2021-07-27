@@ -343,7 +343,7 @@ namespace Barbuuuda.Services
             var oTask = await (from tasks in _postgre.Tasks
                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                               where tasks.TaskId.Equals(taskId)
+                               where tasks.TaskId == taskId
                                select new
                                {
                                    tasks.CategoryCode,
@@ -1097,23 +1097,19 @@ namespace Barbuuuda.Services
 
                 // Проверит существование перехода пользователя. Если он уже записан в таблицу (для избежания дублей).
                 var transition = await (from t in _postgre.Transitions
-                                        where t.TaskId == taskId
-                                              && t.Id.Equals(userId)
-                                              && t.TransitionType.Equals("View")
-                                        select new TransitionEntity
-                                        {
-                                            Id = t.Id,
-                                            TaskId = t.TaskId
-                                        })
+                                        where t.Id.Equals(userId)
+                                              && t.TransitionType.Equals(type)
+                                        select t)
                     .FirstOrDefaultAsync();
 
                 // Если переход уже делался ранее.
-                if (transition != null)
+                if (transition != null && transition.Id.Equals(userId))
                 {
                     // Перезапишет переод.
                     transition.Id = userId;
                     transition.TaskId = taskId;
 
+                    //_postgre.Transitions.Update(transition);
                     await _postgre.SaveChangesAsync();
 
                     return result;
