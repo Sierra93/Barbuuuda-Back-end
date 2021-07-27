@@ -250,5 +250,33 @@ namespace Barbuuuda.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Метод запишет переход к просмотру или изменению задания исполнителем.
+        /// </summary>
+        /// <param name="transitionInput">Входная модель.</param>
+        /// <returns></returns>
+        [HttpPost, Route("set-transition")]
+        [ProducesResponseType(200, Type = typeof(TransitionOutput))]
+        public async Task<IActionResult> SetTransitionAsync([FromBody] TransitionInput transitionInput)
+        {
+            var transition = await _taskService.SetTransitionAsync(transitionInput.TaskId, transitionInput.Type, GetUserName());
+
+            return Ok(transition);
+        }
+
+        /// <summary>
+        /// Метод получит переход.
+        /// </summary>
+        /// <param name="transitionInput">Входная модель.</param>
+        /// <returns></returns>
+        [HttpPost, Route("get-transition")]
+        [ProducesResponseType(200, Type = typeof(TransitionOutput))]
+        public async Task<IActionResult> SetTransitionAsync()
+        {
+            var transition = await _taskService.GetTransitionAsync(GetUserName());
+
+            return Ok(transition);
+        }
     }
 }

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.Entities.Task;
 
 namespace Barbuuuda.Services
@@ -1060,6 +1061,119 @@ namespace Barbuuuda.Services
                 Console.WriteLine(ex);
                 Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод запишет переход к просмотру или изменению задания исполнителем.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="type">Тип перехода.</param>
+        /// <param name="account">Логин пользователя</param>
+        /// <returns>Id задания.</returns>
+        public async Task<TransitionOutput> SetTransitionAsync(int taskId, string type, string account)
+        {
+            try
+            {
+                var result = new TransitionOutput
+                {
+                    TaskId = taskId,
+                    Type = type
+                };
+
+                if (string.IsNullOrEmpty(type))
+                {
+                    throw new EmptyTransitionTypeException();
+                }
+
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                // Найдет Id пользователя.
+                var userId = await _userService.GetUserIdByLogin(account);
+
+                // Проверит существование перехода пользователя. Если он уже записан в таблицу (для избежания дублей).
+                var transition = await (from t in _postgre.Transitions
+                                        where t.TaskId == taskId
+                                              && t.Id.Equals(userId)
+                                              && t.TransitionType.Equals("View")
+                                        select new TransitionEntity
+                                        {
+                                            Id = t.Id,
+                                            TaskId = t.TaskId
+                                        })
+                    .FirstOrDefaultAsync();
+
+                // Если переход уже делался ранее.
+                if (transition != null)
+                {
+                    // Перезапишет переод.
+                    transition.Id = userId;
+                    transition.TaskId = taskId;
+
+                    await _postgre.SaveChangesAsync();
+
+                    return result;
+                }
+
+                // Перехода еще не было. Запишет переход.
+                await _postgre.Transitions.AddAsync(new TransitionEntity
+                {
+                    TaskId = taskId,
+                    Id = userId,
+                    TransitionType = type.Equals("View") ? "View" : "Edit"
+                });
+
+                await _postgre.SaveChangesAsync();
+
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит переход.
+        /// </summary>
+        /// <param name="account">Логин пользователя</param>
+        /// <returns>Id задания.</returns>
+        public async Task<TransitionOutput> GetTransitionAsync(string account)
+        {
+            try
+            {
+                // Найдет Id пользователя.
+                var userId = await _userService.GetUserIdByLogin(account);
+
+                var transition = await (from t in _postgre.Transitions
+                                        where t.Id.Equals(userId)
+                                        select new TransitionEntity
+                                        {
+                                            TaskId = t.TaskId,
+                                            TransitionType = t.TransitionType
+                                        })
+                    .FirstOrDefaultAsync();
+
+                if (transition == null)
+                {
+                    throw new NotFoundTransitionException();
+                }
+
+                var jsonString = JsonSerializer.Serialize(transition);
+                var result = JsonSerializer.Deserialize<TransitionOutput>(jsonString);
+
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
                 throw;
             }
         }

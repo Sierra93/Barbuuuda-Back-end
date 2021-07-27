@@ -140,5 +140,21 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Если все хорошо, то вернет список ставок к заданию, в котором будет только ставка исполнителя, которого выбрали и который принял в работу задание.</returns>
         Task<GetRespondResultOutput> CheckAcceptAndNotCancelInviteTaskAsync(long taskId, string account);
+
+        /// <summary>
+        /// Метод запишет переход к просмотру или изменению задания исполнителем.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="type">Тип перехода.</param>
+        /// <param name="account">Логин пользователя</param>
+        /// <returns>Id задания.</returns>
+        Task<TransitionOutput> SetTransitionAsync(int taskId, string type, string account);
+
+        /// <summary>
+        /// Метод получит переход.
+        /// </summary>
+        /// <param name="account">Логин пользователя</param>
+        /// <returns>Id задания.</returns>
+        Task<TransitionOutput> GetTransitionAsync(string account);
     }
 }

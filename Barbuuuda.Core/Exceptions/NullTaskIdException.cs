@@ -5,7 +5,7 @@
     /// </summary>
     public class NullTaskIdException : UserMessageException
     {
-        public NullTaskIdException() : base($"Не передан TaskId")
+        public NullTaskIdException() : base("Не передан TaskId")
         {
 
         }

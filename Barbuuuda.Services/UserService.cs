@@ -88,16 +88,13 @@ namespace Barbuuuda.Services
 
                     return new
                     {
-                        user = claim.Name,
+                        user = user.UserName,
                         userToken = sToken,
                         role = aRoles
                     };
                 }
 
-                else
-                {
-                    throw new ArgumentException();
-                }
+                throw new ArgumentException();
             }
 
             catch (ArgumentNullException ex)
