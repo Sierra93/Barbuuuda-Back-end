@@ -35,9 +35,11 @@ namespace Barbuuuda.Models.Entities.Executor
         [Column("TransitionType")]
         public string TransitionType { get; set; }
 
+        [NotMapped]
         [ForeignKey("Id")]
         public UserEntity User { get; set; }
 
+        [NotMapped]
         [ForeignKey("TaskId")]
         public TaskEntity Task { get; set; }
     }
