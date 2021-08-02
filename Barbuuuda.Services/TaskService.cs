@@ -1102,8 +1102,6 @@ namespace Barbuuuda.Services
                                         select t)
                     .FirstOrDefaultAsync();
 
-                //var transition = await _postgre.Transitions.FindAsync(c => c)
-
                 // Если переход уже делался ранее.
                 if (transition != null && transition.Id.Equals(userId))
                 {
