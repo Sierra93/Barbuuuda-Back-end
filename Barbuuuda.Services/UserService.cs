@@ -257,11 +257,12 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
+        /// TODO: доработать получение сумму счета для вывода в профиль пользователя. Ведь поле Score было удалено из сущности пользователя. Теперь тянуть его из другой таблицы.
         /// Метод получает информацию о пользователе для профиля.
         /// </summary>
-        /// <param name="userId">Id юзера.</param>
+        /// <param name="userName">Логин юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        public async Task<object> GetProfileInfo(string userName)
+        public async Task<ProfileOutput> GetProfileInfo(string userName)
         {
             try
             {
@@ -270,25 +271,27 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                return await _postgre.Users
-                    .Where(u => u.UserName.Equals(userName))
-                    .Select(up => new
-                    {
-                        up.UserName,
-                        up.Email,
-                        up.PhoneNumber,
-                        up.LastName,
-                        up.FirstName,
-                        up.Patronymic,
-                        up.UserIcon,
-                        dateRegister = string.Format("{0:f}", up.DateRegister),
-                        //scoreMoney = string.Format("{0:0,0}", up.Score),
-                        up.AboutInfo,
-                        up.Plan,
-                        up.City,
-                        up.Age
-                    })
+                var result = await (from u in _postgre.Users
+                                    where u.UserName.Equals(userName)
+                                    select new ProfileOutput
+                                    {
+                                        UserName = u.UserName,
+                                        Email = u.Email,
+                                        PhoneNumber = u.PhoneNumber,
+                                        LastName = u.LastName,
+                                        FirstName = u.FirstName,
+                                        Patronymic = u.Patronymic,
+                                        UserIcon = u.UserIcon,
+                                        DateRegister = string.Format("{0:f}", u.DateRegister),
+                                        //ScoreMoney = string.Format("{0:0,0}", u.Score),//TODO: тут доработать получение суммы счета
+                                        AboutInfo = u.AboutInfo,
+                                        Plan = u.Plan,
+                                        City = u.City,
+                                        Age = u.Age
+                                    })
                     .FirstOrDefaultAsync();
+
+                return result;
             }
 
             catch (ArgumentNullException ex)

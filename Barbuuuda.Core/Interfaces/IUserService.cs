@@ -29,7 +29,7 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="userId">Id юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        Task<object> GetProfileInfo(string userId);
+        Task<ProfileOutput> GetProfileInfo(string userId);
 
         /// <summary>
         /// Метод сохраняет личные данные юзера.

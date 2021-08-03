@@ -121,12 +121,13 @@ namespace Barbuuuda.Controllers
         /// Метод получает информацию о пользователе для профиля.
         /// </summary>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        [HttpGet, Route("profile")]
+        [HttpPost, Route("profile")]
+        [ProducesResponseType(200, Type = typeof(ProfileOutput))]
         public async Task<IActionResult> GetProfileInfoAsync()
         {
-            var oUser = await _userService.GetProfileInfo(GetUserName());
+            var user = await _userService.GetProfileInfo(GetUserName());
 
-            return Ok(oUser);
+            return Ok(user);
         }
 
         /// <summary>
