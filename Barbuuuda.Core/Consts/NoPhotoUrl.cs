@@ -8,6 +8,6 @@
         /// <summary>
         /// Если нет фото, то выбрать по дефолту.
         /// </summary>
-        public static string NO_PHOTO = "nophoto.jpg";
+        public static string NO_PHOTO = "../../../assets/images/nophoto.jpg";
     }
 }
