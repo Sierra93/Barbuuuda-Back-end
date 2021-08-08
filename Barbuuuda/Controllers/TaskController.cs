@@ -164,7 +164,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("count-status")]
         public async Task<IActionResult> GetCountTaskStatuses()
         {
-            object countTask = await _taskService.GetCountTaskStatuses();
+            var countTask = await _taskService.GetCountTaskStatuses();
 
             return Ok(countTask);
         }
@@ -172,14 +172,15 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод получает задания определенного статуса.
         /// </summary>
-        /// <param name="status">Название статуса.</param>
+        /// <param name="taskInput">Входная модель.</param>
         /// <returns>Список заданий с определенным статусом.</returns>
-        [HttpGet, Route("task-status")]
-        public async Task<IActionResult> GetStatusTasks([FromQuery] string status)
+        [HttpPost, Route("task-status")]
+        [ProducesResponseType(200, Type = typeof(GetTaskResultOutput))]
+        public async Task<IActionResult> GetStatusTasks([FromBody] TaskInput taskInput)
         {
-            IList aTasks = await _taskService.GetStatusTasks(status, GetUserName());
+            var tasks = await _taskService.GetStatusTasks(taskInput.Status, GetUserName());
 
-            return Ok(aTasks);
+            return Ok(tasks);
         }
 
         /// <summary>

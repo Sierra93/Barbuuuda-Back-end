@@ -1,7 +1,7 @@
 ﻿namespace Barbuuuda.Models.Task.Input
 {
     /// <summary>
-    /// Класс водной модели задания.
+    /// Класс входной модели задания.
     /// </summary>
     public class TaskInput
     {
@@ -14,5 +14,10 @@
         /// Параметр получения заданий либо все либо одно.
         /// </summary>
         public string Type { get; set; }
+
+        /// <summary>
+        /// Статус задания, задания которого нужно получить.
+        /// </summary>
+        public string Status { get; set; }
     }
 }

@@ -87,7 +87,7 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="status">Название статуса.</param>
         /// <param name="userName">Логин пользователя.</param>
         /// <returns>Список заданий с определенным статусом.</returns>
-        Task<IList> GetStatusTasks(string status, string userName);
+        Task<GetTaskResultOutput> GetStatusTasks(string status, string userName);
 
         /// <summary>
         /// Метод получает список заданий в аукционе. Выводит задания в статусе "В аукционе".

@@ -721,39 +721,51 @@ namespace Barbuuuda.Services
         /// <param name="status">Название статуса.</param>
         /// <param name="userName">Логин пользователя.</param>
         /// <returns>Список заданий с определенным статусом.</returns>
-        public async Task<IList> GetStatusTasks(string status, string userName)
+        public async Task<GetTaskResultOutput> GetStatusTasks(string status, string userName)
         {
             try
             {
-                string userId = await GetUserByName(userName);
+                var result = new GetTaskResultOutput();
 
-                return string.IsNullOrEmpty(status) ? throw new ArgumentNullException() :
-                     await (from tasks in _postgre.Tasks
-                            join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                            join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                var userId = await GetUserByName(userName);
+
+                var tasks = string.IsNullOrEmpty(status) ? throw new ArgumentNullException() :
+                    await (from task in _postgre.Tasks
+                            join categories in _postgre.TaskCategories on task.CategoryCode equals categories.CategoryCode
+                            join statuses in _postgre.TaskStatuses on task.StatusCode equals statuses.StatusCode
                             where statuses.StatusName.Equals(status)
-                            where tasks.OwnerId.Equals(userId)
+                            where task.OwnerId.Equals(userId)
                             select new
                             {
-                                tasks.CategoryCode,
-                                tasks.CountOffers,
-                                tasks.CountViews,
-                                tasks.OwnerId,
-                                tasks.SpecCode,
+                                task.CategoryCode,
+                                task.CountOffers,
+                                task.CountViews,
+                                task.OwnerId,
+                                task.SpecCode,
                                 categories.CategoryName,
-                                tasks.StatusCode,
+                                task.StatusCode,
                                 statuses.StatusName,
-                                taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                taskEndda = string.Format("{0:f}", tasks.TaskEndda),
-                                tasks.TaskTitle,
-                                tasks.TaskDetail,
-                                tasks.TaskId,
-                                taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                                tasks.TypeCode,
-                                userName
+                                TaskBegda = string.Format("{0:f}", task.TaskBegda),
+                                TaskEndda = string.Format("{0:f}", task.TaskEndda),
+                                task.TaskTitle,
+                                task.TaskDetail,
+                                task.TaskId,
+                                TaskPrice = string.Format("{0:0,0}", task.TaskPrice),
+                                task.TypeCode,
+                                UserName = userName
                             })
-                          .OrderBy(o => o.TaskId)
-                          .ToListAsync();
+                        .OrderBy(o => o.TaskId)
+                        .ToListAsync();
+
+                foreach (var t in tasks)
+                {
+                    var jsonString = JsonSerializer.Serialize(t);
+                    var jResult = JsonSerializer.Deserialize<TaskOutput>(jsonString);
+
+                    result.Tasks.Add(jResult);
+                }
+
+                return result;
             }
 
             catch (ArgumentNullException ex)
