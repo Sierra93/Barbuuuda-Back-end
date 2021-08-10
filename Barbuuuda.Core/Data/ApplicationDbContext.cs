@@ -12,6 +12,10 @@ namespace Barbuuuda.Core.Data
     /// </summary>
     public class ApplicationDbContext : DbContext
     {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
+
         public DbSet<LoggerEntity> Logs { get; set; }   // Таблица логов.
 
         public DbSet<FonEntity> Fons { get; set; }     // Таблица фона.
@@ -38,9 +42,5 @@ namespace Barbuuuda.Core.Data
         /// Таблица контактов.
         /// </summary>
         public DbSet<ContactEntity> Contacts { get; set; }
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
     }
 }

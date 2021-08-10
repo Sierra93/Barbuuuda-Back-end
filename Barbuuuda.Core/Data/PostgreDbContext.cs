@@ -19,6 +19,13 @@ namespace Barbuuuda.Core.Data
     {
         private readonly DbContextOptions<PostgreDbContext> _options;
 
+        public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options)
+        {
+            _options = options;
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
+
         /// <summary>
         /// Таблица пользователей.
         /// </summary>
@@ -124,11 +131,14 @@ namespace Barbuuuda.Core.Data
         /// </summary>
         public DbSet<TransitionEntity> Transitions { get; set; }
 
-        public PostgreDbContext(DbContextOptions<PostgreDbContext> options) : base(options)
-        {
-            _options = options;
-        }
+        /// <summary>
+        /// Таблица контрола селекта сортировки заданий.
+        /// </summary>
+        public DbSet<ControlSortEntity> ControlSorts { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
+        /// <summary>
+        /// Таблица контрола селекта фильтрации заданий.
+        /// </summary>
+        public DbSet<ControlFilterEntity> ControlFilters { get; set; }
     }
 }
