@@ -1,13 +1,18 @@
-﻿namespace Barbuuuda.Models.Entities.Task
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Barbuuuda.Models.Entities.Task
 {
     /// <summary>
     /// Класс сопоставляется с таблицей для контрола селекта сортировки заданий.
     /// </summary>
+    [Table("ControlSorts", Schema = "dbo")]
     public class ControlSortEntity
     {
         /// <summary>
         /// PK.
         /// </summary>
+        [Key]
         public long SortId { get; set; }
 
         /// <summary>
