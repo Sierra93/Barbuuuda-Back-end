@@ -1,22 +1,31 @@
-﻿using Autofac.Extensions.DependencyInjection;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Barbuuuda
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        public static IWebHostBuilder CreateHostBuilder(string[] args)
+        {
+            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
+            var conf = builder.Build();
+
+            IWebHostBuilder defaultBuilder = WebHost.CreateDefaultBuilder(args).ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+            });
+            
+            defaultBuilder.UseConfiguration(conf);
+
+            return defaultBuilder.UseStartup<Startup>();
+        }
     }
 }

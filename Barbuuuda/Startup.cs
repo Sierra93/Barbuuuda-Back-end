@@ -1,4 +1,5 @@
-﻿using Barbuuuda.Core.Data;
+﻿using System;
+using Barbuuuda.Core.Data;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,7 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Barbuuuda.Services.AutofacModules;
+using Barbuuuda.Services.Utils;
 using Microsoft.OpenApi.Models;
 
 namespace Barbuuuda
@@ -21,13 +22,15 @@ namespace Barbuuuda
         public IConfiguration Configuration { get; }
         public ContainerBuilder ContainerBuilder { get; }
 
+        public IContainer ApplicationContainer { get; private set; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
             ContainerBuilder = new ContainerBuilder(); 
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
 
@@ -63,6 +66,8 @@ namespace Barbuuuda
                 options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
             #endregion
 
+            //InitDbConfiguration.Init(services);
+
             services.AddIdentity<UserEntity, IdentityRole>(opts =>
             {
                 opts.Password.RequiredLength = 5;
@@ -97,9 +102,12 @@ namespace Barbuuuda
 
             services.AddSignalR();
 
-            ContainerBuilder builder = new ContainerBuilder();
-            builder.Populate(services);
-            builder.Build();
+            ApplicationContainer = AutoFac.Init(cb =>
+            {
+                cb.Populate(services);
+            });
+
+            return new AutofacServiceProvider(ApplicationContainer);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -126,9 +134,6 @@ namespace Barbuuuda
                 endpoints.MapControllers();
             });
 
-            // Запишет путь для xml-файла документации API.
-            //applicationLifetime.ApplicationStarted.Register(DocumentationFileExtension.OnApplicationStarted);
-
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
@@ -141,11 +146,6 @@ namespace Barbuuuda
                 //endpoints.MapHub<ChatHub>("/chat");
                 endpoints.MapDefaultControllerRoute();
             });
-        }
-
-        public void ConfigureContainer(ContainerBuilder builder)
-        {
-            ServicesModule.InitModules(builder);
         }
     }
 }

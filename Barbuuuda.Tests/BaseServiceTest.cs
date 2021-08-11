@@ -27,7 +27,7 @@ namespace Barbuuuda.Tests
         public BaseServiceTest()
         {
             // Настройка тестовых строк подключения.
-            IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
+            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
             AppConfiguration = builder.Build();
             MsSqlConfigString = AppConfiguration["ConnectionStrings:TestMsSqlConnection"];
             PostgreConfigString = AppConfiguration["ConnectionStrings:TestNpgSqlConnection"];

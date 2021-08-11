@@ -1,12 +1,22 @@
 ﻿using Autofac;
+using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 
 namespace Barbuuuda.Services.AutofacModules
 {
-    public partial class ServicesModule 
+    //[CommonModule]
+    public sealed class ServicesModule
     {
         public static void InitModules(ContainerBuilder builder)
         {
+            builder.RegisterType<ApplicationDbContext>().InstancePerLifetimeScope();
+
+            builder.RegisterType<PostgreDbContext>().InstancePerLifetimeScope();
+
+            builder.RegisterType<UserService>().Named<IUserService>("UserService");
+
+            builder.RegisterType<TaskService>().Named<ITaskService>("TaskService");
+
             // Сервис стартовой страницы.
             builder.RegisterType<MainPageService>().As<IMainPageService>();
 
