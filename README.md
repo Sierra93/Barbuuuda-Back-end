@@ -2,7 +2,7 @@
 # Стек бэка:
 
 **Серверный язык:** C#, ASP.NET Core Web API.<br>
-**Tests:** MSTest (юнит-тесты + интеграционное).
+**Tests:** MSTest (юнит-тесты + интеграционные).<br>
 **ORM:** LINQ, Entity Framework Core.<br>
 **БД:** MSSQL, Postgres.<br>
 **DI:** Autofac.<br>
