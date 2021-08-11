@@ -1,4 +1,6 @@
 # Barbuuuda-Back-end - API онлайн-сервиса удаленной работы.
+<hr>
+
 # Стек бэка:
 
 **Серверный язык:** C#, ASP.NET Core Web API.<br>
