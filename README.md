@@ -1,4 +1,7 @@
 # Barbuuuda-Back-end - API онлайн-сервиса удаленной работы.
 # Стек бэка:
 
-C#, ASP.NET Core Web API, LINQ, Entity Framework Core, SQL Server, PostgreSQL, DI (Autofac).
+**Серверный язык:** C#, ASP.NET Core Web API.<br>
+**ORM:** LINQ, Entity Framework Core.<br>
+**БД:**MSSQL, Postgres.<br>
+**DI:**Autofac.
