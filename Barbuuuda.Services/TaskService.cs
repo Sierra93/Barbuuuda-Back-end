@@ -1071,7 +1071,7 @@ namespace Barbuuuda.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                var logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await logger.LogCritical();
                 throw;
             }
@@ -1143,6 +1143,8 @@ namespace Barbuuuda.Services
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                await logger.LogCritical();
                 throw;
             }
         }
@@ -1182,6 +1184,43 @@ namespace Barbuuuda.Services
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит список значений для селекта сортировки заданий.
+        /// </summary>
+        /// <returns>Список значений.</returns>
+        public async Task<ControlSortResult> GetSortSelectAsync()
+        {
+            try
+            {
+                var result = new ControlSortResult();
+
+                var sortData = await (from res in _postgre.ControlSorts
+                                      select new ControlSortOutput
+                                      {
+                                          SortKey = res.SortKey,
+                                          SortValue = res.SortValue
+                                      })
+                    .ToListAsync();
+
+                foreach (var el in sortData)
+                {
+                    result.ControlSorts.Add(el);
+                }
+
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                await logger.LogCritical();
                 throw;
             }
         }

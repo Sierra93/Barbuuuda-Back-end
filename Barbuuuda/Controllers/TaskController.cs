@@ -279,5 +279,18 @@ namespace Barbuuuda.Controllers
 
             return Ok(transition);
         }
+
+        /// <summary>
+        /// Метод получит список значений для селекта сортировки заданий.
+        /// </summary>
+        /// <returns>Список значений.</returns>
+        [HttpPost, Route("get-sort-select")]
+        [ProducesResponseType(200, Type = typeof(ControlSortResult))]
+        public async Task<IActionResult> GetSortSelectAsync()
+        {
+            var result = await _taskService.GetSortSelectAsync();
+
+            return Ok(result);
+        }
     }
 }

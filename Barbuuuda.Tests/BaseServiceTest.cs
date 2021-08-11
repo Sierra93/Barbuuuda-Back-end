@@ -15,11 +15,11 @@ namespace Barbuuuda.Tests
         protected readonly long TASK_ID = 1000001;
         protected readonly string EXECUTOR_ID = "b723e618-6e6a-41da-a1ac-50610fd4ae96";
         protected readonly string EXECUTOR_LOGIN = "executor1";
-
         protected string MsSqlConfigString { get; set; }
         protected string PostgreConfigString { get; set; }
         protected IConfiguration AppConfiguration { get; set; }
 
+        protected ApplicationDbContext ApplicationDbContext;
         protected PostgreDbContext PostgreContext;
         protected UserService UserService;
         protected ExecutorService ExecutorService;
@@ -33,7 +33,11 @@ namespace Barbuuuda.Tests
             PostgreConfigString = AppConfiguration["ConnectionStrings:TestNpgSqlConnection"];
 
             // Настройка тестовых контекстов.
-            DbContextOptionsBuilder<PostgreDbContext> optionsBuilder = new DbContextOptionsBuilder<PostgreDbContext>();
+            var optionsMsSqlBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsMsSqlBuilder.UseSqlServer(MsSqlConfigString);
+            ApplicationDbContext = new ApplicationDbContext(optionsMsSqlBuilder.Options);
+
+            var optionsBuilder = new DbContextOptionsBuilder<PostgreDbContext>();
             optionsBuilder.UseNpgsql(PostgreConfigString);
             PostgreContext = new PostgreDbContext(optionsBuilder.Options);
 

@@ -156,5 +156,11 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="account">Логин пользователя</param>
         /// <returns>Id задания.</returns>
         Task<TransitionOutput> GetTransitionAsync(string account);
+
+        /// <summary>
+        /// Метод получит список значений для селекта сортировки заданий.
+        /// </summary>
+        /// <returns>Список значений.</returns>
+        Task<ControlSortResult> GetSortSelectAsync();
     }
 }
