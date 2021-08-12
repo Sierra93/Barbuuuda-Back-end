@@ -1200,18 +1200,43 @@ namespace Barbuuuda.Services
             {
                 var result = new ControlSortResult();
 
-                var sortData = await (from res in _postgre.ControlSorts
-                                      select new ControlSortOutput
-                                      {
-                                          SortKey = res.SortKey,
-                                          SortValue = res.SortValue
-                                      })
-                    .ToListAsync();
+                await (from res in _postgre.ControlSorts
+                       select new ControlSortOutput
+                       {
+                           SortKey = res.SortKey,
+                           SortValue = res.SortValue
+                       })
+                    .ForEachAsync(item => result.ControlSorts.Add(item));
 
-                foreach (var el in sortData)
-                {
-                    result.ControlSorts.Add(el);
-                }
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит список значений для селекта фильтров заданий.
+        /// </summary>
+        /// <returns>Список значений.</returns>
+        public async Task<ControlFilterResult> GetFilterSelectAsync()
+        {
+            try
+            {
+                var result = new ControlFilterResult();
+
+                await (from res in _postgre.ControlFilters
+                       select new ControlFilterOutput
+                       {
+                           FilterKey = res.FilterKey,
+                           FilterValue = res.FilterValue
+                       })
+                    .ForEachAsync(item => { result.ControlFilters.Add(item); });
 
                 return result;
             }

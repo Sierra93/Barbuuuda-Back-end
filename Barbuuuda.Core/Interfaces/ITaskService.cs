@@ -162,5 +162,11 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <returns>Список значений.</returns>
         Task<ControlSortResult> GetSortSelectAsync();
+
+        /// <summary>
+        /// Метод получит список значений для селекта фильтров заданий.
+        /// </summary>
+        /// <returns>Список значений.</returns>
+        Task<ControlFilterResult> GetFilterSelectAsync();
     }
 }

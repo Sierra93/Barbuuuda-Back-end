@@ -292,5 +292,18 @@ namespace Barbuuuda.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Метод получит список значений для селекта фильтров заданий.
+        /// </summary>
+        /// <returns>Список значений.</returns>
+        [HttpPost, Route("get-filter-select")]
+        [ProducesResponseType(200, Type = typeof(ControlFilterResult))]
+        public async Task<IActionResult> GetFilterSelectAsync()
+        {
+            var result = await _taskService.GetFilterSelectAsync();
+
+            return Ok(result);
+        }
     }
 }

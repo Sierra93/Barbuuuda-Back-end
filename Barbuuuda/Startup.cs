@@ -66,8 +66,6 @@ namespace Barbuuuda
                 options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
             #endregion
 
-            //InitDbConfiguration.Init(services);
-
             services.AddIdentity<UserEntity, IdentityRole>(opts =>
             {
                 opts.Password.RequiredLength = 5;
