@@ -28,7 +28,6 @@ namespace Barbuuuda.Controllers
             _taskService = taskService;
         }
 
-
         /// <summary>
         /// Метод создает новое задание.
         /// </summary>

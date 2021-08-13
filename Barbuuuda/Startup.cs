@@ -27,7 +27,7 @@ namespace Barbuuuda
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            ContainerBuilder = new ContainerBuilder(); 
+            ContainerBuilder = new ContainerBuilder();
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -36,12 +36,16 @@ namespace Barbuuuda
 
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
             {
-                builder.AllowAnyMethod()
-                       .AllowAnyHeader()
-                       .WithOrigins("*")
-                       .WithMethods("*")
-                       .WithHeaders("*")
-                       .DisallowCredentials();
+                //builder.AllowAnyMethod()
+                //    .AllowAnyHeader()
+                //    .WithOrigins("*")
+                //    .WithMethods("*")
+                //    .WithHeaders("*")
+                //.DisallowCredentials();
+                builder.WithOrigins("http://localhost:4200", "http://localhost:4200/", "https://barbuuuda.ru", "https://barbuuuda.ru/")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
             }));
 
             #region ПРОД.
