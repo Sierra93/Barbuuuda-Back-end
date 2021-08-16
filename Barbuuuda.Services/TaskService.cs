@@ -66,7 +66,8 @@ namespace Barbuuuda.Services
                     oTask.StatusCode = await _postgre.TaskStatuses
                     .Where(s => s.StatusName
                     .Equals(StatusTask.AUCTION))
-                    .Select(s => s.StatusCode).FirstOrDefaultAsync();
+                    .Select(s => s.StatusCode)
+                    .FirstOrDefaultAsync();
 
                     // Запишет Id заказчика, создавшего задание.
                     oTask.OwnerId = user.Id;
@@ -117,20 +118,15 @@ namespace Barbuuuda.Services
                 // Проверяет существование заказчика, который создал задание.
                 var user = await IdentityCustomer(userName);
 
-                string ownerId = await _userService.GetUserIdByLogin(userName);
-
-                // Запишет Id заказчика.
-                if (!string.IsNullOrEmpty(ownerId))
-                {
-                    oTask.OwnerId = ownerId;
-                }
-
                 // Проверяет, есть ли такая категория в БД.
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
 
                 // Если все проверки прошли.
                 if (user != null && bCategory)
                 {
+                    // Запишет Id заказчика.
+                    oTask.OwnerId = user.Id;
+
                     // Запишет код статуса "В аукционе".
                     oTask.StatusCode = await _postgre.TaskStatuses
                     .Where(s => s.StatusName
@@ -364,7 +360,8 @@ namespace Barbuuuda.Services
                                    tasks.StatusCode,
                                    statuses.StatusName,
                                    taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                   taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                   //taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                   tasks.TaskEndda,
                                    tasks.TaskTitle,
                                    tasks.TaskDetail,
                                    tasks.TaskId,
