@@ -52,13 +52,13 @@ namespace Barbuuuda.Services
                 }
 
                 // Проверяет существование заказчика, который создает задание.
-                bool bCustomer = await IdentityCustomer(userName);
+                var user = await IdentityCustomer(userName);
 
                 // Проверяет, есть ли такая категория в БД.
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
 
                 // Если все проверки прошли.
-                if (bCustomer && bCategory)
+                if (user != null && bCategory)
                 {
                     oTask.TaskBegda = DateTime.Now;
 
@@ -67,6 +67,9 @@ namespace Barbuuuda.Services
                     .Where(s => s.StatusName
                     .Equals(StatusTask.AUCTION))
                     .Select(s => s.StatusCode).FirstOrDefaultAsync();
+
+                    // Запишет Id заказчика, создавшего задание.
+                    oTask.OwnerId = user.Id;
 
                     // TODO: Доработать передачу с фронта для про или для всех.
                     oTask.TypeCode = "Для всех";
@@ -112,7 +115,7 @@ namespace Barbuuuda.Services
                 }
 
                 // Проверяет существование заказчика, который создал задание.
-                bool bCustomer = await IdentityCustomer(userName);
+                var user = await IdentityCustomer(userName);
 
                 string ownerId = await _userService.GetUserIdByLogin(userName);
 
@@ -126,7 +129,7 @@ namespace Barbuuuda.Services
                 bool bCategory = await IdentityCategory(oTask.CategoryCode);
 
                 // Если все проверки прошли.
-                if (bCustomer && bCategory)
+                if (user != null && bCategory)
                 {
                     // Запишет код статуса "В аукционе".
                     oTask.StatusCode = await _postgre.TaskStatuses
@@ -167,7 +170,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>true/false</returns>
-        async Task<bool> IdentityCustomer(string userName)
+        async Task<UserEntity> IdentityCustomer(string userName)
         {
             try
             {
@@ -176,11 +179,16 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                UserEntity oUser = await _postgre.Users
+                var user = await _postgre.Users
                     .Where(u => u.UserName.Equals(userName))
                     .FirstOrDefaultAsync();
 
-                return oUser != null ? true : throw new ArgumentNullException();
+                if (user == null)
+                {
+                    throw new ArgumentNullException();
+                }
+
+                return user;
             }
 
             catch (ArgumentNullException ex)
