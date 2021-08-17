@@ -3,6 +3,7 @@ using Barbuuuda.Models.Task.Output;
 using System.Collections;
 using System.Threading.Tasks;
 using Barbuuuda.Models.Task;
+using Barbuuuda.Models.Task.Input;
 
 namespace Barbuuuda.Core.Interfaces
 {
@@ -24,7 +25,7 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="task">Объект с данными задания.</param>
         /// <returns>Вернет данные созданного задания.</returns>
-        Task<TaskEntity> EditTask(TaskEntity oTask, string userName);
+        Task<TaskEntity> EditTask(TaskInput oTask, string userName);
 
         /// <summary>
         /// Метод выгружает список категорий заданий.

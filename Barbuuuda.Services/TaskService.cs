@@ -17,6 +17,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.Entities.Task;
+using Barbuuuda.Models.Task.Input;
 
 namespace Barbuuuda.Services
 {
@@ -42,11 +43,11 @@ namespace Barbuuuda.Services
         /// <param name="task">Объект с данными задания.</param>
         /// <param name="userName">Login юзера.</param>
         /// <returns>Вернет данные созданного задания.</returns>
-        public async Task<TaskEntity> CreateTask(TaskEntity oTask, string userName)
+        public async Task<TaskEntity> CreateTask(TaskEntity task, string userName)
         {
             try
             {
-                if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail))
+                if (string.IsNullOrEmpty(task.TaskTitle) || string.IsNullOrEmpty(task.TaskDetail))
                 {
                     throw new ArgumentException();
                 }
@@ -55,30 +56,38 @@ namespace Barbuuuda.Services
                 var user = await IdentityCustomer(userName);
 
                 // Проверяет, есть ли такая категория в БД.
-                bool bCategory = await IdentityCategory(oTask.CategoryCode);
+                bool bCategory = await IdentityCategory(task.CategoryCode);
 
                 // Если все проверки прошли.
                 if (user != null && bCategory)
                 {
-                    oTask.TaskBegda = DateTime.Now;
+                    task.TaskBegda = DateTime.Now;
 
                     // Запишет код статуса "В аукционе".
-                    oTask.StatusCode = await _postgre.TaskStatuses
+                    task.StatusCode = await _postgre.TaskStatuses
                     .Where(s => s.StatusName
                     .Equals(StatusTask.AUCTION))
                     .Select(s => s.StatusCode)
                     .FirstOrDefaultAsync();
 
                     // Запишет Id заказчика, создавшего задание.
-                    oTask.OwnerId = user.Id;
+                    task.OwnerId = user.Id;
 
                     // TODO: Доработать передачу с фронта для про или для всех.
-                    oTask.TypeCode = "Для всех";
+                    task.TypeCode = "Для всех";
 
-                    await _postgre.Tasks.AddAsync(oTask);
+                    // Найдет и увеличит последний PK.
+                    var incrementTaskId = await (from x in _postgre.Tasks
+                                                 select x.TaskId)
+                        .Reverse()
+                        .FirstOrDefaultAsync();
+
+                    task.TaskId = ++incrementTaskId;
+
+                    await _postgre.Tasks.AddAsync(task);
                     await _postgre.SaveChangesAsync();
 
-                    return oTask;
+                    return task;
                 }
 
                 throw new ArgumentNullException();
@@ -106,11 +115,14 @@ namespace Barbuuuda.Services
         /// <param name="task">Объект с данными задания.</param>
         /// <param name="userName">Login юзера.</param>
         /// <returns>Вернет данные измененного задания.</returns>
-        public async Task<TaskEntity> EditTask(TaskEntity oTask, string userName)
+        public async Task<TaskEntity> EditTask(TaskInput task, string userName)
         {
             try
             {
-                if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail))
+                if (string.IsNullOrEmpty(task.TaskTitle)
+                    || string.IsNullOrEmpty(task.TaskDetail)
+                    || task.TaskId <= 0
+                    || task.TaskId == null)
                 {
                     throw new ArgumentException();
                 }
@@ -119,27 +131,41 @@ namespace Barbuuuda.Services
                 var user = await IdentityCustomer(userName);
 
                 // Проверяет, есть ли такая категория в БД.
-                bool bCategory = await IdentityCategory(oTask.CategoryCode);
+                var bCategory = await IdentityCategory(task.CategoryCode);
+
+                // Найдет задание, которое нужно изменить.
+                var updateTask = await (from t in _postgre.Tasks
+                                        where t.TaskId == task.TaskId
+                                        select t)
+                    .FirstOrDefaultAsync();
 
                 // Если все проверки прошли.
-                if (user != null && bCategory)
+                if (user != null && bCategory && updateTask != null)
                 {
                     // Запишет Id заказчика.
-                    oTask.OwnerId = user.Id;
+                    updateTask.OwnerId = user.Id;
 
                     // Запишет код статуса "В аукционе".
-                    oTask.StatusCode = await _postgre.TaskStatuses
-                    .Where(s => s.StatusName
-                    .Equals(StatusTask.AUCTION))
-                    .Select(s => s.StatusCode).FirstOrDefaultAsync();
+                    updateTask.StatusCode = await _postgre.TaskStatuses
+                        .Where(s => s.StatusName
+                        .Equals(StatusTask.AUCTION))
+                        .Select(s => s.StatusCode)
+                        .FirstOrDefaultAsync();
 
                     // TODO: Доработать передачу с фронта для про или для всех.
-                    oTask.TypeCode = "Для всех";
+                    updateTask.TypeCode = "Для всех";
 
-                    _postgre.Tasks.Update(oTask);
+                    // Обновит поля задания.
+                    updateTask.TaskTitle = task.TaskTitle;
+                    updateTask.TaskDetail = task.TaskDetail;
+                    updateTask.CategoryCode = task.CategoryCode;
+                    updateTask.SpecCode = task.SpecCode;
+                    updateTask.TaskEndda = task.TaskEndda;
+                    updateTask.TaskPrice = task.TaskPrice;
+
                     await _postgre.SaveChangesAsync();
 
-                    return oTask;
+                    return updateTask;
                 }
 
                 throw new ArgumentNullException();

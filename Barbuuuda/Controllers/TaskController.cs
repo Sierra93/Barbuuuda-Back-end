@@ -34,9 +34,9 @@ namespace Barbuuuda.Controllers
         /// <param name="oTask">Объект с данными задания.</param>
         /// <returns>Вернет данные созданного задания.</returns>
         [HttpPost, Route("create")]
-        public async Task<IActionResult> CreateTask([FromBody] TaskEntity oTask)
+        public async Task<IActionResult> CreateTaskAsync([FromBody] TaskEntity task)
         {
-            TaskEntity oResultTask = await _taskService.CreateTask(oTask, GetUserName());
+            var oResultTask = await _taskService.CreateTask(task, GetUserName());
 
             return Ok(oResultTask);
         }
@@ -47,9 +47,9 @@ namespace Barbuuuda.Controllers
         /// <param name="oTask">Объект с данными задания.</param>
         /// <returns>Вернет данные измененного задания.</returns>
         [HttpPost, Route("edit")]
-        public async Task<IActionResult> EditTask([FromBody] TaskEntity oTask)
+        public async Task<IActionResult> EditTaskAsync([FromBody] TaskInput task)
         {
-            TaskEntity oResultTask = await _taskService.EditTask(oTask, GetUserName());
+            var oResultTask = await _taskService.EditTask(task, GetUserName());
 
             return Ok(oResultTask);
         }
