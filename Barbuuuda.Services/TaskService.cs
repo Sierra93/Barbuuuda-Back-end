@@ -77,10 +77,7 @@ namespace Barbuuuda.Services
                     task.TypeCode = "Для всех";
 
                     // Найдет и увеличит последний PK.
-                    var incrementTaskId = await (from x in _postgre.Tasks
-                                                 select x.TaskId)
-                        .Reverse()
-                        .FirstOrDefaultAsync();
+                    var incrementTaskId = await _postgre.Tasks.Select(x => x.TaskId).MaxAsync();
 
                     task.TaskId = ++incrementTaskId;
 

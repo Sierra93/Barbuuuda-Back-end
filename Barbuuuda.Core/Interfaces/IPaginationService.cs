@@ -12,15 +12,15 @@ namespace Barbuuuda.Core.Interfaces
         /// Метод пагинации.
         /// </summary>
         /// <param name="pageIdx">Номер страницы.</param>
-        /// <param name="userName">Имя юзера.</param>
         /// <returns>Данные пагинации.</returns>
-        Task<IndexOutput> GetPaginationTasks(int pageIdx, string userName);
+        Task<IndexOutput> GetInitPaginationAuctionTasks(int pageIdx);
 
         /// <summary>
-        /// Метод пагинации аукциона.
+        /// Метод пагинации всех заданий аукциона.
         /// </summary>
-        /// <param name="pageIdx"></param>
+        /// <param name="pageNumber">Номер страницы.</param>
+        /// <param name="countRows">Кол-во строк.</param>
         /// <returns>Данные пагинации.</returns>
-        Task<IndexOutput> GetPaginationAuction(int pageIdx);
+        Task<IndexOutput> GetPaginationAuction(int pageNumber, int countRows);
     }
 }

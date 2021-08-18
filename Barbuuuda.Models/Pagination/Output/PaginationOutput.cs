@@ -7,8 +7,8 @@ namespace Barbuuuda.Models.Pagination.Output
     /// </summary>
     public class PaginationOutput
     {
-        public int PageNumber { get; private set; }
-        public int TotalPages { get; private set; }
+        private int PageNumber { get; set; }
+        private int TotalPages { get; set; }
 
         public PaginationOutput(int count, int pageNumber, int pageSize)
         {
@@ -16,20 +16,8 @@ namespace Barbuuuda.Models.Pagination.Output
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
         }
 
-        public bool HasPreviousPage
-        {
-            get
-            {
-                return (PageNumber > 1);
-            }
-        }
+        public bool HasPreviousPage => (PageNumber > 1);
 
-        public bool HasNextPage
-        {
-            get
-            {
-                return (PageNumber < TotalPages);
-            }
-        }
+        public bool HasNextPage => (PageNumber < TotalPages);
     }
 }
