@@ -22,8 +22,8 @@ namespace Barbuuuda.Models.Pagination.Output
         public bool IsLoadAll { get; set; }
 
         /// <summary>
-        /// Если число строк меньше запрашиваемых, то увеличит до минимального для появления кол-ва страниц.
+        /// Флаг видимости пагинации.
         /// </summary>
-        public long Increment { get; set; }
+        public bool IsVisiblePagination { get; set; }
     }
 }

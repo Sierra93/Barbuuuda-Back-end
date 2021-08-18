@@ -13,6 +13,6 @@
         /// <summary>
         /// Кол-во строк для отображения.
         /// </summary>
-        public int CountRows { get; set; }
+        public int CountRows { get; set; } = 10;
     }
 }

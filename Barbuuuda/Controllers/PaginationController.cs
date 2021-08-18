@@ -30,7 +30,7 @@ namespace Barbuuuda.Controllers
         /// <param name="pageIdx">Номер страницы. По дефолту 1.</param>
         /// <returns>Данные пагинации.</returns>
         [HttpPost, Route("init-auction")]
-        public async Task<IActionResult> GetInitPaginationAuctionTasks([FromBody] PaginationInput paginationInput)
+        public async Task<IActionResult> GetInitPaginationAuctionTasksAsync([FromBody] PaginationInput paginationInput)
         {
             var paginationData = await _paginationService.GetInitPaginationAuctionTasks(paginationInput.PageNumber);
 
@@ -43,11 +43,35 @@ namespace Barbuuuda.Controllers
         /// <param name="paginationInput">Входная модель.</param>
         /// <returns>Данные пагинации.</returns>
         [HttpPost, Route("auction")]
-        public async Task<IActionResult> GetPaginationAuction([FromBody] PaginationInput paginationInput)
+        public async Task<IActionResult> GetPaginationAuctionAsync([FromBody] PaginationInput paginationInput)
         {
             var paginationData = await _paginationService.GetPaginationAuction(paginationInput.PageNumber, paginationInput.CountRows);
 
             return Ok(paginationData);
+        }
+
+        /// <summary>
+        /// Метод пагинации всех заданий в работе у исполнителя.
+        /// </summary>
+        /// <param name="paginationInput">Входная модель.</param>
+        /// <returns>Данные пагинации.</returns>
+        [HttpPost, Route("work")]
+        public async Task<IActionResult> GetPaginationWorkAsync([FromBody] PaginationInput paginationInput)
+        {
+            var paginationData = await _paginationService.GetPaginationWorkAsync(paginationInput.PageNumber, paginationInput.CountRows, GetUserName());
+
+            return Ok(paginationData);
+        }
+
+        /// <summary>
+        /// Метод пагинации всех заданий заказчика.
+        /// </summary>
+        /// <param name="paginationInput">Входная модель.</param>
+        /// <returns>Данные пагинации.</returns>
+        [HttpPost, Route("customer")]
+        public async Task<IActionResult> GetPaginationCustomerAsync([FromBody] PaginationInput paginationInput)
+        {
+            return Ok();
         }
     }
 }
