@@ -33,10 +33,11 @@ namespace Barbuuuda.Core.Interfaces
         Task<IndexOutput> GetPaginationWorkAsync(int pageNumber, int countRows, string account);
 
         /// <summary>
-        /// Метод пагинации.
+        /// Метод пагинации в работе у исполнителя на ините станицы мои задания.
         /// </summary>
         /// <param name="pageIdx">Номер страницы.</param>
+        /// <param name="account">Логин пользователя.</param>
         /// <returns>Данные пагинации.</returns>
-        Task<IndexOutput> GetInitPaginationWorkAsync(int pageIdx);
+        Task<IndexOutput> GetInitPaginationWorkAsync(int pageIdx, string account);
     }
 }

@@ -11,7 +11,7 @@ namespace Barbuuuda.Tests.UnitTests.PaginationTests
     /// Тест на пагинацию на ините аукциона.
     /// </summary>
     [TestClass]
-    public class InitPaginationTest : BaseServiceTest
+    public class InitAuctionPaginationTest : BaseServiceTest
     {
         [TestMethod]
         public async Task InitPaginationTestAsync()

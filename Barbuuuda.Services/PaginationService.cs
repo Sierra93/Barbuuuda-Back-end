@@ -223,9 +223,75 @@ namespace Barbuuuda.Services
             }
         }
 
-        public Task<IndexOutput> GetInitPaginationWorkAsync(int pageIdx)
+        /// <summary>
+        /// Метод пагинации в работе у исполнителя на ините станицы мои задания.
+        /// </summary>
+        /// <param name="pageIdx">Номер страницы.</param>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Данные пагинации.</returns>
+        public async Task<IndexOutput> GetInitPaginationWorkAsync(int pageIdx, string account)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var countRows = 10;   // Кол-во заданий на странице.
+                var userId = await _userService.GetUserIdByLogin(account);
+
+                var getTasks = (from tasks in _postgre.Tasks
+                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                                join users in _postgre.Users on tasks.OwnerId equals users.Id
+                                where statuses.StatusName.Equals(StatusTask.IN_WORK)
+                                      && tasks.ExecutorId.Equals(userId)
+                                select new
+                                {
+                                    tasks.CategoryCode,
+                                    tasks.CountOffers,
+                                    tasks.CountViews,
+                                    tasks.OwnerId,
+                                    tasks.SpecCode,
+                                    categories.CategoryName,
+                                    tasks.StatusCode,
+                                    statuses.StatusName,
+                                    taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                    taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                    tasks.TaskTitle,
+                                    tasks.TaskDetail,
+                                    tasks.TaskId,
+                                    taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                    tasks.TypeCode,
+                                    users.UserName
+                                })
+                              .OrderBy(o => o.TaskId)
+                              .AsQueryable();
+
+                var count = await getTasks.CountAsync();
+                //var items = await getTasks.Skip((pageIdx - 1) * countRows).Take(countRows).ToListAsync();
+                var items = await getTasks.Take(countRows).ToListAsync();
+
+                var pageData = new PaginationOutput(count, pageIdx, countRows);
+                var paginationData = new IndexOutput
+                {
+                    PageData = pageData,
+                    Tasks = items,
+                    TotalCount = count,
+                    IsLoadAll = count < countRows,
+                    IsVisiblePagination = count > 10
+                };
+
+                if (paginationData.IsLoadAll)
+                {
+                    var difference = countRows - count;
+                    paginationData.TotalCount += difference;
+                }
+
+                return paginationData;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

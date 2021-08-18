@@ -64,14 +64,16 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод пагинации всех заданий заказчика.
+        /// Метод пагинации в работе у исполнителя на ините станицы мои задания.
         /// </summary>
         /// <param name="paginationInput">Входная модель.</param>
         /// <returns>Данные пагинации.</returns>
-        [HttpPost, Route("customer")]
-        public async Task<IActionResult> GetPaginationCustomerAsync([FromBody] PaginationInput paginationInput)
+        [HttpPost, Route("work-init")]
+        public async Task<IActionResult> GetInitPaginationWorkAsync([FromBody] PaginationInput paginationInput)
         {
-            return Ok();
+            var paginationData = await _paginationService.GetInitPaginationWorkAsync(paginationInput.PageNumber, GetUserName());
+
+            return Ok(paginationData);
         }
     }
 }
