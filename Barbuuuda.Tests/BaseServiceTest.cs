@@ -10,11 +10,6 @@ namespace Barbuuuda.Tests
     /// </summary>
     public class BaseServiceTest
     {
-        protected readonly string Account = "lera";
-        protected readonly string UserId = "b723e618-6e6a-41da-a1ac-50610fd4ae96";
-        protected readonly long TaskId = 1000001;
-        protected readonly string ExecutorId = "b723e618-6e6a-41da-a1ac-50610fd4ae96";
-        protected readonly string ExecutorLogin = "executor1";
         protected string MsSqlConfigString { get; set; }
         protected string PostgreConfigString { get; set; }
         protected IConfiguration AppConfiguration { get; set; }

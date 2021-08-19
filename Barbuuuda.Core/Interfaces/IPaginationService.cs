@@ -24,20 +24,20 @@ namespace Barbuuuda.Core.Interfaces
         Task<IndexOutput> GetPaginationAuction(int pageNumber, int countRows);
 
         /// <summary>
-        /// Метод пагинации всех заданий в работе у исполнителя.
+        /// Метод пагинации на ините страницы мои задания у заказчика.
+        /// </summary>
+        /// <param name="pageIdx">Номер страницы.</param>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Данные пагинации.</returns>
+        Task<IndexOutput> InitMyCustomerPaginationAsync(int pageIdx, string account);
+
+        /// <summary>
+        /// Метод пагинации страницы мои задания у заказчика.
         /// </summary>
         /// <param name="pageNumber">Номер страницы.</param>
         /// <param name="countRows">Кол-во строк.</param>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Данные пагинации.</returns>
-        Task<IndexOutput> GetPaginationWorkAsync(int pageNumber, int countRows, string account);
-
-        /// <summary>
-        /// Метод пагинации в работе у исполнителя на ините станицы мои задания.
-        /// </summary>
-        /// <param name="pageIdx">Номер страницы.</param>
-        /// <param name="account">Логин пользователя.</param>
-        /// <returns>Данные пагинации.</returns>
-        Task<IndexOutput> GetInitPaginationWorkAsync(int pageIdx, string account);
+        Task<IndexOutput> GetMyCustomerPaginationAsync(int pageNumber, int countRows, string account);
     }
 }

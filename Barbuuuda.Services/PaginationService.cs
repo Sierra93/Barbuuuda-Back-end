@@ -154,50 +154,52 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод пагинации всех заданий в работе у исполнителя.
+        /// Метод пагинации на ините страницы мои задания у заказчика.
         /// </summary>
-        /// <param name="pageNumber">Номер страницы.</param>
-        /// <param name="countRows">Кол-во строк.</param>
+        /// <param name="pageIdx">Номер страницы.</param>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Данные пагинации.</returns>
-        public async Task<IndexOutput> GetPaginationWorkAsync(int pageNumber, int countRows, string account)
+        public async Task<IndexOutput> InitMyCustomerPaginationAsync(int pageIdx, string account)
         {
             try
             {
+                var countRows = 10;   // Кол-во заданий на странице.
+
                 var userId = await _userService.GetUserIdByLogin(account);
 
-                var aAuctionTasks = (from tasks in _postgre.Tasks
-                                     join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                                     join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                                     join users in _postgre.Users on tasks.OwnerId equals users.Id
-                                     where statuses.StatusName.Equals(StatusTask.IN_WORK) 
-                                           && tasks.ExecutorId.Equals(userId)
-                                     select new
-                                     {
-                                         tasks.CategoryCode,
-                                         tasks.CountOffers,
-                                         tasks.CountViews,
-                                         tasks.OwnerId,
-                                         tasks.SpecCode,
-                                         categories.CategoryName,
-                                         tasks.StatusCode,
-                                         statuses.StatusName,
-                                         taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                         taskEndda = string.Format("{0:f}", tasks.TaskEndda),
-                                         tasks.TaskTitle,
-                                         tasks.TaskDetail,
-                                         tasks.TaskId,
-                                         taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                                         tasks.TypeCode,
-                                         users.UserName
-                                     })
+                var getTasks = (from tasks in _postgre.Tasks
+                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                                join users in _postgre.Users on tasks.OwnerId equals users.Id
+                                where (statuses.StatusName.Equals(StatusTask.AUCTION)
+                                      || statuses.StatusName.Equals(StatusTask.IN_WORK)) 
+                                      && tasks.OwnerId.Equals(userId)
+                                select new
+                                {
+                                    tasks.CategoryCode,
+                                    tasks.CountOffers,
+                                    tasks.CountViews,
+                                    tasks.OwnerId,
+                                    tasks.SpecCode,
+                                    categories.CategoryName,
+                                    tasks.StatusCode,
+                                    statuses.StatusName,
+                                    taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                    taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                    tasks.TaskTitle,
+                                    tasks.TaskDetail,
+                                    tasks.TaskId,
+                                    taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                    tasks.TypeCode,
+                                    users.UserName
+                                })
                               .OrderBy(o => o.TaskId)
                               .AsQueryable();
 
-                var count = await aAuctionTasks.CountAsync();
-                var items = await aAuctionTasks.Skip((pageNumber - 1) * countRows).Take(countRows).ToListAsync();
+                var count = await getTasks.CountAsync();
+                var items = await getTasks.Take(countRows).ToListAsync();
 
-                var pageData = new PaginationOutput(count, pageNumber, countRows);
+                var pageData = new PaginationOutput(count, pageIdx, countRows);
                 var paginationData = new IndexOutput
                 {
                     PageData = pageData,
@@ -224,24 +226,25 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод пагинации в работе у исполнителя на ините станицы мои задания.
+        /// Метод пагинации страницы мои задания у заказчика.
         /// </summary>
-        /// <param name="pageIdx">Номер страницы.</param>
+        /// <param name="pageNumber">Номер страницы.</param>
+        /// <param name="countRows">Кол-во строк.</param>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Данные пагинации.</returns>
-        public async Task<IndexOutput> GetInitPaginationWorkAsync(int pageIdx, string account)
+        public async Task<IndexOutput> GetMyCustomerPaginationAsync(int pageNumber, int countRows, string account)
         {
             try
             {
-                var countRows = 10;   // Кол-во заданий на странице.
                 var userId = await _userService.GetUserIdByLogin(account);
 
                 var getTasks = (from tasks in _postgre.Tasks
                                 join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                 join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
                                 join users in _postgre.Users on tasks.OwnerId equals users.Id
-                                where statuses.StatusName.Equals(StatusTask.IN_WORK)
-                                      && tasks.ExecutorId.Equals(userId)
+                                where (statuses.StatusName.Equals(StatusTask.AUCTION)
+                                      || statuses.StatusName.Equals(StatusTask.IN_WORK))
+                                      && tasks.OwnerId.Equals(userId)
                                 select new
                                 {
                                     tasks.CategoryCode,
@@ -265,10 +268,9 @@ namespace Barbuuuda.Services
                               .AsQueryable();
 
                 var count = await getTasks.CountAsync();
-                //var items = await getTasks.Skip((pageIdx - 1) * countRows).Take(countRows).ToListAsync();
-                var items = await getTasks.Take(countRows).ToListAsync();
+                var items = await getTasks.Skip((pageNumber - 1) * countRows).Take(countRows).ToListAsync();
 
-                var pageData = new PaginationOutput(count, pageIdx, countRows);
+                var pageData = new PaginationOutput(count, pageNumber, countRows);
                 var paginationData = new IndexOutput
                 {
                     PageData = pageData,
