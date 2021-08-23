@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Payment.Input;
-using Barbuuuda.Models.Payment.Output;
 using Barbuuuda.Models.User.Input;
 using Barbuuuda.Models.User.Output;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -38,17 +37,18 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
+        /// TODO: возможно пригодится, когда будет подключена реальная платежная система.
         /// Метод инициализирует конфигурацию платежный виджет фронта данными.
         /// </summary>
         /// <returns>Объект с данными конфигурации виджета.</returns>
-        [HttpPost, Route("init")]
-        [ProducesResponseType(200, Type = typeof(PaymentWidgetOutput))]
-        public async Task<IActionResult> InitPaymentAsync([FromBody] PaymentWidgetInput input)
-        {
-            PaymentWidgetOutput result = await _paymentService.InitPaymentAsync(input.Amount, input.TaskId, input.Currency, GetUserName());
+        //[HttpPost, Route("init")]
+        //[ProducesResponseType(200, Type = typeof(PaymentWidgetOutput))]
+        //public async Task<IActionResult> InitPaymentAsync([FromBody] PaymentWidgetInput input)
+        //{
+        //    PaymentWidgetOutput result = await _paymentService.InitPaymentAsync(input.Amount, input.TaskId, input.Currency, GetUserName());
             
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         /// <summary>
         /// Метод действий после успешной оплаты.
@@ -64,6 +64,8 @@ namespace Barbuuuda.Controllers
 
             // TODO: Менять при тесте на http://localhost:8080/home или для прода https://barbuuuda.ru
             return new RedirectResult("http://localhost:8080/home");
+            //return new RedirectResult(" https://barbuuuda.ru");
+            //return new RedirectResult(" https://barbuuuda.com");
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -169,6 +168,7 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
+        /// TODO: вернуть после подключения реальной платежной системы.
         /// Метод инициализирует конфигурацию платежный виджет фронта данными.
         /// </summary>
         /// <param name="amount">Сумма.</param>
@@ -180,194 +180,196 @@ namespace Barbuuuda.Services
         {
             try
             {
-                if (amount <= 0)
-                {
-                    throw new EmptyAmountException();
-                }
+                //if (amount <= 0)
+                //{
+                //    throw new EmptyAmountException();
+                //}
 
-                PaymentWidgetOutput paymentWidget;
+                //PaymentWidgetOutput paymentWidget;
 
-                // Если валюта не передана, значит выставить ее по дефолту в RUB.
-                if (string.IsNullOrEmpty(currency))
-                {
-                    currency = CurrencyType.CURRENCY_RUB;
-                }
+                //// Если валюта не передана, значит выставить ее по дефолту в RUB.
+                //if (string.IsNullOrEmpty(currency))
+                //{
+                //    currency = CurrencyType.CURRENCY_RUB;
+                //}
 
                 // Если передан Id задания, значит идет оплата задания.
-                if (taskId != null && taskId > 0)
-                {
-                    // Сформировать шаблон виджета для оплаты задания на сервисе.
-                    paymentWidget = new PaymentWidgetOutput
-                    {
-                        Version = "1.0",
+                #region Если нужна будет конфигурация виджета после подключения реальной платежной системы.
+                //if (taskId != null && taskId > 0)
+                //{
+                //    // Сформировать шаблон виджета для оплаты задания на сервисе.
+                //    paymentWidget = new PaymentWidgetOutput
+                //    {
+                //        Version = "1.0",
 
-                        Invoice = new Invoice
-                        {
-                            Description = "Оплата задания на сервисе Barbuuuda",
-                            Amount = amount.ToString(CultureInfo.CurrentCulture),
-                            MerchantId = "02d2f902-e614-43d0-a0b6-2026b9923932",
-                            TaskId = taskId,
-                            Account = account,
-                            Currency = currency,
-                            Refill = "false"
-                        },
+                //        Invoice = new Invoice
+                //        {
+                //            Description = "Оплата задания на сервисе Barbuuuda",
+                //            Amount = amount.ToString(CultureInfo.CurrentCulture),
+                //            MerchantId = "02d2f902-e614-43d0-a0b6-2026b9923932",
+                //            TaskId = taskId,
+                //            Account = account,
+                //            Currency = currency,
+                //            Refill = "false"
+                //        },
 
-                        PaymentForm = new PaymentForm
-                        {
-                            Title = "Данные об оплате. Информация об оплате будет выслана на вашу почту.",
+                //        PaymentForm = new PaymentForm
+                //        {
+                //            Title = "Данные об оплате. Информация об оплате будет выслана на вашу почту.",
 
-                            Value = new Value
-                            {
-                                Description = new Description
-                                {
-                                    Type = "textarea",
-                                    Label = "Наименование услуги"
-                                },
+                //            Value = new Value
+                //            {
+                //                Description = new Description
+                //                {
+                //                    Type = "textarea",
+                //                    Label = "Наименование услуги"
+                //                },
 
-                                Amount = new Amount
-                                {
-                                    Type = "input",
-                                    Label = "Сумма оплаты",
-                                    Placeholder = string.Empty,
-                                    Access = "readonly"
-                                },
+                //                Amount = new Amount
+                //                {
+                //                    Type = "input",
+                //                    Label = "Сумма оплаты",
+                //                    Placeholder = string.Empty,
+                //                    Access = "readonly"
+                //                },
 
-                                MerchantId = new MerchantId
-                                {
-                                    Type = "input"
-                                },
+                //                MerchantId = new MerchantId
+                //                {
+                //                    Type = "input"
+                //                },
 
-                                TaskId = new TaskId
-                                {
-                                    Type = "number",
-                                    Label = "ID задания",
-                                    Placeholder = string.Empty,
-                                    Access = "readonly"
-                                },
+                //                TaskId = new TaskId
+                //                {
+                //                    Type = "number",
+                //                    Label = "ID задания",
+                //                    Placeholder = string.Empty,
+                //                    Access = "readonly"
+                //                },
 
-                                Account = new Account
-                                {
-                                    Type = "textarea",
-                                    Label = "Login",
-                                    Placeholder = string.Empty,
-                                    Access = "hidden"
-                                },
+                //                Account = new Account
+                //                {
+                //                    Type = "textarea",
+                //                    Label = "Login",
+                //                    Placeholder = string.Empty,
+                //                    Access = "hidden"
+                //                },
 
-                                Currency = new Currency
-                                {
-                                    Type = "textarea",
-                                    Label = "Currency",
-                                    Placeholder = string.Empty,
-                                    Access = "hidden"
-                                },
+                //                Currency = new Currency
+                //                {
+                //                    Type = "textarea",
+                //                    Label = "Currency",
+                //                    Placeholder = string.Empty,
+                //                    Access = "hidden"
+                //                },
 
-                                Refill = new Refill
-                                {
-                                    Type = "textarea",
-                                    Label = "Флаг пополнения счета",
-                                    Placeholder = string.Empty,
-                                    Access = "hidden"
-                                }
-                            }
-                        },
+                //                Refill = new Refill
+                //                {
+                //                    Type = "textarea",
+                //                    Label = "Флаг пополнения счета",
+                //                    Placeholder = string.Empty,
+                //                    Access = "hidden"
+                //                }
+                //            }
+                //        },
 
-                        Payment = new Payment
-                        {
-                            Title = null,
-                            SubmitText = "Оплатить",
-                            AllowExternal = false,
-                            Methods = new List<string> { "test" }
-                        }
-                    };
-                }
+                //        Payment = new Payment
+                //        {
+                //            Title = null,
+                //            SubmitText = "Оплатить",
+                //            AllowExternal = false,
+                //            Methods = new List<string> { "test" }
+                //        }
+                //    };
+                //}
 
-                // Если не передан Id задания, значит идет пополнение счета.
-                else
-                {
-                    // Сформировать шаблон виджета для пополнения счета на сервисе.
-                    paymentWidget = new PaymentWidgetOutput
-                    {
-                        Version = "1.0",
+                //// Если не передан Id задания, значит идет пополнение счета.
+                //else
+                //{
+                //    // Сформировать шаблон виджета для пополнения счета на сервисе.
+                //    paymentWidget = new PaymentWidgetOutput
+                //    {
+                //        Version = "1.0",
 
-                        Invoice = new Invoice
-                        {
-                            Description = "Пополнение счета на сервисе Barbuuuda",
-                            Amount = amount.ToString(CultureInfo.CurrentCulture),
-                            MerchantId = "02d2f902-e614-43d0-a0b6-2026b9923932",
-                            TaskId = 1,
-                            Account = account,
-                            Currency = currency,
-                            Refill = "true"
-                        },
+                //        Invoice = new Invoice
+                //        {
+                //            Description = "Пополнение счета на сервисе Barbuuuda",
+                //            Amount = amount.ToString(CultureInfo.CurrentCulture),
+                //            MerchantId = "02d2f902-e614-43d0-a0b6-2026b9923932",
+                //            TaskId = 1,
+                //            Account = account,
+                //            Currency = currency,
+                //            Refill = "true"
+                //        },
 
-                        PaymentForm = new PaymentForm
-                        {
-                            Title = "Данные о пополнении счета. Информация о пополнении счета будет выслана на вашу почту.",
+                //        PaymentForm = new PaymentForm
+                //        {
+                //            Title = "Данные о пополнении счета. Информация о пополнении счета будет выслана на вашу почту.",
 
-                            Value = new Value
-                            {
-                                Description = new Description
-                                {
-                                    Type = "textarea",
-                                    Label = "Наименование услуги"
-                                },
+                //            Value = new Value
+                //            {
+                //                Description = new Description
+                //                {
+                //                    Type = "textarea",
+                //                    Label = "Наименование услуги"
+                //                },
 
-                                Amount = new Amount
-                                {
-                                    Type = "input",
-                                    Label = "Сумма пополнения",
-                                    Placeholder = string.Empty,
-                                    Access = "readonly"
-                                },
+                //                Amount = new Amount
+                //                {
+                //                    Type = "input",
+                //                    Label = "Сумма пополнения",
+                //                    Placeholder = string.Empty,
+                //                    Access = "readonly"
+                //                },
 
-                                MerchantId = new MerchantId
-                                {
-                                    Type = "input"
-                                },
+                //                MerchantId = new MerchantId
+                //                {
+                //                    Type = "input"
+                //                },
 
-                                TaskId = new TaskId
-                                {
-                                    Type = "number",
-                                    Label = "ID задания",
-                                    Placeholder = string.Empty,
-                                    Access = "hidden"
-                                },
+                //                TaskId = new TaskId
+                //                {
+                //                    Type = "number",
+                //                    Label = "ID задания",
+                //                    Placeholder = string.Empty,
+                //                    Access = "hidden"
+                //                },
 
-                                Account = new Account
-                                {
-                                    Type = "textarea",
-                                    Label = "Login",
-                                    Placeholder = string.Empty,
-                                    Access = "hidden"
-                                },
+                //                Account = new Account
+                //                {
+                //                    Type = "textarea",
+                //                    Label = "Login",
+                //                    Placeholder = string.Empty,
+                //                    Access = "hidden"
+                //                },
 
-                                Currency = new Currency
-                                {
-                                    Type = "textarea",
-                                    Label = "Currency",
-                                    Placeholder = string.Empty,
-                                    Access = "hidden"
-                                },
+                //                Currency = new Currency
+                //                {
+                //                    Type = "textarea",
+                //                    Label = "Currency",
+                //                    Placeholder = string.Empty,
+                //                    Access = "hidden"
+                //                },
 
-                                Refill = new Refill
-                                {
-                                    Type = "textarea",
-                                    Label = "Флаг пополнения счета",
-                                    Placeholder = string.Empty,
-                                    Access = "hidden"
-                                }
-                            }
-                        },
+                //                Refill = new Refill
+                //                {
+                //                    Type = "textarea",
+                //                    Label = "Флаг пополнения счета",
+                //                    Placeholder = string.Empty,
+                //                    Access = "hidden"
+                //                }
+                //            }
+                //        },
 
-                        Payment = new Payment
-                        {
-                            Title = null,
-                            SubmitText = "Пополнить",
-                            AllowExternal = false,
-                            Methods = new List<string> { "test" }
-                        }
-                    };
-                }
+                //        Payment = new Payment
+                //        {
+                //            Title = null,
+                //            SubmitText = "Пополнить",
+                //            AllowExternal = false,
+                //            Methods = new List<string> { "test" }
+                //        }
+                //    };
+                //}
+                #endregion
 
                 // Найдет последний заказ и возьмет его OrderId.
                 //long orderId = await _postgre.Orders.MaxAsync(x => x.OrderId);
@@ -391,7 +393,8 @@ namespace Barbuuuda.Services
                 //    Amount = amount 
                 //};
 
-                return paymentWidget;
+                //return paymentWidget;
+                throw new NotImplementedException("Не реализовано до подключения реальной платежной системы");
             }
 
             catch (Exception e)
