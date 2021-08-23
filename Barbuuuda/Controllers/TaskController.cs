@@ -97,12 +97,14 @@ namespace Barbuuuda.Controllers
         /// Метод удаляет задание.
         /// </summary>
         /// <param name="taskId">Id задачи.</param>
-        [HttpGet, Route("delete/{taskId}")]
+        /// <returns>Статус удаления.</returns>
+        [HttpPut, Route("delete/{taskId}")]
+        [ProducesResponseType(200, Type = typeof(bool))]
         public async Task<IActionResult> DeleteTask([FromRoute] long taskId)
         {
-            await _taskService.DeleteTask(taskId);
+            var result = await _taskService.DeleteTask(taskId);
 
-            return Ok();
+            return Ok(result);
         }
 
         /// <summary>

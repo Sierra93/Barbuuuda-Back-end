@@ -404,18 +404,30 @@ namespace Barbuuuda.Services
         /// Метод удаляет задание.
         /// </summary>
         /// <param name="taskId">Id задачи.</param>
-        public async Task DeleteTask(long taskId)
+        /// <returns>Статус удаления.</returns>
+        public async Task<bool> DeleteTask(long taskId)
         {
             try
             {
-                if (taskId == 0)
+                if (taskId <= 0)
                 {
                     throw new ArgumentNullException();
                 }
 
-                TaskEntity oRemovedTask = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
-                _postgre.Tasks.Remove(oRemovedTask);
+                var removeTask = await _postgre.Tasks
+                    .Where(t => t.TaskId == taskId)
+                    .FirstOrDefaultAsync();
+
+                if (removeTask == null)
+                {
+                    return false;
+                }
+
+                _postgre.Tasks.Remove(removeTask);
+
                 await _postgre.SaveChangesAsync();
+
+                return true;
             }
 
             catch (ArgumentNullException ex)
