@@ -29,7 +29,7 @@ namespace Barbuuuda.Models.Entities.Executor
     /// Нужно для столбца вариантов ответов.
     /// </summary>
     [NotMapped]
-    public sealed class AnswerVariant
+    public class AnswerVariant
     {
         /// <summary>
         /// Вариант ответа.

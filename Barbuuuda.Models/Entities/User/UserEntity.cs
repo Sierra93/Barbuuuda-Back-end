@@ -58,8 +58,8 @@ namespace Barbuuuda.Models.User
         /// <summary>
         /// Счет пользователя.
         /// </summary>
-        [Column("Score", TypeName = "numeric(12,2)")]
-        public decimal? Score { get; set; }
+        //[Column("Score", TypeName = "numeric(12,2)")]
+        //public decimal? Score { get; set; }
 
         /// <summary>
         /// План: PRO или базовый.

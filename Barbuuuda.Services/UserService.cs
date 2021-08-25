@@ -7,7 +7,7 @@ using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
-using Barbuuuda.Models.User.Outpoot;
+using Barbuuuda.Models.User.Output;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -23,7 +23,7 @@ namespace Barbuuuda.Services
     /// <summary>
     /// Сервис реализует методы пользователя.
     /// </summary>
-    public sealed class UserService : IUser
+    public sealed class UserService : IUserService
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
@@ -51,8 +51,7 @@ namespace Barbuuuda.Services
                 bool isContinue = false;
 
                 // Проверит, логин передан или email.
-                CustomValidatorExtension validatorExtension = new CustomValidatorExtension(_postgre);
-                bool isEmail = validatorExtension.CheckIsEmail(user.UserName);
+                bool isEmail = CustomValidatorExtension.CheckIsEmail(user.UserName);
 
                 // Если нужно проверять по логину.
                 if (!isEmail)
@@ -89,16 +88,13 @@ namespace Barbuuuda.Services
 
                     return new
                     {
-                        user = claim.Name,
+                        user = user.UserName,
                         userToken = sToken,
                         role = aRoles
                     };
                 }
 
-                else
-                {
-                    throw new ArgumentException();
-                }
+                throw new ArgumentException();
             }
 
             catch (ArgumentNullException ex)
@@ -169,6 +165,7 @@ namespace Barbuuuda.Services
         {
             var claims = new List<Claim> {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, username)
+                    //new Claim(JwtRegisteredClaimNames.UniqueName, username)
                 };
 
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
@@ -189,21 +186,20 @@ namespace Barbuuuda.Services
                 {
                     throw new ArgumentNullException();
                 }
-                string userId = string.Empty;
 
                 // Выбирает юзера по логину.
-                UserEntity oUser = await _postgre.Users
+                var oUser = await _postgre.Users
                     .Where(u => u.UserName
                     .Equals(username))
                     .FirstOrDefaultAsync();
 
-                // В зависимости от роли юзера формирует хидер.
-                IList<HeaderTypeEntity> aHeaderFields = await GetHeader(oUser.UserRole);
-
-                if (oUser != null)
+                if (oUser == null)
                 {
-                    userId = oUser.Id;
+                    return null;
                 }
+
+                // В зависимости от роли юзера формирует хидер.
+                var aHeaderFields = await GetHeader(oUser.UserRole);
 
                 return new { aHeaderFields };
             }
@@ -261,11 +257,12 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
+        /// TODO: доработать получение сумму счета для вывода в профиль пользователя. Ведь поле Score было удалено из сущности пользователя. Теперь тянуть его из другой таблицы.
         /// Метод получает информацию о пользователе для профиля.
         /// </summary>
-        /// <param name="userId">Id юзера.</param>
+        /// <param name="userName">Логин юзера.</param>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        public async Task<object> GetProfileInfo(string userName)
+        public async Task<ProfileOutput> GetProfileInfo(string userName)
         {
             try
             {
@@ -274,25 +271,27 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                return await _postgre.Users
-                    .Where(u => u.UserName.Equals(userName))
-                    .Select(up => new
-                    {
-                        up.UserName,
-                        up.Email,
-                        up.PhoneNumber,
-                        up.LastName,
-                        up.FirstName,
-                        up.Patronymic,
-                        up.UserIcon,
-                        dateRegister = string.Format("{0:f}", up.DateRegister),
-                        scoreMoney = string.Format("{0:0,0}", up.Score),
-                        up.AboutInfo,
-                        up.Plan,
-                        up.City,
-                        up.Age
-                    })
+                var result = await (from u in _postgre.Users
+                                    where u.UserName.Equals(userName)
+                                    select new ProfileOutput
+                                    {
+                                        UserName = u.UserName,
+                                        Email = u.Email,
+                                        PhoneNumber = u.PhoneNumber,
+                                        LastName = u.LastName,
+                                        FirstName = u.FirstName,
+                                        Patronymic = u.Patronymic,
+                                        UserIcon = u.UserIcon,
+                                        DateRegister = string.Format("{0:f}", u.DateRegister),
+                                        //ScoreMoney = string.Format("{0:0,0}", u.Score),//TODO: тут доработать получение суммы счета
+                                        AboutInfo = u.AboutInfo,
+                                        Plan = u.Plan,
+                                        City = u.City,
+                                        Age = u.Age
+                                    })
                     .FirstOrDefaultAsync();
+
+                return result;
             }
 
             catch (ArgumentNullException ex)
@@ -378,16 +377,21 @@ namespace Barbuuuda.Services
         /// <summary>
         /// Метод обновит токен юзеру.
         /// </summary>
-        /// <param name="claimsIdentity">Объект полномочий.</param>
-        /// <returns>Строку токена.</returns>
-        public Task<string> GenerateToken(string userName)
+        /// <param name="userName">Логин пользователя.</param>
+        /// <returns>Обновленный токен.</returns>
+        public async Task<UserOutput> GenerateToken(string userName)
         {
             try
             {
                 if (string.IsNullOrEmpty(userName))
                 {
-                    throw new ArgumentNullException();
+                    throw new UserMessageException("Не передан логин пользователя");
                 }
+
+                var userRole = await _postgre.Users
+                    .Where(u => u.UserName.Equals(userName))
+                    .Select(res => res.UserRole)
+                    .FirstOrDefaultAsync();
 
                 var now = DateTime.UtcNow;
                 var jwt = new JwtSecurityToken(
@@ -399,7 +403,13 @@ namespace Barbuuuda.Services
                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                return Task.FromResult(encodedJwt);
+                var result = new UserOutput
+                {
+                    UserToken = encodedJwt,
+                    UserRole = userRole
+                };
+
+                return result;
             }
 
             catch (ArgumentNullException ex)
@@ -469,16 +479,17 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userId">Id пользователя.</param>
         /// <returns>Фамилия, имя, фото профиля пользователя.</returns>
-        public async Task<UserOutpoot> GetUserInitialsByIdAsync(string userId)
+        public async Task<UserOutput> GetUserInitialsByIdAsync(string userId)
         {
-            UserOutpoot user = await _postgre.Users
+            UserOutput user = await _postgre.Users
                 .Where(u => u.Id
                 .Equals(userId))
-                .Select(res => new UserOutpoot { 
+                .Select(res => new UserOutput { 
                     FirstName = res.FirstName, 
                     LastName = res.LastName,
                     UserIcon = res.UserIcon,
-                    UserRole = res.UserRole
+                    UserRole = res.UserRole,
+                    UserName = res.UserName
                 })
                 .FirstOrDefaultAsync();
 
@@ -490,7 +501,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="taskId">Id задания.</param>
         /// <returns>Данные заказчика.</returns>
-        public async Task<CustomerOutpoot> GetCustomerLoginByTaskId(int? taskId)
+        public async Task<CustomerOutput> GetCustomerLoginByTaskId(long? taskId)
         {
             try
             {
@@ -511,10 +522,10 @@ namespace Barbuuuda.Services
                     throw new NotFoundTaskCustomerIdException(customerId);
                 }
 
-                // Найдет логин и иконку профиля заказчика задания и мапит к типу CustomerOutpoot.
-                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, CustomerOutpoot>());
+                // Найдет логин и иконку профиля заказчика задания и мапит к типу CustomerOutput.
+                MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<UserEntity, CustomerOutput>());
                 Mapper mapper = new Mapper(config);
-                CustomerOutpoot customer = mapper.Map<CustomerOutpoot>(await _postgre.Users
+                CustomerOutput customer = mapper.Map<CustomerOutput>(await _postgre.Users
                     .Where(u => u.Id
                     .Equals(customerId))
                     .FirstOrDefaultAsync());
@@ -539,6 +550,74 @@ namespace Barbuuuda.Services
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 _ = _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод находит последнего добавленного пользователя и берет его Id.
+        /// </summary>
+        /// <returns>Id последнего пользователя.</returns>
+        public async Task<string> GetLastUserAsync()
+        {
+            try
+            {
+                List<UserEntity> users = await _postgre.Users.ToListAsync();
+
+                if (users.Count <= 0)
+                {
+                    throw new EmptyTableUserException();
+                }
+
+                users.Reverse();
+                string userId = users.Select(u => u.Id).FirstOrDefault();
+
+                return userId;
+
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Logger _logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                _ = _logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит роль пользователя по его логину.
+        /// </summary>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Роль пользователя.</returns>
+        public async Task<UserOutput> GetUserRoleByLoginAsync(string account)
+        {
+            try
+            {
+                var role = await (from u in _postgre.Users
+                                  where u.UserName.Equals(account)
+                                  select u.UserRole)
+                    .FirstOrDefaultAsync();
+
+                // Если нет роли, значит назначить гостя.
+                if (string.IsNullOrEmpty(role))
+                {
+                    role = "G";
+                }
+
+                var result = new UserOutput
+                {
+                    UserRole = role
+                };
+
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message, e.StackTrace);
+                await logger.LogCritical();
+                throw;
             }
         }
     }

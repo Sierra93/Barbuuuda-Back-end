@@ -1,4 +1,5 @@
-﻿using Barbuuuda.Core.Data;
+﻿using System;
+using Barbuuuda.Core.Data;
 using Barbuuuda.Models.User;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,63 +8,66 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.IO;
-using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Autofac;
-using Barbuuuda.Core.Extensions;
+using Autofac.Extensions.DependencyInjection;
+using Barbuuuda.Services.Utils;
+using Microsoft.OpenApi.Models;
 
 namespace Barbuuuda
 {
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        public ContainerBuilder containerBuilder { get; }
+        public ContainerBuilder ContainerBuilder { get; }
+
+        public IContainer ApplicationContainer { get; private set; }
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            containerBuilder = new ContainerBuilder();
+            ContainerBuilder = new ContainerBuilder();
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
 
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
             {
-                builder.AllowAnyMethod()
-                       .AllowAnyHeader()
-                       .WithOrigins("*")
-                       .WithMethods("*")
-                       .WithHeaders("*")
-                       .DisallowCredentials();
+                //builder.AllowAnyMethod()
+                //    .AllowAnyHeader()
+                //    .WithOrigins("*")
+                //    .WithMethods("*")
+                //    .WithHeaders("*")
+                //.DisallowCredentials();
+                builder.WithOrigins("http://localhost:4200", "http://localhost:4200/", "https://barbuuuda.ru", "https://barbuuuda.ru/")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
             }));
 
             #region ПРОД.
             //    services.AddDbContext<ApplicationDbContext>(options =>
-            //      options.UseSqlServer(
-            //          Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //      options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
 
             //    services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-            //opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //opt.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
 
             //    services.AddDbContext<IdentityDbContext>(options =>
-            //        options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            //        options.UseNpgsql(Configuration.GetConnectionString("PostgreConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
             #endregion
 
             #region ТЕСТ.
             services.AddDbContext<ApplicationDbContext>(options =>
-             options.UseSqlServer(
-                 Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+             options.UseSqlServer(Configuration.GetConnectionString("TestMsSqlConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
 
             services.AddEntityFrameworkNpgsql().AddDbContext<PostgreDbContext>(opt =>
-        opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+            opt.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
 
             services.AddDbContext<IdentityDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda").EnableRetryOnFailure()));
+                options.UseNpgsql(Configuration.GetConnectionString("TestNpgSqlConnection"), b => b.MigrationsAssembly("Barbuuuda.Core").EnableRetryOnFailure()));
             #endregion
 
             services.AddIdentity<UserEntity, IdentityRole>(opts =>
@@ -77,12 +81,9 @@ namespace Barbuuuda
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddSwaggerGen(options =>
+            services.AddSwaggerGen(c =>
             {
-                // Set the comments path for the Swagger JSON and UI.
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(Directory.GetCurrentDirectory(), xmlFile);
-                options.IncludeXmlComments(xmlPath);
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Barbuuuda", Version = "v1" });
             });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -102,10 +103,16 @@ namespace Barbuuuda
                     });
 
             services.AddSignalR();
+
+            ApplicationContainer = AutoFac.Init(cb =>
+            {
+                cb.Populate(services);
+            });
+
+            return new AutofacServiceProvider(ApplicationContainer);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCors("ApiCorsPolicy");
 
@@ -129,9 +136,6 @@ namespace Barbuuuda
                 endpoints.MapControllers();
             });
 
-            // Запишет путь для xml-файла документации API.
-            applicationLifetime.ApplicationStarted.Register(DocumentationFileExtension.OnApplicationStarted);
-
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
@@ -141,7 +145,7 @@ namespace Barbuuuda
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<ChatHub>("/chat");
+                //endpoints.MapHub<ChatHub>("/chat");
                 endpoints.MapDefaultControllerRoute();
             });
         }

@@ -1,6 +1,6 @@
 ﻿using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Models.Chat.Input;
-using Barbuuuda.Models.Chat.Outpoot;
+using Barbuuuda.Models.Chat.Output;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,16 +15,14 @@ namespace Barbuuuda.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ChatController : BaseController
     {
-        public static string Module => "Barbuuuda.Chat";
-
         /// <summary>
         /// Абстракция чата.
         /// </summary>
-        private readonly IChat _chat;
+        private readonly IChatService _chatService;
 
-        public ChatController(IChat chat) : base(Module)
+        public ChatController(IChatService chatService)
         {
-            _chat = chat;
+            _chatService = chatService;
         }
 
         /// <summary>
@@ -33,10 +31,10 @@ namespace Barbuuuda.Controllers
         /// <param name="chatInput">Входная модель.</param>
         /// <returns></returns>
         [HttpPost, Route("send")]
-        [ProducesResponseType(200, Type = typeof(GetResultMessageOutpoot))]
+        [ProducesResponseType(200, Type = typeof(GetResultMessageOutput))]
         public async Task<IActionResult> SendAsync([FromBody] ChatInput chatInput)
         {
-            GetResultMessageOutpoot messages = await _chat.SendAsync(chatInput.Message, GetUserName(), chatInput.DialogId);
+            GetResultMessageOutput messages = await _chatService.SendAsync(chatInput.Message, GetUserName(), chatInput.DialogId);
 
             return Ok(messages);
         }
@@ -47,10 +45,10 @@ namespace Barbuuuda.Controllers
         /// <param name="dialogInput">Входная модель.</param>
         /// <returns></returns>
         [HttpPost, Route("dialog")]
-        [ProducesResponseType(200, Type = typeof(GetResultMessageOutpoot))]
+        [ProducesResponseType(200, Type = typeof(GetResultMessageOutput))]
         public async Task<IActionResult> GetDialogAsync([FromBody] DialogInput dialogInput)
         {
-            GetResultMessageOutpoot messages = await _chat.GetDialogAsync(dialogInput.DialogId, GetUserName(), dialogInput.ExecutorId, dialogInput.IsWriteBtn);
+            GetResultMessageOutput messages = await _chatService.GetDialogAsync(dialogInput.DialogId, GetUserName(), dialogInput.ExecutorId, dialogInput.IsWriteBtn);
 
             return Ok(messages);
         }
@@ -60,10 +58,10 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <returns>Список диалогов.</returns>
         [HttpPost, Route("dialogs")]
-        [ProducesResponseType(200, Type = typeof(GetResultDialogOutpoot))]
+        [ProducesResponseType(200, Type = typeof(GetResultDialogOutput))]
         public async Task<IActionResult> GetDialogsAsync()
         {
-            GetResultDialogOutpoot dialogs = await _chat.GetDialogsAsync(GetUserName());
+            GetResultDialogOutput dialogs = await _chatService.GetDialogsAsync(GetUserName());
 
             return Ok(dialogs);
         }

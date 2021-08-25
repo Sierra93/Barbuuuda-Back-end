@@ -10,10 +10,9 @@ namespace Barbuuuda.Controllers
     [Route("knowlege")]
     public class KnowlegeController : BaseController
     {
-        public static string Module => "Barbuuuda.knowlege";
-        private readonly IKnowlege _knowlege;
+        private readonly IKnowlegeService _knowlege;
 
-        public KnowlegeController(IKnowlege knowlege) : base(Module)
+        public KnowlegeController(IKnowlegeService knowlege)
         {
             _knowlege = knowlege;
         }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Task.Output;
 
 namespace Barbuuuda.Controllers
 {
@@ -18,16 +19,14 @@ namespace Barbuuuda.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ExecutorController : BaseController
     {
-        public static string Module => "Barbuuuda.Executor";
-
         /// <summary>
         /// Сервис исполнителя.
         /// </summary>
-        private readonly IExecutor _executor;
+        private readonly IExecutorService _executorService;
 
-        public ExecutorController(IExecutor executor) : base(Module)
+        public ExecutorController(IExecutorService executorService)
         {
-            _executor = executor;
+            _executorService = executorService;
         }
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("list")]
         public async Task<IActionResult> GetExecutorListAsync()
         {            
-            IEnumerable aExecutors = await _executor.GetExecutorListAsync();
+            IEnumerable aExecutors = await _executorService.GetExecutorListAsync();
 
             return Ok(aExecutors);
         }
@@ -49,7 +48,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("add-spec")]
         public async Task<IActionResult> AddExecutorSpecializations([FromBody] ExecutorSpecialization[] specializations)
         {
-            await _executor.AddExecutorSpecializations(specializations, GetUserName());
+            await _executorService.AddExecutorSpecializations(specializations, GetUserName());
 
             return Ok();  
         }
@@ -57,14 +56,14 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод получает вопрос для теста исполнителя в зависимости от номера вопроса, переданного с фронта.
         /// </summary>
-        /// <param name="numberQuestion">Номер вопроса.</param>
+        /// <param name="nextQuestionInput">Входная модель.</param>
         /// <returns>Вопрос с вариантами ответов.</returns>
-        [HttpGet, Route("answer")]
-        public async Task<IActionResult> GetExecutorTestAsync([FromQuery] int numberQuestion)
+        [HttpPost, Route("answer")]
+        public async Task<IActionResult> GetExecutorTestAsync([FromBody] NextQuestionInput nextQuestionInput)
         {
-            var oQuestion = await _executor.GetQuestionAsync(numberQuestion);
+            var question = await _executorService.GetQuestionAsync(nextQuestionInput.NumberQuestion);
 
-            return Ok(oQuestion);
+            return Ok(question);
         }
 
         /// <summary>
@@ -74,7 +73,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("answers-count")]
         public async Task<IActionResult> GetAnswersCountAsync()
         {
-            int count = await _executor.GetCountAsync();
+            int count = await _executorService.GetCountAsync();
 
             return Ok(count);
         }
@@ -87,7 +86,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("check")]
         public async Task<IActionResult> CheckAnswersTestAsync([FromBody] List<AnswerVariant> answers)
         {
-            bool isCheck = await _executor.CheckAnswersTestAsync(answers, GetUserName());
+            bool isCheck = await _executorService.CheckAnswersTestAsync(answers, GetUserName());
 
             return Ok(isCheck);
         }
@@ -99,7 +98,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("tasks-work")]
         public async Task<IActionResult> GetTasksWorkAsync()
         {
-            IEnumerable tasks = await _executor.GetTasksWorkAsync(GetUserName());
+            IEnumerable tasks = await _executorService.GetTasksWorkAsync(GetUserName());
 
             return Ok(tasks);
         }
@@ -111,7 +110,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("respond")]
         public async Task<IActionResult> RespondTaskAsync([FromBody] RespondInput taskInput)
         {
-            bool isRespond = await _executor.RespondAsync(taskInput.TaskId, taskInput.Price, taskInput.IsTemplate, taskInput, taskInput.Comment, GetUserName());
+            bool isRespond = await _executorService.RespondAsync(taskInput.TaskId, taskInput.Price, taskInput.IsTemplate, taskInput, taskInput.Comment, GetUserName());
 
             return Ok(isRespond);
         }
@@ -124,9 +123,74 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("check-respond")]
         public async Task<IActionResult> CheckRespondAsync([FromBody] CheckRespondInput checkRespondInput)
         {
-            bool isCheck = await _executor.CheckRespondAsync(checkRespondInput.TaskId, GetUserName());
+            bool isCheck = await _executorService.CheckRespondAsync(checkRespondInput.TaskId, GetUserName());
 
             return Ok(isCheck);
+        }
+
+        /// <summary>
+        /// Метод выгрузит список заданий, в которых был выбран исполнитель.
+        /// </summary>
+        /// <returns>Список приглашений с данными заданий.</returns>
+        [HttpPost, Route("invite")]
+        [ProducesResponseType(200, Type = typeof(GetResultTask))]
+        public async Task<IActionResult> InviteAsync()
+        {
+            GetResultTask result = await _executorService.InviteAsync(GetUserName());
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод выгрузит список заданий, в которых был выбран текущий исполнитель.
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        //[HttpPost, Route("my")]
+        //[ProducesResponseType(200, Type = typeof(GetResultTask))]
+        //public async Task<IActionResult> MyWorkTasksAsync()
+        //{
+        //    GetResultTask result = await _executorService.MyTasksAsync(GetUserName());
+
+        //    return Ok(result);
+        //}
+
+        /// <summary>
+        /// Метод проставит согласие на выполнение задания.
+        /// </summary>
+        /// <returns>Флаг результата.</returns>
+        [HttpPost, Route("accept")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> AcceptTaskAsync([FromBody] AcceptOrCancelWorkTaskInput input)
+        {
+            bool result = await _executorService.AcceptTaskAsync(input.TaskId, GetUserName());
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод проставит отказ на выполнение задания.
+        /// </summary>
+        /// <returns>Флаг результата.</returns>
+        [HttpPost, Route("cancel")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> CancelTaskAsync([FromBody] AcceptOrCancelWorkTaskInput input)
+        {
+            bool result = await _executorService.CancelTaskAsync(input.TaskId, GetUserName());
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод получит список заданий для вкладки "Мои задания". Т.е задания, работа над которыми начата текущим исполнителем.
+        /// </summary>
+        /// <returns>Список заданий.</returns>
+        [HttpPost, Route("work")]
+        [ProducesResponseType(200, Type = typeof(GetResultTask))]
+        public async Task<IActionResult> GetWorkTasksAsync()
+        {
+            GetResultTask result = await _executorService.GetWorkTasksAsync(GetUserName());
+
+            return Ok(result);
         }
     }
 }

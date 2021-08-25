@@ -1,9 +1,10 @@
 ﻿using Barbuuuda.Core.Interfaces;
-using Barbuuuda.Models.Pagination.Outpoot;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Pagination.Input;
+using Barbuuuda.Models.Pagination.Output;
 
 namespace Barbuuuda.Controllers
 {
@@ -13,41 +14,69 @@ namespace Barbuuuda.Controllers
     [ApiController, Route("pagination")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PaginationController : BaseController
-    {        
-        public static string Module => "Barbuuuda.Pagination";
-
+    {
         /// <summary>
         /// Абстракция сервиса пагинации.
         /// </summary>
-        private readonly IPagination _pagination;
+        private readonly IPaginationService _paginationService;
 
-        public PaginationController(IPagination pagination) : base(Module)
+        public PaginationController(IPaginationService paginationService)
         {
-            _pagination = pagination;
+            _paginationService = paginationService;
         }
 
         /// <summary>
-        /// Метод пагинации.
+        /// Метод пагинации для инита аукциона.
         /// </summary>
         /// <param name="pageIdx">Номер страницы. По дефолту 1.</param>
         /// <returns>Данные пагинации.</returns>
-        [HttpGet, Route("page")]
-        public async Task<IActionResult> GetPaginationTasks(int pageIdx = 1)
+        [HttpPost, Route("init-auction")]
+        [ProducesResponseType(200, Type = typeof(IndexOutput))]
+        public async Task<IActionResult> GetInitPaginationAuctionTasksAsync([FromBody] PaginationInput paginationInput)
         {
-            IndexOutpoot paginationData = await _pagination.GetPaginationTasks(pageIdx, GetUserName());
+            var paginationData = await _paginationService.GetInitPaginationAuctionTasks(paginationInput.PageNumber);
 
             return Ok(paginationData);
         }
 
         /// <summary>
-        /// Метод пагинации аукциона.
+        /// Метод пагинации всех заданий аукциона.
         /// </summary>
-        /// <param name="pageIdx"></param>
+        /// <param name="paginationInput">Входная модель.</param>
         /// <returns>Данные пагинации.</returns>
         [HttpPost, Route("auction")]
-        public async Task<IActionResult> GetPaginationAuction([FromQuery] int pageIdx)
+        [ProducesResponseType(200, Type = typeof(IndexOutput))]
+        public async Task<IActionResult> GetPaginationAuctionAsync([FromBody] PaginationInput paginationInput)
         {
-            var paginationData = await _pagination.GetPaginationAuction(pageIdx);
+            var paginationData = await _paginationService.GetPaginationAuction(paginationInput.PageNumber, paginationInput.CountRows);
+
+            return Ok(paginationData);
+        }
+
+        /// <summary>
+        /// Метод пагинации на ините страницы мои задания у заказчика.
+        /// </summary>
+        /// <param name="paginationInput">Входная модель.</param>
+        /// <returns>Данные пагинации.</returns>
+        [HttpPost, Route("init-my-customer")]
+        [ProducesResponseType(200, Type = typeof(IndexOutput))]
+        public async Task<IActionResult> InitMyCustomerPaginationAsync([FromBody] PaginationInput paginationInput)
+        {
+            var paginationData = await _paginationService.InitMyCustomerPaginationAsync(paginationInput.PageNumber, GetUserName());
+
+            return Ok(paginationData);
+        }
+
+        /// <summary>
+        /// Метод пагинации страницы мои задания у заказчика.
+        /// </summary>
+        /// <param name="paginationInput">Входная модель.</param>
+        /// <returns>Данные пагинации.</returns>
+        [HttpPost, Route("my-customer")]
+        [ProducesResponseType(200, Type = typeof(IndexOutput))]
+        public async Task<IActionResult> GetMyCustomerPaginationAsync([FromBody] PaginationInput paginationInput)
+        {
+            var paginationData = await _paginationService.GetMyCustomerPaginationAsync(paginationInput.PageNumber, paginationInput.CountRows, GetUserName());
 
             return Ok(paginationData);
         }

@@ -3,18 +3,19 @@ using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Extensions.User;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
-using Barbuuuda.Emails;
 using Barbuuuda.Models.User;
 using Barbuuuda.Models.User.Input;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Barbuuuda.Emails.Service;
+using Barbuuuda.Models.Entities.Payment;
+using Barbuuuda.Models.User.Output;
 
 namespace Barbuuuda.Controllers
 {
@@ -28,21 +29,15 @@ namespace Barbuuuda.Controllers
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
         private readonly UserManager<UserEntity> _userManager;
-        public static string Module => "Barbuuuda.User";
+        private readonly IUserService _userService;
 
-        /// <summary>
-        /// Сервис работы с юзерами.
-        /// </summary>
-        private readonly IUser _user;
-
-        public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUser user) : base(Module)
+        public UserController(ApplicationDbContext db, PostgreDbContext postgre, UserManager<UserEntity> userManager, IUserService userService)
         {
             _userManager = userManager;
-            _user = user;
+            _userService = userService;
             _postgre = postgre;
             _db = db;
         }
-
 
         /// <summary>
         /// Метод создает нового пользователя.
@@ -54,16 +49,16 @@ namespace Barbuuuda.Controllers
         {
             try
             {
-                IActionResult result = await CreateUser(user);
+                var result = await CreateUser(user);
 
                 return result;
             }
 
             catch (Exception ex)
             {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                _ = _logger.LogCritical();
-                throw new Exception(ex.Message.ToString());
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                _ = logger.LogCritical();
+                throw new Exception(ex.Message);
             }
         }
 
@@ -74,12 +69,12 @@ namespace Barbuuuda.Controllers
         /// <returns>true - если существует, иначе false.</returns>
         private async Task<bool> IdentityUserEmail(string email)
         {
-            UserEntity oUser = await _postgre.Users
+            var oUser = await _postgre.Users
                     .Where(u => u.Email
                     .Equals(email))
                     .FirstOrDefaultAsync();
 
-            return oUser != null ? true : false;
+            return oUser != null;
         }
 
         /// <summary>
@@ -90,7 +85,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, AllowAnonymous]
         public async Task<IActionResult> ConfirmAsync(string userId, string code)
         {
-            UserEntity user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
             await _userManager.ConfirmEmailAsync(user, code);
 
             return new RedirectResult("https://barbuuuda.ru");
@@ -104,12 +99,12 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("login")]
         public async Task<IActionResult> LoginUserAsync([FromBody] UserInput user)
         {
-            object oAuth = await _user.LoginAsync(user);
+            var oAuth = await _userService.LoginAsync(user);
 
             return Ok(oAuth);
         }
+
         /// <summary>
-        /// TODO: нужно убрать этот метод, так как авторизация переделана на основе токенов и доступ и так будет отваливаться когда токен протухнет.
         /// Метод проверяет, авторизован ли юзер.
         /// </summary>
         /// <returns>Объект с данными авторизованного юзера.</returns>       
@@ -117,7 +112,7 @@ namespace Barbuuuda.Controllers
         [HttpGet, Route("authorize")]
         public async Task<IActionResult> GetUserAuthorize([FromQuery] string userName)
         {
-            object oAuthorize = await _user.GetUserAuthorize(GetUserName() ?? userName);
+            var oAuthorize = await _userService.GetUserAuthorize(GetUserName() ?? userName);
 
             return Ok(oAuthorize);
         }
@@ -126,12 +121,13 @@ namespace Barbuuuda.Controllers
         /// Метод получает информацию о пользователе для профиля.
         /// </summary>
         /// <returns>Объект с данными о профиле пользователя.</returns>
-        [HttpGet, Route("profile")]
+        [HttpPost, Route("profile")]
+        [ProducesResponseType(200, Type = typeof(ProfileOutput))]
         public async Task<IActionResult> GetProfileInfoAsync()
         {
-            object oUser = await _user.GetProfileInfo(GetUserName());
+            var user = await _userService.GetProfileInfo(GetUserName());
 
-            return Ok(oUser);
+            return Ok(user);
         }
 
         /// <summary>
@@ -141,7 +137,7 @@ namespace Barbuuuda.Controllers
         [HttpPost, Route("save-data")]
         public async Task<IActionResult> SaveProfileDataAsync([FromBody] UserInput user)
         {
-            await _user.SaveProfileData(user, GetUserName());
+            await _userService.SaveProfileData(user, GetUserName());
 
             return Ok();
         }
@@ -149,14 +145,16 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод обновляет токен юзеру.
         /// </summary>
-        /// <returns>Строка токена.</returns>
+        /// <param name="userName">Логин пользователя.</param>
+        /// <returns>Обновленный токен.</returns>
         [AllowAnonymous]
         [HttpGet, Route("token")]
+        [ProducesResponseType(200, Type = typeof(UserOutput))]
         public async Task<IActionResult> RefreshToken([FromQuery] string userName)
         {
-            string sToken = await _user.GenerateToken(userName ?? GetUserName() ?? null);
+            var refreshData = await _userService.GenerateToken(userName ?? GetUserName());
 
-            return Ok(sToken);
+            return Ok(refreshData);
         }
 
         /// <summary>
@@ -170,11 +168,6 @@ namespace Barbuuuda.Controllers
             {
                 IdentityResult errors = null;
 
-                if (user.Score == null)
-                {
-                    user.Score = 0;
-                }
-
                 // Ищет такой email в БД.
                 bool bErrorEmail = await IdentityUserEmail(user.Email);
 
@@ -184,19 +177,24 @@ namespace Barbuuuda.Controllers
                     {
                         // Генерит временный токен для пользователя.
                         string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                        // Готовит ссылку, которая будет отображена в письме.
                         string callbackUrl = Url.Action("ConfirmAsync", "User", new { userId = user.Id, code = code },
-                            protocol: HttpContext.Request.Scheme);
+                            protocol: HttpContext.Request.Scheme)
+                            .Replace("http://localhost:58822", "https://barbuuuda.ru")
+                            .Replace("https://barbuuuda.online", "https://barbuuuda.ru");
 
                         // Отправит уведомление на email.
-                        await EmailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
+                        EmailService emailService = new EmailService(_db);
+                        await emailService.SendEmailAsync(user.Email, "Подтверждение регистрации",
                             $"Подтвердите регистрацию на сервисе Barbuuuda, перейдя по ссылке: <a href='{callbackUrl}'>подтвердить</a>");
                     }
 
                     // Если почта не существует.
                     catch (Exception ex)
                     {
-                        Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                        _ = _logger.LogCritical();
+                        Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                        _ = logger.LogCritical();
 
                         return BadRequest(ErrorValidate.EMAIL_NOT_ENTITY);
                     }
@@ -210,6 +208,20 @@ namespace Barbuuuda.Controllers
                     // Если регистрация успешна.
                     if (oAddedUser.Succeeded)
                     {
+                        // Находит добавленного пользователя и берет его Id.
+                        string userId = await _userService.GetLastUserAsync();
+
+                        // Создаст счет пользователю (по дефолту в валюте RUB).
+                        await _postgre.AddAsync(new InvoiceEntity()
+                        {
+                            UserId = userId,
+                            InvoiceAmount = 0,
+                            Currency = CurrencyType.CURRENCY_RUB,
+                            ScoreNumber = null,
+                            ScoreEmail = string.Empty
+                        });
+                        await _postgre.SaveChangesAsync();
+
                         return Ok(oAddedUser);
                     }
                 }
@@ -226,10 +238,23 @@ namespace Barbuuuda.Controllers
 
             catch (Exception ex)
             {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                _ = _logger.LogCritical();
-                throw new Exception(ex.Message.ToString());
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await logger.LogCritical();
+                throw new Exception(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Метод получит роль пользователя по его логину.
+        /// </summary>
+        /// <returns>Роль пользователя.</returns>
+        [HttpPost, Route("role")]
+        [ProducesResponseType(200, Type = typeof(UserOutput))]
+        public async Task<IActionResult> GetUserRoleByLoginAsync()
+        {
+            var role = await _userService.GetUserRoleByLoginAsync(GetUserName());
+
+            return Ok(role);
         }
     }
 }

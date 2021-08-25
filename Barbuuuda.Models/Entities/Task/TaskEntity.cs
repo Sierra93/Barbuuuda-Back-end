@@ -16,7 +16,7 @@ namespace Barbuuuda.Models.Task
         /// <summary>
         /// Id заказчика, который создал задание.
         /// </summary>
-        [Required, Column("OwnerId", TypeName = "varchar(150)")]
+        [Column("OwnerId", TypeName = "varchar(150)")]
         public string OwnerId { get; set; }
 
         /// <summary>
@@ -89,6 +89,16 @@ namespace Barbuuuda.Models.Task
         /// Код специализации.   
         /// </summary>
         [Column("SpecCode", TypeName = "varchar(100)")]
-        public string SpecCode { get; set; }            
+        public string SpecCode { get; set; }
+
+        /// <summary>
+        /// Флаг оплаты задания заказчиком.
+        /// </summary>
+        public bool IsPay { get; set; }
+
+        /// <summary>
+        /// Флаг подтверждения исполнителем взятия в работу задания.
+        /// </summary>
+        public bool IsWorkAccept { get; set; }
     }
 }

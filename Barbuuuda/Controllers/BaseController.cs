@@ -7,20 +7,30 @@ namespace Barbuuuda.Controllers
     /// </summary>
     public class BaseController : ControllerBase
     {
-        private readonly string _moduleName;
-
-        protected BaseController(string moduleName) {
-            _moduleName = moduleName;
-        }
-
         /// <summary>
-        /// Метод получает имя текущего юзера.
+        /// Метод получит имя текущего юзера.
         /// </summary>
-        /// <returns>Имя юзера.</returns>
+        /// <returns>Логин пользователя.</returns>
         [ApiExplorerSettings(IgnoreApi = true)]
         protected string GetUserName()
         {
-            return HttpContext?.User?.Identity?.Name ?? "lera";
+            // Запишет логин в куки и вернет фронту.
+            if (!HttpContext.Request.Cookies.ContainsKey("name"))
+            {
+                HttpContext.Response.Cookies.Append("name", HttpContext?.User?.Identity?.Name);
+            }
+
+            return HttpContext?.User?.Identity?.Name ?? GetLoginFromCookie();
+        }
+
+        /// <summary>
+        /// Метод вернет логин пользователя из куки.
+        /// </summary>  
+        /// <returns>Логин пользователя.</returns>
+        [ApiExplorerSettings(IgnoreApi = true)]
+        private string GetLoginFromCookie()
+        {
+            return HttpContext.Request.Cookies["name"];
         }
     }
 }

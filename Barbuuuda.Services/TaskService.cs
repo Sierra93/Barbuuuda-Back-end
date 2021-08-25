@@ -1,14 +1,13 @@
 ﻿using Barbuuuda.Core.Consts;
 using Barbuuuda.Core.Data;
-using Barbuuuda.Core.Enums;
 using Barbuuuda.Core.Exceptions;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
-using Barbuuuda.Models.Respond.Outpoot;
+using Barbuuuda.Models.Respond.Output;
 using Barbuuuda.Models.Task;
-using Barbuuuda.Models.Task.Outpoot;
+using Barbuuuda.Models.Task.Output;
 using Barbuuuda.Models.User;
-using Barbuuuda.Models.User.Outpoot;
+using Barbuuuda.Models.User.Output;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
@@ -16,23 +15,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Entities.Executor;
+using Barbuuuda.Models.Entities.Task;
+using Barbuuuda.Models.Task.Input;
 
 namespace Barbuuuda.Services
 {
     /// <summary>
     /// Сервис реализует методы заданий.
     /// </summary>
-    public sealed class TaskService : ITask
+    public sealed class TaskService : ITaskService
     {
         private readonly ApplicationDbContext _db;
         private readonly PostgreDbContext _postgre;
-        private readonly IUser _user;
+        private readonly IUserService _userService;
 
-        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUser user)
+        public TaskService(ApplicationDbContext db, PostgreDbContext postgre, IUserService userService)
         {
             _db = db;
             _postgre = postgre;
-            _user = user;
+            _userService = userService;
         }
 
         /// <summary>
@@ -41,39 +43,48 @@ namespace Barbuuuda.Services
         /// <param name="task">Объект с данными задания.</param>
         /// <param name="userName">Login юзера.</param>
         /// <returns>Вернет данные созданного задания.</returns>
-        public async Task<TaskEntity> CreateTask(TaskEntity oTask, string userName)
+        public async Task<TaskEntity> CreateTask(TaskEntity task, string userName)
         {
             try
             {
-                if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail))
+                if (string.IsNullOrEmpty(task.TaskTitle) || string.IsNullOrEmpty(task.TaskDetail))
                 {
                     throw new ArgumentException();
                 }
 
                 // Проверяет существование заказчика, который создает задание.
-                bool bCustomer = await IdentityCustomer(userName);
+                var user = await IdentityCustomer(userName);
 
                 // Проверяет, есть ли такая категория в БД.
-                bool bCategory = await IdentityCategory(oTask.CategoryCode);
+                bool bCategory = await IdentityCategory(task.CategoryCode);
 
                 // Если все проверки прошли.
-                if (bCustomer && bCategory)
+                if (user != null && bCategory)
                 {
-                    oTask.TaskBegda = DateTime.Now;
+                    task.TaskBegda = DateTime.Now;
 
                     // Запишет код статуса "В аукционе".
-                    oTask.StatusCode = await _postgre.TaskStatuses
+                    task.StatusCode = await _postgre.TaskStatuses
                     .Where(s => s.StatusName
                     .Equals(StatusTask.AUCTION))
-                    .Select(s => s.StatusCode).FirstOrDefaultAsync();
+                    .Select(s => s.StatusCode)
+                    .FirstOrDefaultAsync();
+
+                    // Запишет Id заказчика, создавшего задание.
+                    task.OwnerId = user.Id;
 
                     // TODO: Доработать передачу с фронта для про или для всех.
-                    oTask.TypeCode = "Для всех";
+                    task.TypeCode = "Для всех";
 
-                    await _postgre.Tasks.AddAsync(oTask);
+                    // Найдет и увеличит последний PK.
+                    var incrementTaskId = await _postgre.Tasks.Select(x => x.TaskId).MaxAsync();
+
+                    task.TaskId = ++incrementTaskId;
+
+                    await _postgre.Tasks.AddAsync(task);
                     await _postgre.SaveChangesAsync();
 
-                    return oTask;
+                    return task;
                 }
 
                 throw new ArgumentNullException();
@@ -101,37 +112,57 @@ namespace Barbuuuda.Services
         /// <param name="task">Объект с данными задания.</param>
         /// <param name="userName">Login юзера.</param>
         /// <returns>Вернет данные измененного задания.</returns>
-        public async Task<TaskEntity> EditTask(TaskEntity oTask, string userName)
+        public async Task<TaskEntity> EditTask(TaskInput task, string userName)
         {
             try
             {
-                if (string.IsNullOrEmpty(oTask.TaskTitle) || string.IsNullOrEmpty(oTask.TaskDetail))
+                if (string.IsNullOrEmpty(task.TaskTitle)
+                    || string.IsNullOrEmpty(task.TaskDetail)
+                    || task.TaskId <= 0
+                    || task.TaskId == null)
                 {
                     throw new ArgumentException();
                 }
 
                 // Проверяет существование заказчика, который создал задание.
-                bool bCustomer = await IdentityCustomer(userName);
+                var user = await IdentityCustomer(userName);
 
                 // Проверяет, есть ли такая категория в БД.
-                bool bCategory = await IdentityCategory(oTask.CategoryCode);
+                var bCategory = await IdentityCategory(task.CategoryCode);
+
+                // Найдет задание, которое нужно изменить.
+                var updateTask = await (from t in _postgre.Tasks
+                                        where t.TaskId == task.TaskId
+                                        select t)
+                    .FirstOrDefaultAsync();
 
                 // Если все проверки прошли.
-                if (bCustomer && bCategory)
+                if (user != null && bCategory && updateTask != null)
                 {
+                    // Запишет Id заказчика.
+                    updateTask.OwnerId = user.Id;
+
                     // Запишет код статуса "В аукционе".
-                    oTask.StatusCode = await _postgre.TaskStatuses
-                    .Where(s => s.StatusName
-                    .Equals(StatusTask.AUCTION))
-                    .Select(s => s.StatusCode).FirstOrDefaultAsync();
+                    updateTask.StatusCode = await _postgre.TaskStatuses
+                        .Where(s => s.StatusName
+                        .Equals(StatusTask.AUCTION))
+                        .Select(s => s.StatusCode)
+                        .FirstOrDefaultAsync();
 
                     // TODO: Доработать передачу с фронта для про или для всех.
-                    oTask.TypeCode = "Для всех";
+                    updateTask.TypeCode = "Для всех";
 
-                    _postgre.Tasks.Update(oTask);
+                    // Обновит поля задания.
+                    updateTask.TaskTitle = task.TaskTitle;
+                    updateTask.TaskDetail = task.TaskDetail;
+                    updateTask.CategoryCode = task.CategoryCode;
+                    updateTask.SpecCode = task.SpecCode;
+                    updateTask.TaskEndda = task.TaskEndda;
+                    updateTask.TaskPrice = task.TaskPrice;
+
                     await _postgre.SaveChangesAsync();
 
-                    return oTask;
+                    return updateTask;
                 }
 
                 throw new ArgumentNullException();
@@ -158,7 +189,7 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>true/false</returns>
-        async Task<bool> IdentityCustomer(string userName)
+        async Task<UserEntity> IdentityCustomer(string userName)
         {
             try
             {
@@ -167,11 +198,16 @@ namespace Barbuuuda.Services
                     throw new ArgumentNullException();
                 }
 
-                UserEntity oUser = await _postgre.Users
+                var user = await _postgre.Users
                     .Where(u => u.UserName.Equals(userName))
                     .FirstOrDefaultAsync();
 
-                return oUser != null ? true : throw new ArgumentNullException();
+                if (user == null)
+                {
+                    throw new ArgumentNullException();
+                }
+
+                return user;
             }
 
             catch (ArgumentNullException ex)
@@ -233,12 +269,10 @@ namespace Barbuuuda.Services
         /// <param name="type">Параметр получения заданий либо все либо одно.</param>
         /// <param name="taskId">TaskId задания, которое нужно получить.</param>
         /// <returns>Коллекция заданий.</returns>
-        public async Task<IList> GetTasksList(string userName, int? taskId, string type)
+        public async Task<IList> GetTasksList(string userName, long? taskId, string type)
         {
             try
             {
-                IList aResultTaskObj = null;
-
                 if (string.IsNullOrEmpty(userName))
                 {
                     throw new ArgumentNullException();
@@ -250,9 +284,9 @@ namespace Barbuuuda.Services
                 }
 
                 // Вернет либо все задания либо одно.
-                return aResultTaskObj = type.Equals(TaskType.ALL)
-                    ? aResultTaskObj = await GetAllTasks(userName)
-                    : aResultTaskObj = await GetSingleTask(userName, taskId);
+                return type.Equals(TaskType.ALL)
+                    ? await GetAllTasks(userName)
+                    : await GetSingleTask(userName, taskId);
             }
 
             catch (ArgumentNullException ex)
@@ -308,7 +342,7 @@ namespace Barbuuuda.Services
         /// <param name="userName">Логин юзера.</param>
         /// <param name="taskId">Id задачи. Может быть null.</param>
         /// <returns>Коллекцию заданий.</returns>
-        async Task<IList> GetSingleTask(string userName, int? taskId)
+        async Task<IList> GetSingleTask(string userName, long? taskId)
         {
             // Выбирает объект задачи, который нужно редактировать.
             TaskEntity oEditTask = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
@@ -330,13 +364,13 @@ namespace Barbuuuda.Services
             }
 
             // Получит логин и иконку профиля заказчика задания.
-            CustomerOutpoot customer = await _user.GetCustomerLoginByTaskId(taskId);
+            CustomerOutput customer = await _userService.GetCustomerLoginByTaskId(taskId);
 
             // TODO: отрефачить этот метод, чтоб не обращаться два раза к БД за получением задания.            
             var oTask = await (from tasks in _postgre.Tasks
                                join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                               where tasks.TaskId.Equals(taskId)
+                               where tasks.TaskId == taskId
                                select new
                                {
                                    tasks.CategoryCode,
@@ -349,7 +383,8 @@ namespace Barbuuuda.Services
                                    tasks.StatusCode,
                                    statuses.StatusName,
                                    taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                   taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                   //taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                   tasks.TaskEndda,
                                    tasks.TaskTitle,
                                    tasks.TaskDetail,
                                    tasks.TaskId,
@@ -369,18 +404,30 @@ namespace Barbuuuda.Services
         /// Метод удаляет задание.
         /// </summary>
         /// <param name="taskId">Id задачи.</param>
-        public async Task DeleteTask(int taskId)
+        /// <returns>Статус удаления.</returns>
+        public async Task<bool> DeleteTask(long taskId)
         {
             try
             {
-                if (taskId == 0)
+                if (taskId <= 0)
                 {
                     throw new ArgumentNullException();
                 }
 
-                TaskEntity oRemovedTask = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
-                _postgre.Tasks.Remove(oRemovedTask);
+                var removeTask = await _postgre.Tasks
+                    .Where(t => t.TaskId == taskId)
+                    .FirstOrDefaultAsync();
+
+                if (removeTask == null)
+                {
+                    return false;
+                }
+
+                _postgre.Tasks.Remove(removeTask);
+
                 await _postgre.SaveChangesAsync();
+
+                return true;
             }
 
             catch (ArgumentNullException ex)
@@ -652,6 +699,7 @@ namespace Barbuuuda.Services
                 int countComplete = await GetStatusName(StatusTask.COMPLETE);
                 int countPerechet = await GetStatusName(StatusTask.PERECHET);
                 int countDraft = await GetStatusName(StatusTask.DRAFT);
+                int total = await GetStatusName(StatusTask.TOTAL);
 
                 return new
                 {
@@ -660,7 +708,8 @@ namespace Barbuuuda.Services
                     garant = countGarant,
                     complete = countComplete,
                     perechet = countPerechet,
-                    draft = countDraft
+                    draft = countDraft,
+                    total
                 };
             }
 
@@ -679,14 +728,31 @@ namespace Barbuuuda.Services
         /// <returns></returns>
         async Task<int> GetStatusName(string status)
         {
-            return await _postgre.Tasks
-                .Join(_postgre.TaskStatuses,
-                t => t.StatusCode,
-                s => s.StatusCode,
-                (t, s) => new { s.StatusName })
-                .Where(s => s.StatusName
-                .Equals(status))
-                .CountAsync();
+            int tasksCount = 0;
+
+            if (status.Equals(StatusTask.TOTAL))
+            {
+                tasksCount = await _postgre.Tasks
+                    .Join(_postgre.TaskStatuses,
+                        t => t.StatusCode,
+                        s => s.StatusCode,
+                        (t, s) => new { s.StatusName })
+                    .CountAsync();
+            }
+
+            else
+            {
+                tasksCount = await _postgre.Tasks
+                    .Join(_postgre.TaskStatuses,
+                        t => t.StatusCode,
+                        s => s.StatusCode,
+                        (t, s) => new { s.StatusName })
+                    .Where(s => s.StatusName
+                        .Equals(status))
+                    .CountAsync();
+            }
+
+            return tasksCount;
         }
 
         /// <summary>
@@ -695,39 +761,51 @@ namespace Barbuuuda.Services
         /// <param name="status">Название статуса.</param>
         /// <param name="userName">Логин пользователя.</param>
         /// <returns>Список заданий с определенным статусом.</returns>
-        public async Task<IList> GetStatusTasks(string status, string userName)
+        public async Task<GetTaskResultOutput> GetStatusTasks(string status, string userName)
         {
             try
             {
-                string userId = await GetUserByName(userName);
+                var result = new GetTaskResultOutput();
 
-                return string.IsNullOrEmpty(status) ? throw new ArgumentNullException() :
-                     await (from tasks in _postgre.Tasks
-                            join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                            join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                var userId = await GetUserByName(userName);
+
+                var tasks = string.IsNullOrEmpty(status) ? throw new ArgumentNullException() :
+                    await (from task in _postgre.Tasks
+                            join categories in _postgre.TaskCategories on task.CategoryCode equals categories.CategoryCode
+                            join statuses in _postgre.TaskStatuses on task.StatusCode equals statuses.StatusCode
                             where statuses.StatusName.Equals(status)
-                            where tasks.OwnerId.Equals(userId)
+                            where task.OwnerId.Equals(userId)
                             select new
                             {
-                                tasks.CategoryCode,
-                                tasks.CountOffers,
-                                tasks.CountViews,
-                                tasks.OwnerId,
-                                tasks.SpecCode,
+                                task.CategoryCode,
+                                task.CountOffers,
+                                task.CountViews,
+                                task.OwnerId,
+                                task.SpecCode,
                                 categories.CategoryName,
-                                tasks.StatusCode,
+                                task.StatusCode,
                                 statuses.StatusName,
-                                taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                taskEndda = string.Format("{0:f}", tasks.TaskEndda),
-                                tasks.TaskTitle,
-                                tasks.TaskDetail,
-                                tasks.TaskId,
-                                taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                                tasks.TypeCode,
-                                userName
+                                TaskBegda = string.Format("{0:f}", task.TaskBegda),
+                                TaskEndda = string.Format("{0:f}", task.TaskEndda),
+                                task.TaskTitle,
+                                task.TaskDetail,
+                                task.TaskId,
+                                TaskPrice = string.Format("{0:0,0}", task.TaskPrice),
+                                task.TypeCode,
+                                UserName = userName
                             })
-                          .OrderBy(o => o.TaskId)
-                          .ToListAsync();
+                        .OrderBy(o => o.TaskId)
+                        .ToListAsync();
+
+                foreach (var t in tasks)
+                {
+                    var jsonString = JsonSerializer.Serialize(t);
+                    var jResult = JsonSerializer.Deserialize<TaskOutput>(jsonString);
+
+                    result.Tasks.Add(jResult);
+                }
+
+                return result;
             }
 
             catch (ArgumentNullException ex)
@@ -746,50 +824,14 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод получает кол-во заданий всего.
-        /// </summary>
-        /// <param name="userName">Login пользователя.</param>
-        /// <returns></returns>
-        public async Task<int?> GetTotalCountTasks(string userName)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(userName))
-                {
-                    return null;
-                }
-
-                UserEntity user = await _user.GetUserByLogin(userName);
-
-                if (user.Id == null)
-                {
-                    throw new NotFoundUserException(userName);
-                }
-
-                return await _postgre.Tasks
-                    .Where(t => t.OwnerId
-                    .Equals(user.Id))
-                    .CountAsync();
-            }
-
-            catch (Exception ex)
-            {
-                Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
-                await _logger.LogCritical();
-                throw new Exception(ex.Message.ToString());
-            }
-        }
-
-        /// <summary>
         /// Метод получает задания в статусе "В аукционе".
         /// </summary>
-        /// <param name="taskId"></param>
         /// <returns>Список заданий в аукционе.</returns>
-        public async Task<GetTaskResultOutpoot> LoadAuctionTasks()
+        public async Task<GetTaskResultOutput> LoadAuctionTasks()
         {
             try
             {
-                GetTaskResultOutpoot resultTasks = new GetTaskResultOutpoot();
+                GetTaskResultOutput resultTasks = new GetTaskResultOutput();
                 IEnumerable auctionTasks = await (from tasks in _postgre.Tasks
                                                   join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                                   join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
@@ -817,11 +859,11 @@ namespace Barbuuuda.Services
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
 
-                // Приводит к типу коллекции GetTaskResultOutpoot.
+                // Приводит к типу коллекции GetTaskResultOutput.
                 foreach (object task in auctionTasks)
                 {
                     string jsonString = JsonSerializer.Serialize(task);
-                    TaskOutpoot result = JsonSerializer.Deserialize<TaskOutpoot>(jsonString);
+                    TaskOutput result = JsonSerializer.Deserialize<TaskOutput>(jsonString);
 
                     // Считает кол-во ставок к заданию, либо проставит 0.
                     int countResponds = await _postgre.Responds
@@ -878,7 +920,7 @@ namespace Barbuuuda.Services
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
         /// <param name="account">Логин пользователя.</param>
         /// <returns>Список ставок.</returns>
-        public async Task<GetRespondResultOutpoot> GetRespondsAsync(int taskId, string account)
+        public async Task<GetRespondResultOutput> GetRespondsAsync(long taskId, string account)
         {
             try
             {
@@ -887,37 +929,42 @@ namespace Barbuuuda.Services
                     throw new NullTaskIdException();
                 }
 
-                IEnumerable respondsList = await (_postgre.Responds.Where(t => t.TaskId == taskId)
-                    .Join(_postgre.Users, re => re.ExecutorId, u => u.Id, (re, u) => new { re, u })
-                    .Join(_postgre.Statistics, user => user.u.Id, st => st.ExecutorId, (user, st) => new { user, st })
-                    .Select(res => new {
-                        res.user.u.UserName,
-                        res.user.re.Comment,
-                        Price = string.Format("{0:0,0}", res.user.re.Price),
-                        res.st.CountPositive,
-                        res.st.CountNegative,
-                        res.st.CountTotalCompletedTask,
-                        res.st.Rating,
-                        UserIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO,
-                        res.st.ExecutorId
-                    })
-                    .ToListAsync());
+                IEnumerable respondsList = await GetRespondsListAsync(taskId);
 
-                GetRespondResultOutpoot result = new GetRespondResultOutpoot();
+                GetRespondResultOutput result = new GetRespondResultOutput();
 
                 // Находит Id исполнителя.
-                string userId = await _user.GetUserIdByLogin(account);
+                string userId = await _userService.GetUserIdByLogin(account);
 
-                // Приведет к типу коллекции GetRespondResultOutpoot.
+                // Приведет к типу коллекции GetRespondResultOutput.
                 foreach (object respond in respondsList)
                 {
                     string jsonString = JsonSerializer.Serialize(respond);
-                    RespondOutpoot resultObject = JsonSerializer.Deserialize<RespondOutpoot>(jsonString);
+                    RespondOutput resultObject = JsonSerializer.Deserialize<RespondOutput>(jsonString);
 
                     // Если исполнитель оставлял ставку к данному заданию, то проставит флаг видимости кнопки "ИЗМЕНИТЬ СТАВКУ", иначе скроет ее.
                     if (resultObject.ExecutorId.Equals(userId))
                     {
                         resultObject.IsVisibleButton = true;
+                    }
+
+                    // Выберет приглашение.
+                    InviteEntity invite = await _postgre.Invities
+                        .Where(c => c.TaskId == taskId && c.ExecutorId.Equals(resultObject.ExecutorId))
+                        .FirstOrDefaultAsync();
+
+                    if (invite != null && !string.IsNullOrEmpty(invite.ExecutorId) && invite.TaskId > 0)
+                    {
+
+                        if (invite.IsAccept)
+                        {
+                            resultObject.IsSendInvite = true;
+                        }
+
+                        if (invite.IsCancel)
+                        {
+                            resultObject.IsCancelInvite = true;
+                        }
                     }
 
                     result.Responds.Add(resultObject);
@@ -932,6 +979,341 @@ namespace Barbuuuda.Services
                 await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
+        }
+
+        /// <summary>
+        /// Метод выберет исполнителя задания.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="executorId">Id исполнителя, которого заказчик выбрал.</param>
+        /// <returns>Флаг проверки оплаты.</returns>
+        public async Task<bool> SelectAsync(long taskId, string executorId)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                if (string.IsNullOrEmpty(executorId))
+                {
+                    throw new EmptyExecutorIdException();
+                }
+
+                TaskEntity task = await _postgre.Tasks
+                    .Where(t => t.TaskId == taskId)
+                    .FirstOrDefaultAsync();
+
+                // Если задание не было оплаченно заказчиком.
+                if (!task.IsPay)
+                {
+                    return false;
+                }
+
+                // Запишет исполнителя на задание и будет ждать ответа от исполнителя на приглашение.
+                await _postgre.Invities.AddAsync(new InviteEntity
+                {
+                    TaskId = task.TaskId,
+                    ExecutorId = executorId,
+                    IsAccept = true,
+                    OwnerId = task.OwnerId
+                });
+                await _postgre.SaveChangesAsync();
+
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод проверит оплату задания.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Флаг проверки.</returns>
+        public async Task<bool> CheckSelectPayAsync(long taskId)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                // Выберет задание. Должно быть оплачено и исполнитель должен быть проставлен.
+                var task = await _postgre.Tasks
+                    .Where(c => c.TaskId == taskId)
+                    .Select(res => new
+                    {
+                        IsPay = res.IsPay.Equals(true)
+                    })
+                    .FirstOrDefaultAsync();
+
+                return task.IsPay;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод проверит, принял ли исполнитель в работу задание и не отказался ли от него.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Если все хорошо, то вернет список ставок к заданию, в котором будет только ставка исполнителя, которого выбрали и который принял в работу задание.</returns>
+        public async Task<GetRespondResultOutput> CheckAcceptAndNotCancelInviteTaskAsync(long taskId, string account)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                // Выберет задание. Задание должно быть принято в работу.
+                var task = await _postgre.Invities
+                    .Where(c => c.TaskId == taskId && c.IsAccept.Equals(true))
+                    .FirstOrDefaultAsync();
+
+                if (task == null)
+                {
+                    return new GetRespondResultOutput();
+                }
+
+                // Получит список ставок к заданию.
+                GetRespondResultOutput responds = await GetRespondsAsync(taskId, account);
+
+                // Если ставок нет.
+                if (!responds.Responds.Any())
+                {
+                    return new GetRespondResultOutput();
+                }
+
+                // Оставит только ставку исполнителя, который принял задание в работу.
+                responds.Responds.RemoveAll(item => !item.ExecutorId.Equals(task.ExecutorId));
+
+                return responds;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                var logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод запишет переход к просмотру или изменению задания исполнителем.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="type">Тип перехода.</param>
+        /// <param name="account">Логин пользователя</param>
+        /// <returns>Id задания.</returns>
+        public async Task<TransitionOutput> SetTransitionAsync(int taskId, string type, string account)
+        {
+            try
+            {
+                var result = new TransitionOutput
+                {
+                    TaskId = taskId,
+                    Type = type
+                };
+
+                if (string.IsNullOrEmpty(type))
+                {
+                    throw new EmptyTransitionTypeException();
+                }
+
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                // Найдет Id пользователя.
+                var userId = await _userService.GetUserIdByLogin(account);
+
+                // Проверит существование перехода пользователя. Если он уже записан в таблицу (для избежания дублей).
+                var transition = await (from t in _postgre.Transitions
+                                        where t.Id.Equals(userId)
+                                              && t.TransitionType.Equals(type)
+                                        select t)
+                    .FirstOrDefaultAsync();
+
+                // Если переход уже делался ранее.
+                if (transition != null && transition.Id.Equals(userId))
+                {
+                    // Перезапишет переод.
+                    transition.Id = userId;
+                    transition.TaskId = taskId;
+
+                    //_postgre.Transitions.Update(transition);
+                    await _postgre.SaveChangesAsync();
+
+                    return result;
+                }
+
+                // Перехода еще не было. Запишет переход.
+                await _postgre.Transitions.AddAsync(new TransitionEntity
+                {
+                    TaskId = taskId,
+                    Id = userId,
+                    TransitionType = type.Equals("View") ? "View" : "Edit"
+                });
+
+                await _postgre.SaveChangesAsync();
+
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит переход.
+        /// </summary>
+        /// <param name="account">Логин пользователя</param>
+        /// <returns>Id задания.</returns>
+        public async Task<TransitionOutput> GetTransitionAsync(string account)
+        {
+            try
+            {
+                // Найдет Id пользователя.
+                var userId = await _userService.GetUserIdByLogin(account);
+
+                var transition = await (from t in _postgre.Transitions
+                                        where t.Id.Equals(userId)
+                                        select new TransitionEntity
+                                        {
+                                            TaskId = t.TaskId,
+                                            TransitionType = t.TransitionType
+                                        })
+                    .FirstOrDefaultAsync();
+
+                if (transition == null)
+                {
+                    throw new NotFoundTransitionException();
+                }
+
+                var jsonString = JsonSerializer.Serialize(transition);
+                var result = JsonSerializer.Deserialize<TransitionOutput>(jsonString);
+
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит список значений для селекта сортировки заданий.
+        /// </summary>
+        /// <returns>Список значений.</returns>
+        public async Task<ControlSortResult> GetSortSelectAsync()
+        {
+            try
+            {
+                var result = new ControlSortResult();
+
+                await (from res in _postgre.ControlSorts
+                       select new ControlSortOutput
+                       {
+                           SortKey = res.SortKey,
+                           SortValue = res.SortValue
+                       })
+                    .ForEachAsync(item => result.ControlSorts.Add(item));
+
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит список значений для селекта фильтров заданий.
+        /// </summary>
+        /// <returns>Список значений.</returns>
+        public async Task<ControlFilterResult> GetFilterSelectAsync()
+        {
+            try
+            {
+                var result = new ControlFilterResult();
+
+                await (from res in _postgre.ControlFilters
+                       select new ControlFilterOutput
+                       {
+                           FilterKey = res.FilterKey,
+                           FilterValue = res.FilterValue
+                       })
+                    .ForEachAsync(item => { result.ControlFilters.Add(item); });
+
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит список ставок исполнителей к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Список заданий.</returns>
+        private async Task<IEnumerable> GetRespondsListAsync(long taskId)
+        {
+            IEnumerable tasks = await (_postgre.Responds.Where(t => t.TaskId == taskId)
+                .Join(_postgre.Users, re => re.ExecutorId, u => u.Id, (re, u) => new { re, u })
+                .Join(_postgre.Statistics, user => user.u.Id, st => st.ExecutorId, (user, st) => new { user, st })
+                .Select(res => new {
+                    res.user.u.UserName,
+                    res.user.re.Comment,
+                    Price = string.Format("{0:0,0}", res.user.re.Price),
+                    res.st.CountPositive,
+                    res.st.CountNegative,
+                    res.st.CountTotalCompletedTask,
+                    res.st.Rating,
+                    UserIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO,
+                    res.st.ExecutorId
+                })
+                .ToListAsync());
+
+            return tasks;
         }
     }
 }

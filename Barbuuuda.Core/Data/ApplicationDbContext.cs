@@ -1,4 +1,4 @@
-﻿using Barbuuuda.Models.Entities.Knowlege;
+﻿using Barbuuuda.Models.Entities.MainPage;
 using Barbuuuda.Models.Logger;
 using Barbuuuda.Models.MainPage;
 using Barbuuuda.Models.Task;
@@ -12,6 +12,10 @@ namespace Barbuuuda.Core.Data
     /// </summary>
     public class ApplicationDbContext : DbContext
     {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
+
         public DbSet<LoggerEntity> Logs { get; set; }   // Таблица логов.
 
         public DbSet<FonEntity> Fons { get; set; }     // Таблица фона.
@@ -32,10 +36,11 @@ namespace Barbuuuda.Core.Data
 
         public DbSet<HeaderTypeEntity> Headers { get; set; }   // Таблица полей хидера.
 
-        public DbSet<HopeEntity> Hopes { get; set; }  // Таблица НАДЕЕМСЯ НА ДОЛГОЕ СОТРУДНИЧЕСТВО.       
+        public DbSet<HopeEntity> Hopes { get; set; }  // Таблица НАДЕЕМСЯ НА ДОЛГОЕ СОТРУДНИЧЕСТВО.
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
+        /// <summary>
+        /// Таблица контактов.
+        /// </summary>
+        public DbSet<ContactEntity> Contacts { get; set; }
     }
 }
