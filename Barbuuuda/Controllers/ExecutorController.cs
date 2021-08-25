@@ -56,14 +56,14 @@ namespace Barbuuuda.Controllers
         /// <summary>
         /// Метод получает вопрос для теста исполнителя в зависимости от номера вопроса, переданного с фронта.
         /// </summary>
-        /// <param name="numberQuestion">Номер вопроса.</param>
+        /// <param name="nextQuestionInput">Входная модель.</param>
         /// <returns>Вопрос с вариантами ответов.</returns>
-        [HttpGet, Route("answer")]
-        public async Task<IActionResult> GetExecutorTestAsync([FromQuery] int numberQuestion)
+        [HttpPost, Route("answer")]
+        public async Task<IActionResult> GetExecutorTestAsync([FromBody] NextQuestionInput nextQuestionInput)
         {
-            var oQuestion = await _executorService.GetQuestionAsync(numberQuestion);
+            var question = await _executorService.GetQuestionAsync(nextQuestionInput.NumberQuestion);
 
-            return Ok(oQuestion);
+            return Ok(question);
         }
 
         /// <summary>

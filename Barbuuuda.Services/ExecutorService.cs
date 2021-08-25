@@ -140,17 +140,17 @@ namespace Barbuuuda.Services
                 }
 
                 var question = await _postgre.Questions
-                .Join(_postgre.AnswerVariants,
-                t1 => t1.QuestionId,
-                t2 => t2.QuestionId,
-                (t1, t2) => new
-                {
-                    t1.QuestionText,
-                    t1.NumberQuestion,
-                    t2.AnswerVariantText
-                })
-                .Where(q => q.NumberQuestion == numberQuestion)
-                .FirstOrDefaultAsync();
+                    .Join(_postgre.AnswerVariants,
+                    t1 => t1.QuestionId,
+                    t2 => t2.QuestionId,
+                    (t1, t2) => new
+                    {
+                        t1.QuestionText,
+                        t1.NumberQuestion,
+                        t2.AnswerVariantText
+                    })
+                    .Where(q => q.NumberQuestion == numberQuestion)
+                    .FirstOrDefaultAsync();
 
                 // Затирает верные ответы, чтобы фронт их не видел.
                 question.AnswerVariantText.ToList().ForEach(el => el.IsRight = null);
