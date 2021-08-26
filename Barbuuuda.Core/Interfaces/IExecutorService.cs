@@ -1,9 +1,10 @@
 ﻿using Barbuuuda.Models.Entities.Executor;
-using Barbuuuda.Models.Executor.Input;
 using Barbuuuda.Models.User;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Respond.Input;
+using Barbuuuda.Models.Respond.Output;
 using Barbuuuda.Models.Task.Output;
 
 namespace Barbuuuda.Core.Interfaces
@@ -64,6 +65,16 @@ namespace Barbuuuda.Core.Interfaces
         Task<bool> RespondAsync(long? taskId, decimal? price, bool isTemplate, RespondInput respondInput, string comment, string userName);
 
         /// <summary>
+        /// Метод изменит ставку к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания, к которому оставляют ставку.</param>
+        /// <param name="price">Цена ставки (без комиссии 22%).</param>
+        /// <param name="comment">Комментарий к ставке.</param>
+        /// <param name="respondId">Id ставки.</param>
+        /// <param name="userName">Имя юзера.</param>
+        Task<bool> ChangeRespondAsync(long taskId, decimal price, string comment, long respondId, string userName);
+
+        /// <summary>
         /// Метод проверит, была ли сделана ставка к заданию текущим исполнителем.
         /// </summary>
         /// <param name="taskId">Id задания</param>
@@ -108,5 +119,14 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <returns>Список заданий.</returns>
         Task<GetResultTask> GetWorkTasksAsync(string account);
+
+        /// <summary>
+        /// Метод получит ставку исполнителя для ее изменения.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="respondId">Id ставки.</param>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Данные ставки исполнителя.</returns>
+        Task<ChangeRespondOutput> GetChangedRespondAsync(long taskId, long respondId, string account);
     }
 }

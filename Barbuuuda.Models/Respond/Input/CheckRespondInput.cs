@@ -1,4 +1,4 @@
-﻿namespace Barbuuuda.Models.Executor.Input
+﻿namespace Barbuuuda.Models.Respond.Input
 {
     /// <summary>
     /// Класс входной модели для проверки сделанной ставки.
@@ -8,6 +8,6 @@
         /// <summary>
         /// Id задания.
         /// </summary>
-        public long? TaskId { get; set; }
+        public long TaskId { get; set; }
     }
 }

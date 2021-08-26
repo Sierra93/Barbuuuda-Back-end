@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Barbuuuda.Models.Respond.Input;
+using Barbuuuda.Models.Respond.Output;
 using Barbuuuda.Models.Task.Output;
 
 namespace Barbuuuda.Controllers
@@ -107,7 +109,7 @@ namespace Barbuuuda.Controllers
         /// Метод оставляет ставку к заданию.
         /// </summary>
         /// <param name="taskInput">Входная модель.</param>
-        [HttpPost, Route("respond")]
+        [HttpPost, Route("create-respond")]
         public async Task<IActionResult> RespondTaskAsync([FromBody] RespondInput taskInput)
         {
             bool isRespond = await _executorService.RespondAsync(taskInput.TaskId, taskInput.Price, taskInput.IsTemplate, taskInput, taskInput.Comment, GetUserName());
@@ -191,6 +193,33 @@ namespace Barbuuuda.Controllers
             GetResultTask result = await _executorService.GetWorkTasksAsync(GetUserName());
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод оставляет ставку к заданию.
+        /// </summary>
+        /// <param name="taskInput">Входная модель.</param>
+        [HttpPost, Route("change-respond")]
+        public async Task<IActionResult> ChangeRespondTaskAsync([FromBody] ChangeRespondInput changeRespondInput)
+        {
+            bool isRespond = await _executorService.ChangeRespondAsync(changeRespondInput.TaskId, changeRespondInput.Price, changeRespondInput.Comment, changeRespondInput.RespondId, GetUserName());
+
+            return Ok(isRespond);
+        }
+
+        /// <summary>
+        /// Метод получит ставку исполнителя для ее изменения.
+        /// </summary>
+        /// <param name="changeRespondInput">Входная модель.</param>
+        /// <returns></returns>
+        [HttpPost, Route("get-change-respond")]
+        [ProducesResponseType(200, Type = typeof(ChangeRespondOutput))]
+        public async Task<IActionResult> GetChangedRespondAsync([FromBody] ChangeRespondInput changeRespondInput)
+        {
+            var editRespond = await _executorService.GetChangedRespondAsync(changeRespondInput.TaskId,
+                changeRespondInput.RespondId, GetUserName());
+
+            return Ok(editRespond);
         }
     }
 }

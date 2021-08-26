@@ -1,6 +1,6 @@
 ﻿using Barbuuuda.Models.Entities.Respond;
 
-namespace Barbuuuda.Models.Executor.Input
+namespace Barbuuuda.Models.Respond.Input
 {
     /// <summary>
     /// Входная модель ставки к заданию.

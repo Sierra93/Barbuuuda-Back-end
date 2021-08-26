@@ -5,7 +5,6 @@ using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Core.Logger;
 using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.Entities.Respond;
-using Barbuuuda.Models.Executor.Input;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.User;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +15,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Barbuuuda.Models.Entities.Task;
+using Barbuuuda.Models.Respond.Input;
+using Barbuuuda.Models.Respond.Output;
 using Barbuuuda.Models.Task.Output;
 
 namespace Barbuuuda.Services
@@ -345,6 +346,66 @@ namespace Barbuuuda.Services
             catch (Exception ex)
             {
                 Logger _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
+                await _logger.LogCritical();
+                throw new Exception(ex.Message.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Метод изменит ставку к заданию.
+        /// </summary>
+        /// <param name="taskId">Id задания, к которому оставляют ставку.</param>
+        /// <param name="price">Цена ставки (без комиссии 22%).</param>
+        /// <param name="comment">Комментарий к ставке.</param>
+        /// <param name="respondId">Id ставки.</param>
+        /// <param name="userName">Имя юзера.</param>
+        public async Task<bool> ChangeRespondAsync(long taskId, decimal price, string comment, long respondId, string userName)
+        {
+            try
+            {
+                if (taskId <= 0 || respondId <= 0)
+                {
+                    return false;
+                }
+
+                // Проверит существование задания TaskId.
+                var task = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
+
+                if (task == null)
+                {
+                    return false;
+                }
+
+                // Находит Id исполнителя, который делает ставку к заданию.
+                var user = await _userService.GetUserByLogin(userName);
+
+                if (user == null)
+                {
+                    return false;
+                }
+
+                // Найдет ставку к заданию с этим исполнителем.
+                var respond = await (from r in _postgre.Responds
+                                     where r.TaskId == taskId && r.ExecutorId.Equals(user.Id)
+                                     select r)
+                    .FirstOrDefaultAsync();
+
+                if (respond != null)
+                {
+                    respond.Price = price;
+                    respond.Comment = comment;
+
+                    await _postgre.SaveChangesAsync();
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            catch (Exception ex)
+            {
+                var _logger = new Logger(_db, ex.GetType().FullName, ex.Message.ToString(), ex.StackTrace);
                 await _logger.LogCritical();
                 throw new Exception(ex.Message.ToString());
             }
@@ -775,6 +836,58 @@ namespace Barbuuuda.Services
                 Console.WriteLine(ex);
                 Logger logger = new Logger(_db, ex.GetType().FullName, ex.Message, ex.StackTrace);
                 await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит ставку исполнителя для ее изменения.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <param name="respondId">Id ставки.</param>
+        /// <param name="account">Логин пользователя.</param>
+        /// <returns>Данные ставки исполнителя.</returns>
+        public async Task<ChangeRespondOutput> GetChangedRespondAsync(long taskId, long respondId, string account)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                // Проверит существование задания TaskId.
+                var task = await _postgre.Tasks.Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
+
+                if (task == null)
+                {
+                    throw new NotFoundTaskIdException(taskId);
+                }
+
+                // Находит Id исполнителя, которому принадлежит ставка.
+                var user = await _userService.GetUserByLogin(account);
+
+                if (user == null)
+                {
+                    throw new NotFoundUserException(account);
+                }
+
+                // Найдет ставку к заданию с этим исполнителем.
+                var respond = await (from r in _postgre.Responds
+                                     where r.TaskId == taskId && r.ExecutorId.Equals(user.Id)
+                                     select new ChangeRespondOutput
+                                     {
+                                         Price = r.Price,
+                                         Comment = r.Comment
+                                     })
+                    .FirstOrDefaultAsync();
+
+                return respond;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
                 throw;
             }
         }
