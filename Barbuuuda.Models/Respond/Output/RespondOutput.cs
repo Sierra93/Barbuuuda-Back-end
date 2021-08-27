@@ -6,6 +6,11 @@
     public class RespondOutput
     {
         /// <summary>
+        /// Id ставки.
+        /// </summary>
+        public long RespondId { get; set; }
+
+        /// <summary>
         /// Логин исполнителя.
         /// </summary>
         public string UserName { get; set; }

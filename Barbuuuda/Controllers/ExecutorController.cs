@@ -196,10 +196,10 @@ namespace Barbuuuda.Controllers
         }
 
         /// <summary>
-        /// Метод оставляет ставку к заданию.
+        /// Метод изменит ставку к заданию.
         /// </summary>
         /// <param name="taskInput">Входная модель.</param>
-        [HttpPost, Route("change-respond")]
+        [HttpPatch, Route("change-respond")]
         public async Task<IActionResult> ChangeRespondTaskAsync([FromBody] ChangeRespondInput changeRespondInput)
         {
             bool isRespond = await _executorService.ChangeRespondAsync(changeRespondInput.TaskId, changeRespondInput.Price, changeRespondInput.Comment, changeRespondInput.RespondId, GetUserName());

@@ -386,7 +386,9 @@ namespace Barbuuuda.Services
 
                 // Найдет ставку к заданию с этим исполнителем.
                 var respond = await (from r in _postgre.Responds
-                                     where r.TaskId == taskId && r.ExecutorId.Equals(user.Id)
+                                     where r.TaskId == taskId 
+                                           && r.ExecutorId.Equals(user.Id)
+                                           && r.RespondId == respondId
                                      select r)
                     .FirstOrDefaultAsync();
 
@@ -874,7 +876,9 @@ namespace Barbuuuda.Services
 
                 // Найдет ставку к заданию с этим исполнителем.
                 var respond = await (from r in _postgre.Responds
-                                     where r.TaskId == taskId && r.ExecutorId.Equals(user.Id)
+                                     where r.TaskId == taskId 
+                                           && r.ExecutorId.Equals(user.Id)
+                                           && r.RespondId == respondId
                                      select new ChangeRespondOutput
                                      {
                                          Price = r.Price,

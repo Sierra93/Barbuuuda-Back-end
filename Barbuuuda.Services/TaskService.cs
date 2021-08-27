@@ -1309,7 +1309,8 @@ namespace Barbuuuda.Services
                     res.st.CountTotalCompletedTask,
                     res.st.Rating,
                     UserIcon = res.user.u.UserIcon ?? NoPhotoUrl.NO_PHOTO,
-                    res.st.ExecutorId
+                    res.st.ExecutorId,
+                    res.user.re.RespondId
                 })
                 .ToListAsync());
 
