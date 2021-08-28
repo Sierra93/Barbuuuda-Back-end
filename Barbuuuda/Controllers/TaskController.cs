@@ -211,7 +211,7 @@ namespace Barbuuuda.Controllers
             return Ok(respondsList);
         }
 
-        /// <summary>
+        /// <summary> 
         /// Метод выберет исполнителя задания.
         /// </summary>
         /// <param name="payInput">Входная модель.</param>
