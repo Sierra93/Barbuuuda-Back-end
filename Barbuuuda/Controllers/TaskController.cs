@@ -214,7 +214,7 @@ namespace Barbuuuda.Controllers
         /// <summary> 
         /// Метод выберет исполнителя задания.
         /// </summary>
-        /// <param name="payInput">Входная модель.</param>
+        /// <param name="payInput">Входная модель.</param> 
         /// <returns>Флаг выбора.</returns>
         [HttpPost, Route("select")]
         [ProducesResponseType(200, Type = typeof(bool))]
