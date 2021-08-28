@@ -194,7 +194,7 @@ namespace Barbuuuda.Controllers
         {
             GetTaskResultOutput auctionTasks = await _taskService.LoadAuctionTasks();
 
-            return Ok(auctionTasks);
+            return Ok(auctionTasks); 
         }
 
         /// <summary>
