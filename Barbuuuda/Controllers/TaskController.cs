@@ -209,7 +209,7 @@ namespace Barbuuuda.Controllers
             GetRespondResultOutput respondsList = await _taskService.GetRespondsAsync(getRespondInput.TaskId, GetUserName());
 
             return Ok(respondsList);
-        }
+        }  
 
         /// <summary> 
         /// Метод выберет исполнителя задания.
