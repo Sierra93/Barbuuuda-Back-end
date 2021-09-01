@@ -140,9 +140,9 @@ namespace Barbuuuda.Services
                     throw new ErrorRangeAnswerException(numberQuestion);
                 }
 
-                var question = await _postgre.Questions
+                var question = await (_postgre.Questions
                     .Join(_postgre.AnswerVariants,
-                    t1 => t1.QuestionId,
+                    t1 => t1.NumberQuestion,
                     t2 => t2.QuestionId,
                     (t1, t2) => new
                     {
@@ -151,7 +151,7 @@ namespace Barbuuuda.Services
                         t2.AnswerVariantText
                     })
                     .Where(q => q.NumberQuestion == numberQuestion)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync());
 
                 // Затирает верные ответы, чтобы фронт их не видел.
                 question.AnswerVariantText.ToList().ForEach(el => el.IsRight = null);
