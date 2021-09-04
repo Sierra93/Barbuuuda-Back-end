@@ -35,7 +35,9 @@ namespace Barbuuuda.Services
                 var getTasks = (from tasks in _postgre.Tasks
                                 join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                 join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                                where statuses.StatusName.Equals(StatusTask.AUCTION)
+                                where statuses.StatusName.Equals(StatusTask.AUCTION) 
+                                && tasks.TaskEndda > DateTime.Now
+                                && !statuses.StatusName.Equals(StatusTask.DRAFT)
                                 join users in _postgre.Users on tasks.OwnerId equals users.Id
                                 select new
                                 {
@@ -174,6 +176,8 @@ namespace Barbuuuda.Services
                                 where (statuses.StatusName.Equals(StatusTask.AUCTION)
                                       || statuses.StatusName.Equals(StatusTask.IN_WORK)) 
                                       && tasks.OwnerId.Equals(userId)
+                                      && tasks.TaskEndda > DateTime.Now
+                                      && !statuses.StatusName.Equals(StatusTask.DRAFT)
                                 select new
                                 {
                                     tasks.CategoryCode,
