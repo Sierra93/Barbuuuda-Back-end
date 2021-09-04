@@ -8,5 +8,5 @@
 **ORM:** LINQ, Entity Framework Core.<br>
 **БД:** MSSQL, Postgres.<br>
 **DI:** Autofac.<br>
-**CI/CD:** В будущем планируется через GitHub Actions, TeamCity.<br>
+**CI/CD:** TeamCity.<br>
 **Миграции БД:** Liquibase.
