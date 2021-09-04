@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barbuuuda", "Barbuuuda\Barbuuuda.csproj", "{0B6BDB4F-0A2A-4651-BE05-71A268FF43BB}"
 EndProject
@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barbuuuda.Tests", "Barbuuud
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barbuuuda.Emails", "Barbuuuda.Emails\Barbuuuda.Emails.csproj", "{44D4D520-52B8-4865-8794-F800858C4431}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barbuuuda.Commerces", "Barbuuuda.Commerces\Barbuuuda.Commerces.csproj", "{2CE9CE88-F4B8-45DB-967F-C1E489C35A2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barbuuuda.Commerces", "Barbuuuda.Commerces\Barbuuuda.Commerces.csproj", "{2CE9CE88-F4B8-45DB-967F-C1E489C35A2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

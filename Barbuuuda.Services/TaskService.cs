@@ -831,8 +831,8 @@ namespace Barbuuuda.Services
         {
             try
             {
-                GetTaskResultOutput resultTasks = new GetTaskResultOutput();
-                IEnumerable auctionTasks = await (from tasks in _postgre.Tasks
+                var resultTasks = new GetTaskResultOutput();
+                var auctionTasks = await (from tasks in _postgre.Tasks
                                                   join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
                                                   join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
                                                   join users in _postgre.Users on tasks.OwnerId equals users.Id
@@ -860,19 +860,49 @@ namespace Barbuuuda.Services
                           .ToListAsync();
 
                 // Приводит к типу коллекции GetTaskResultOutput.
-                foreach (object task in auctionTasks)
+                foreach (var task in auctionTasks)
                 {
-                    string jsonString = JsonSerializer.Serialize(task);
-                    TaskOutput result = JsonSerializer.Deserialize<TaskOutput>(jsonString);
+                    var jsonString = JsonSerializer.Serialize(task);
+                    var result = JsonSerializer.Deserialize<TaskOutput>(jsonString);
 
-                    // Считает кол-во ставок к заданию, либо проставит 0.
-                    int countResponds = await _postgre.Responds
-                        .Where(r => r.TaskId == result.TaskId)
-                        .Select(r => r.RespondId)
-                        .CountAsync();
-                    result.CountOffers = countResponds > 0 ? countResponds : 0;
+                    if (result != null)
+                    {
+                        // Считает кол-во ставок к заданию, либо проставит 0.
+                        var countResponds = await _postgre.Responds
+                            .Where(r => r.TaskId == result.TaskId)
+                            .Select(r => r.RespondId)
+                            .CountAsync();
 
-                    resultTasks.Tasks.Add(result);
+                        result.CountOffers = countResponds > 0 ? countResponds : 0;
+
+                        // Если дата сдачи задания больше чем текущая дата, значит срок еще есть. В аукцион задание попадет.
+                        if (Convert.ToDateTime(result.TaskEndda) > DateTime.Now)
+                        {
+                            resultTasks.Tasks.Add(result);
+                        }
+
+                        // Если дата сдачи задания меньше чем текущая дата, значит срок истек, и нужно добавить в таблицу просроченных заданий. В аукцион задание не попадет.
+                        else if (Convert.ToDateTime(result.TaskEndda) < DateTime.Now)
+                        {
+                            // Ищет такое задание в таблице просроченных.
+                            var overdueTask = await (from ov in _postgre.OverdueTasks
+                                                     where ov.TaskId == result.TaskId
+                                                     select ov)
+                                .FirstOrDefaultAsync();
+
+                            if (overdueTask != null)
+                            {
+                                continue;
+                            }
+
+                            await _postgre.OverdueTasks.AddAsync(new OverdueTaskEntity
+                            {
+                                TaskId = result.TaskId
+                            });
+
+                            await _postgre.SaveChangesAsync();
+                        }
+                    }
                 }
 
                 return resultTasks;

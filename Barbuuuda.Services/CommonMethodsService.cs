@@ -1,19 +1,19 @@
 ﻿using Barbuuuda.Core.Data;
+using Barbuuuda.Services.Base;
 
 namespace Barbuuuda.Services
 {
     /// <summary>
     /// Сервис общих методов.
     /// </summary>
-    public class CommonMethodsService
+    public sealed class CommonMethodsService : BaseCommonMethodsService
     {
-        private readonly ApplicationDbContext _db;
-        private readonly PostgreDbContext _postgre;
+        private readonly ApplicationDbContext _dbContext;
+        private readonly PostgreDbContext _postgreDbContext;
 
-        public CommonMethodsService(ApplicationDbContext db, PostgreDbContext postgre)
+        public CommonMethodsService(ApplicationDbContext dbContext, PostgreDbContext postgreDbContext) : base(dbContext, postgreDbContext)
         {
-            _db = db;
-            _postgre = postgre;
+            
         }
 
         /// <summary>

@@ -93,5 +93,10 @@
         /// Кол-во заданий всего.
         /// </summary>
         public long CountTotalTasks { get; set; }
+
+        /// <summary>
+        /// Флаг просроченно ли задание.
+        /// </summary>
+        public bool IsOverdue { get; set; }
     }
 }

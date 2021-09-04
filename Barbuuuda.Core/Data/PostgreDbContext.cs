@@ -140,5 +140,10 @@ namespace Barbuuuda.Core.Data
         /// Таблица контрола селекта фильтрации заданий.
         /// </summary>
         public DbSet<ControlFilterEntity> ControlFilters { get; set; }
+
+        /// <summary>
+        /// Таблица просроченных заданий.
+        /// </summary>
+        public DbSet<OverdueTaskEntity> OverdueTasks { get; set; }
     }
 }
