@@ -98,21 +98,6 @@ namespace Barbuuuda.Core.Interfaces
         Task<GetTaskResultOutput> LoadAuctionTasks();
 
         /// <summary>
-        /// Метод получает логин юзера по его Id.
-        /// </summary>
-        /// <param name="userId">Id юзера.</param>
-        /// <returns>Логин юзера.</returns>
-        Task<string> GetUserLoginById(string userId);
-
-
-        /// <summary>
-        /// Метод получает Id юзера по его Login.
-        /// </summary>
-        /// <param name="userId">Id юзера.</param>
-        /// <returns>Id юзера.</returns>
-        Task<string> GetUserByName(string userName);
-
-        /// <summary>
         /// Метод получает список ставок к заданию.
         /// </summary>
         /// <param name="taskId">Id задания, для которого нужно получить список ставок.</param>
@@ -170,5 +155,19 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <returns>Список значений.</returns>
         Task<ControlFilterResult> GetFilterSelectAsync();
+
+        /// <summary>
+        /// Метод найдет задание по его Id.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Найденное задание.</returns>
+        Task<TaskOutput> GetTaskByIdAsync(int taskId);
+
+        /// <summary>
+        /// Метод получит код статуса по его названию.
+        /// </summary>
+        /// <param name="name">Название статуса.</param>
+        /// <returns>Код статуса.</returns>
+        Task<string> GetStatusCodeByNameAsync(string name);
     }
 }

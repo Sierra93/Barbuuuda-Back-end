@@ -13,11 +13,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Barbuuuda.Models.Entities.Executor;
 using Barbuuuda.Models.Entities.Task;
 using Barbuuuda.Models.Task.Input;
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Barbuuuda.Services
 {
@@ -508,10 +509,11 @@ namespace Barbuuuda.Services
                 // Если передали Id.
                 if (int.TryParse(param, out int bIntParse))
                 {
-                    int taskId = Convert.ToInt32(param);
+                    int taskId = bIntParse;
+
                     return await _postgre.Tasks
-                    .Where(t => t.TaskId == taskId)
-                    .ToListAsync();
+                        .Where(t => t.TaskId == taskId)
+                        .ToListAsync();
                 }
 
                 // Если передали строку.
@@ -900,10 +902,25 @@ namespace Barbuuuda.Services
                                 continue;
                             }
 
+                            // Добавит задание в таблицу просроченных.
                             await _postgre.OverdueTasks.AddAsync(new OverdueTaskEntity
                             {
                                 TaskId = result.TaskId
                             });
+
+                            await _postgre.SaveChangesAsync();
+
+                            // Найдет задание по его Id.
+                            var findTask = await (from t in _postgre.Tasks
+                                                  where t.TaskId == result.TaskId
+                                                  select t)
+                                .FirstOrDefaultAsync();
+
+                            // Найдет код статуса черновик.
+                            var code = await GetStatusCodeByNameAsync(StatusTask.DRAFT);
+
+                            // Запишет заданию статус черновик.
+                            findTask.StatusCode = code;
 
                             await _postgre.SaveChangesAsync();
                         }
@@ -1321,6 +1338,69 @@ namespace Barbuuuda.Services
                 Console.WriteLine(e);
                 var logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
                 await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод найдет задание по его Id.
+        /// </summary>
+        /// <param name="taskId">Id задания.</param>
+        /// <returns>Найденное задание.</returns>
+        public async Task<TaskOutput> GetTaskByIdAsync(int taskId)
+        {
+            try
+            {
+                if (taskId <= 0)
+                {
+                    throw new NullTaskIdException();
+                }
+
+                var findTask = await (from t in _postgre.Tasks
+                                      where t.TaskId == taskId
+                                      select t)
+                    .FirstOrDefaultAsync();
+
+                if (findTask == null)
+                {
+                    throw new NotFoundTaskIdException(taskId);
+                }
+
+                var jsonString = JsonConvert.SerializeObject(findTask);
+                var json = JsonConvert.DeserializeObject<TaskOutput>(jsonString);
+
+                return json;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message.ToString(), e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит код статуса по его названию.
+        /// </summary>
+        /// <param name="name">Название статуса.</param>
+        /// <returns>Код статуса.</returns>
+        public async Task<string> GetStatusCodeByNameAsync(string name)
+        {
+            try
+            {
+                var code = await (from n in _postgre.TaskStatuses
+                                  where n.StatusName.Equals(name)
+                                  select n.StatusCode)
+                    .FirstOrDefaultAsync();
+
+                return code;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
                 throw;
             }
         }
