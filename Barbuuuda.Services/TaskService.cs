@@ -1401,6 +1401,74 @@ namespace Barbuuuda.Services
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message, e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит список статусов для селекта статусов.
+        /// </summary>
+        /// <returns>Список статусов.</returns>
+        public async Task<IEnumerable<TaskStatusOutput>> GetStatusesSelectAsync()
+        {
+            try
+            {
+                var statuses = await (from st in _postgre.TaskStatuses
+                                      where new[] { StatusTask.PERECHET, StatusTask.AUCTION }.Contains(st.StatusName)
+                                      select new TaskStatusOutput
+                                      {
+                                          StatusCode = st.StatusCode,
+                                          StatusName = st.StatusName
+                                      })
+                    .ToListAsync();
+
+                if (!statuses.Any())
+                {
+                    throw new ErrorGetTaskStatusesException();
+                }
+
+                return statuses;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                var logger = new Logger(_db, e.GetType().FullName, e.Message, e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод получит список типов заданий для селекта фильтрации.
+        /// </summary>
+        /// <returns>Список типов заданий.</returns>
+        public async Task<IEnumerable<TaskTypeOutput>> GetTypesSelectAsync()
+        {
+            try
+            {
+                var types = await (from t in _postgre.TaskTypes
+                                   where new[] { TaskType.FOR_PRO, TaskType.FOR_ALL }.Contains(t.TypeName)
+                                   select new TaskTypeOutput
+                                   {
+                                       TypeCode = t.TypeCode,
+                                       TypeName = t.TypeName
+                                   })
+                    .ToListAsync();
+
+                if (!types.Any())
+                {
+                    throw new ErrorGetTaskTypesException();
+                }
+
+                return types;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
                 throw;
             }
         }

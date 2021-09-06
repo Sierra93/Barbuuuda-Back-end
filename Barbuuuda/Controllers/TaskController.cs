@@ -306,5 +306,29 @@ namespace Barbuuuda.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Метод получит список статусов для селекта статусов.
+        /// </summary>
+        /// <returns>Список статусов.</returns>
+        [HttpPost, Route("get-filter-statuses-select")]
+        public async Task<IActionResult> GetStatusesSelectAsync()
+        {
+            var result = await _taskService.GetStatusesSelectAsync();
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод получит список типов заданий для селекта фильтрации.
+        /// </summary>
+        /// <returns>Список типов заданий.</returns>
+        [HttpPost, Route("get-filter-types-select")]
+        public async Task<IActionResult> GetTypesSelectAsync()
+        {
+            var result = await _taskService.GetTypesSelectAsync();
+
+            return Ok(result);
+        }
     }
 }

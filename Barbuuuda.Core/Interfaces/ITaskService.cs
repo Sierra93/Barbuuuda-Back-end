@@ -1,6 +1,7 @@
 ﻿using Barbuuuda.Models.Respond.Output;
 using Barbuuuda.Models.Task.Output;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Barbuuuda.Models.Task;
 using Barbuuuda.Models.Task.Input;
@@ -169,5 +170,17 @@ namespace Barbuuuda.Core.Interfaces
         /// <param name="name">Название статуса.</param>
         /// <returns>Код статуса.</returns>
         Task<string> GetStatusCodeByNameAsync(string name);
+
+        /// <summary>
+        /// Метод получит список статусов для селекта фильтрации.
+        /// </summary>
+        /// <returns>Список статусов.</returns>
+        Task<IEnumerable<TaskStatusOutput>> GetStatusesSelectAsync();
+
+        /// <summary>
+        /// Метод получит список типов заданий для селекта фильтрации.
+        /// </summary>
+        /// <returns>Список типов заданий.</returns>
+        Task<IEnumerable<TaskTypeOutput>> GetTypesSelectAsync();
     }
 }

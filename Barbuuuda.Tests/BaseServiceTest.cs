@@ -19,6 +19,7 @@ namespace Barbuuuda.Tests
         protected UserService UserService;
         protected ExecutorService ExecutorService;
         protected PaginationService PaginationService;
+        protected TaskService TaskService;
 
         public BaseServiceTest()
         {
@@ -41,6 +42,7 @@ namespace Barbuuuda.Tests
             UserService = new UserService(null, PostgreContext, null, null);
             ExecutorService = new ExecutorService(null, PostgreContext, UserService);
             PaginationService = new PaginationService(PostgreContext, UserService);
+            TaskService = new TaskService(ApplicationDbContext, PostgreContext, UserService);
         }
     }
 }
