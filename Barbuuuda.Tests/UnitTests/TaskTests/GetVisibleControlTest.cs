@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Barbuuuda.Core.Interfaces;
 using Barbuuuda.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,17 +7,17 @@ using Moq;
 namespace Barbuuuda.Tests.UnitTests.TaskTests
 {
     [TestClass]
-    public class SelectTypesTest : BaseServiceTest
+    public class GetVisibleControlTest : BaseServiceTest
     {
         [TestMethod]
-        public async Task SelectTypesTestAsync()
+        public async Task GetVisibleControlTestAsync()
         {
             var mock = new Mock<ITaskService>();
-            mock.Setup(a => a.GetTypesSelectAsync());
+            mock.Setup(a => a.VisibleControlAsync("По статусу"));
             var controller = new TaskService(ApplicationDbContext, PostgreContext, UserService);
-            var result = await controller.GetTypesSelectAsync();
+            var result = await controller.VisibleControlAsync("По статусу");
 
-            Assert.IsTrue(result.Any());
+            Assert.IsNotNull(result);
         }
     }
 }

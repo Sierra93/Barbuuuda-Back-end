@@ -1474,6 +1474,31 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
+        /// Метод выдаст тип контрола.
+        /// </summary>
+        /// <param name="selectedValue">Выбранное значение.</param>
+        /// <returns>Тип контрола.</returns>
+        public async Task<string> VisibleControlAsync(string selectedValue)
+        {
+            try
+            {
+                // Отобразит нужный контрол в зависимости от значения.
+                return selectedValue switch
+                {
+                    "По статусу" => await Task.FromResult("StatusSelect"),
+                    "По типу" => await Task.FromResult("TypeSelect"),
+                    _ => await Task.FromResult("Тип неизвестен")
+                };
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Метод получит список ставок исполнителей к заданию.
         /// </summary>
         /// <param name="taskId">Id задания.</param>

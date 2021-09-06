@@ -460,6 +460,11 @@ namespace Barbuuuda.Services
                 // Выберет Id текущего исполнителя по его логину.
                 string executorId = await _userService.GetUserIdByLogin(account);
 
+                var codeAuction = await (from st in _postgre.TaskStatuses
+                                         where st.StatusName.Equals(StatusTask.AUCTION)
+                                         select st.StatusCode)
+                    .FirstOrDefaultAsync();
+
                 // Получит список заданий, в которых выбран исполнитель.
                 var invities = await _postgre.Tasks
                     .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode, (t, tc) => new { Tasks = t, ParentTaskCategory = tc })
@@ -471,7 +476,7 @@ namespace Barbuuuda.Services
                         i => i.TaskId,
                         (x, i) => new { ChildUser = x, Invite = i })
                     .Where(c => c.Invite.ExecutorId.Equals(executorId) 
-                                && c.ChildUser.Result.TaskCategory.Tasks.StatusCode.Equals(StatusCode.CODE_AUCTION))
+                                && c.ChildUser.Result.TaskCategory.Tasks.StatusCode.Equals(codeAuction))
                     .Select(res => new
                     {
                         res.ChildUser.Result.TaskCategory.Tasks.TaskId,
@@ -774,6 +779,11 @@ namespace Barbuuuda.Services
                     throw new NotFoundUserException(account);
                 }
 
+                var codeWork = await (from st in _postgre.TaskStatuses
+                                      where st.StatusName.Equals(StatusTask.IN_WORK)
+                                      select st.StatusCode)
+                    .FirstOrDefaultAsync();
+
                 var tasks = await _postgre.Tasks
                     .Join(_postgre.TaskCategories, t => t.CategoryCode, tc => tc.CategoryCode,
                         (t, tc) => new {Tasks = t, ParentTaskCategory = tc})
@@ -786,7 +796,7 @@ namespace Barbuuuda.Services
                         i => i.TaskId,
                         (x, i) => new {ChildUser = x, Invite = i})
                     .Where(c => c.Invite.IsAccept.Equals(true)
-                                && c.ChildUser.TaskStatus.StatusCode.Equals(StatusCode.CODE_WORK)
+                                && c.ChildUser.TaskStatus.StatusCode.Equals(codeWork)
                                 && c.ChildUser.Result.TaskCategory.Tasks.ExecutorId.Equals(executorId)
                                 && c.ChildUser.Result.TaskCategory.Tasks.IsPay.Equals(true))
                     .Select(res => new

@@ -182,5 +182,12 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <returns>Список типов заданий.</returns>
         Task<IEnumerable<TaskTypeOutput>> GetTypesSelectAsync();
+
+        /// <summary>
+        /// Метод выдаст тип контрола.
+        /// </summary>
+        /// <param name="selectedValue">Выбранное значение.</param>
+        /// <returns>Тип контрола.</returns>
+        Task<string> VisibleControlAsync(string selectedValue);
     }
 }

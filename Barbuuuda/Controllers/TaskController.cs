@@ -312,6 +312,7 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <returns>Список статусов.</returns>
         [HttpPost, Route("get-filter-statuses-select")]
+        [ProducesResponseType(200, Type = typeof(TaskStatusOutput))]
         public async Task<IActionResult> GetStatusesSelectAsync()
         {
             var result = await _taskService.GetStatusesSelectAsync();
@@ -324,11 +325,26 @@ namespace Barbuuuda.Controllers
         /// </summary>
         /// <returns>Список типов заданий.</returns>
         [HttpPost, Route("get-filter-types-select")]
+        [ProducesResponseType(200, Type = typeof(TaskTypeOutput))]
         public async Task<IActionResult> GetTypesSelectAsync()
         {
             var result = await _taskService.GetTypesSelectAsync();
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Метод выдаст тип контрола.
+        /// </summary>
+        /// <param name="controlVisibleInput">Входная модель.</param>
+        /// <returns>Тип контрола.</returns>
+        [HttpPost, Route("visible-control")]
+        [ProducesResponseType(200, Type = typeof(string))]
+        public async Task<IActionResult> VisibleControlByCodeAsync([FromBody] ControlVisibleInput controlVisibleInput)
+        {
+            var type = await _taskService.VisibleControlAsync(controlVisibleInput.SelectedValue);
+
+            return Ok(type);
         }
     }
 }
