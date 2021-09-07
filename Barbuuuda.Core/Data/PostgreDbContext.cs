@@ -138,7 +138,7 @@ namespace Barbuuuda.Core.Data
 
         /// <summary>
         /// Таблица контрола селекта фильтрации заданий.
-        /// </summary>
+        /// </summary> 
         public DbSet<ControlFilterEntity> ControlFilters { get; set; }
 
         /// <summary>
