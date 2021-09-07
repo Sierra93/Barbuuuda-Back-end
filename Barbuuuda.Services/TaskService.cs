@@ -1478,17 +1478,22 @@ namespace Barbuuuda.Services
         /// </summary>
         /// <param name="selectedValue">Выбранное значение.</param>
         /// <returns>Тип контрола.</returns>
-        public async Task<string> VisibleControlAsync(string selectedValue)
+        public async Task<ControlVisibleOutput> VisibleControlAsync(string selectedValue)
         {
             try
             {
                 // Отобразит нужный контрол в зависимости от значения.
-                return selectedValue switch
+                if (selectedValue.Equals("По статусу"))
                 {
-                    "По статусу" => await Task.FromResult("StatusSelect"),
-                    "По типу" => await Task.FromResult("TypeSelect"),
-                    _ => await Task.FromResult("Тип неизвестен")
-                };
+                    return await Task.FromResult(new ControlVisibleOutput() { ControlType = "StatusSelect" });
+                }
+
+                if (selectedValue.Equals("По типу"))
+                {
+                    return await Task.FromResult(new ControlVisibleOutput() { ControlType = "TypeSelect" });
+                }
+
+                return await Task.FromResult(new ControlVisibleOutput() { ControlType = "Тип неизвестен" });
             }
 
             catch (Exception e)

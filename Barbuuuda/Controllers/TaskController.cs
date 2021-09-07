@@ -339,7 +339,7 @@ namespace Barbuuuda.Controllers
         /// <param name="controlVisibleInput">Входная модель.</param>
         /// <returns>Тип контрола.</returns>
         [HttpPost, Route("visible-control")]
-        [ProducesResponseType(200, Type = typeof(string))]
+        [ProducesResponseType(200, Type = typeof(ControlVisibleOutput))]
         public async Task<IActionResult> VisibleControlByCodeAsync([FromBody] ControlVisibleInput controlVisibleInput)
         {
             var type = await _taskService.VisibleControlAsync(controlVisibleInput.SelectedValue);

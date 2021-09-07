@@ -188,6 +188,6 @@ namespace Barbuuuda.Core.Interfaces
         /// </summary>
         /// <param name="selectedValue">Выбранное значение.</param>
         /// <returns>Тип контрола.</returns>
-        Task<string> VisibleControlAsync(string selectedValue);
+        Task<ControlVisibleOutput> VisibleControlAsync(string selectedValue);
     }
 }
