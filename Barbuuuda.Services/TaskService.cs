@@ -1415,7 +1415,7 @@ namespace Barbuuuda.Services
         {
             try
             {
-                var statuses = await (from st in _postgre.TaskStatuses
+                var statuses = await (from st in _postgre.TaskStatuses 
                                       where new[] { StatusTask.PERECHET, StatusTask.AUCTION }.Contains(st.StatusName)
                                       select new TaskStatusOutput
                                       {
