@@ -38,5 +38,11 @@ namespace Barbuuuda.Models.Entities.Knowlege
         /// </summary>
         [Column("CategoryMainTitle", TypeName = "varchar(200)")]
         public string CategoryMainTitle { get; set; }
+
+        /// <summary>
+        /// Код категории.
+        /// </summary>
+        [Column("CategoryCode", TypeName = "varchar(150)")]
+        public string CategoryCode { get; set; }
     }
 }

@@ -62,7 +62,7 @@ namespace Barbuuuda.Services
         public async Task<IEnumerable<PopularArticleEntity>> GetPopularArticlesAsync()
         {
             try
-            {            
+            {
                 return await _postgre.PopularArticles
                     .OrderByDescending(a => a.HelpfulCount)
                     .ToListAsync();
@@ -74,6 +74,26 @@ namespace Barbuuuda.Services
             }
         }
 
+        /// <summary>
+        /// Метод выгружает список статей определенной категории.
+        /// </summary>
+        /// <param name="categoryCode">Код категории.</param>
+        /// <returns>Список статей определённой категории.</returns>
+        public async Task<IEnumerable<KnowlegeArticleEntity>> GetArticlesByCategoryCode(string categoryCode)
+        {
+            try
+            {
+                return await _postgre.KnowlegeArticles
+                .Include(u => u.Category)
+                .Where(u => u.Category.CategoryCode == categoryCode)
+                .ToListAsync();
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message.ToString());
+            }            
+        }
     }
 
 }
