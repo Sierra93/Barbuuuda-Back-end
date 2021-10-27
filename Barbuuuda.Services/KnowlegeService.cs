@@ -56,15 +56,16 @@ namespace Barbuuuda.Services
         }
 
         /// <summary>
-        /// Метод выгружает список популярных статей.
+        /// Метод выгружает список популярных статей в порядке убывания HelpfulCount.
         /// </summary>  
-        /// <returns>Список статей.</returns>
+        /// <returns>Список популярных статей.</returns>
         public async Task<IEnumerable<PopularArticleEntity>> GetPopularArticlesAsync()
         {
             try
-            {
-                var arcticles = _postgre.PopularArticles.OrderByDescending(a => a.HelpfulCount);              
-                return await arcticles .ToListAsync();
+            {            
+                return await _postgre.PopularArticles
+                    .OrderByDescending(a => a.HelpfulCount)
+                    .ToListAsync();
             }
 
             catch (Exception ex)
