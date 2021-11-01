@@ -1,11 +1,16 @@
 ﻿using Autofac;
+using Barbuuuda.Core.Attributes;
 using Barbuuuda.Core.Data;
 using Barbuuuda.Core.Interfaces;
 
 namespace Barbuuuda.Services.AutofacModules
 {
-    //[CommonModule]
-    public sealed class ServicesModule
+
+    /// <summary>
+    /// Класс регистрации сервисов автофака.
+    /// </summary>
+    [CommonModule]
+    public sealed class CommonServicesModule : Module
     {
         public static void InitModules(ContainerBuilder builder)
         {

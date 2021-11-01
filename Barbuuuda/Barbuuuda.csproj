@@ -8,6 +8,9 @@
     <FileVersion>0.2.5</FileVersion>
     <Description>Barbuuuda - онлайн-сервис удаленной работы.</Description>
     <Authors>Barbuuuda</Authors>
+   <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile></DocumentationFile>

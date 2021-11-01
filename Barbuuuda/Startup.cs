@@ -7,12 +7,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Barbuuuda.Services.Utils;
+using Barbuuuda.Core.Utils;
 using Microsoft.OpenApi.Models;
 
 namespace Barbuuuda
@@ -36,13 +35,7 @@ namespace Barbuuuda
 
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
             {
-                //builder.AllowAnyMethod()
-                //    .AllowAnyHeader()
-                //    .WithOrigins("*")
-                //    .WithMethods("*")
-                //    .WithHeaders("*")
-                //.DisallowCredentials();
-                builder.WithOrigins("http://localhost:4200", "http://localhost:4200/", "https://barbuuuda.ru", "https://barbuuuda.ru/")
+                builder.WithOrigins("http://localhost:4200", "https://barbuuuda.ru")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
@@ -115,34 +108,21 @@ namespace Barbuuuda
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCors("ApiCorsPolicy");
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
+            app.UseDeveloperExceptionPage();
             app.UseStaticFiles();
-
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthentication();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-
             app.UseSwagger();
-
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Barbuuuda API");
             });
-
             app.UseEndpoints(endpoints =>
             {
                 //endpoints.MapHub<ChatHub>("/chat");
