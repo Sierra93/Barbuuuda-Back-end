@@ -186,29 +186,29 @@ namespace Barbuuuda.Services
             try
             {
                 var aTasks = await (from tasks in _postgre.Tasks
-                              join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
-                              join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
-                              join users in _postgre.Users on tasks.OwnerId equals users.Id
-                              where statuses.StatusName.Equals(StatusTask.AUCTION)
-                              select new
-                              {
-                                  tasks.CategoryCode,
-                                  tasks.CountOffers,
-                                  tasks.CountViews,
-                                  tasks.OwnerId,
-                                  tasks.SpecCode,
-                                  categories.CategoryName,
-                                  tasks.StatusCode,
-                                  statuses.StatusName,
-                                  taskBegda = string.Format("{0:f}", tasks.TaskBegda),
-                                  taskEndda = string.Format("{0:f}", tasks.TaskEndda),
-                                  tasks.TaskTitle,
-                                  tasks.TaskDetail,
-                                  tasks.TaskId,
-                                  taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
-                                  tasks.TypeCode,
-                                  users.UserName
-                              })
+                                    join categories in _postgre.TaskCategories on tasks.CategoryCode equals categories.CategoryCode
+                                    join statuses in _postgre.TaskStatuses on tasks.StatusCode equals statuses.StatusCode
+                                    join users in _postgre.Users on tasks.OwnerId equals users.Id
+                                    where statuses.StatusName.Equals(StatusTask.AUCTION)
+                                    select new
+                                    {
+                                        tasks.CategoryCode,
+                                        tasks.CountOffers,
+                                        tasks.CountViews,
+                                        tasks.OwnerId,
+                                        tasks.SpecCode,
+                                        categories.CategoryName,
+                                        tasks.StatusCode,
+                                        statuses.StatusName,
+                                        taskBegda = string.Format("{0:f}", tasks.TaskBegda),
+                                        taskEndda = string.Format("{0:f}", tasks.TaskEndda),
+                                        tasks.TaskTitle,
+                                        tasks.TaskDetail,
+                                        tasks.TaskId,
+                                        taskPrice = string.Format("{0:0,0}", tasks.TaskPrice),
+                                        tasks.TypeCode,
+                                        users.UserName
+                                    })
                           .OrderBy(o => o.TaskId)
                           .ToListAsync();
                 IEnumerable aReverseTasks = ExtensionService.Reverse(aTasks).Take(5);
