@@ -9,7 +9,7 @@ using Module = Autofac.Module;
 
 namespace Barbuuuda.Core.Utils
 {
-    public static class AutoFac
+    public static class AutoFac 
     {
         private static ContainerBuilder _builder;
         private static IContainer _container;
